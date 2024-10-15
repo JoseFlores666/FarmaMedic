@@ -1,7 +1,7 @@
-import { useAuth } from '../../context/useAuth';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './Navbar.css';
+import { useAuth } from '../../../context/useAuth';
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

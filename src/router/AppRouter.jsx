@@ -1,20 +1,19 @@
 import { Route, Routes } from 'react-router-dom';
 import { PrivateRoute } from './PrivateRoute';
-import { Login, About, Contact, Home, Services } from '../components/pages';
-import { Register } from '../components/pages/Register';
-import Footer from '../components/pages/Footer';
+import Footer from '../components/Layout/Footer/Footer';
+import { Login, About, Contact, Home, Services, Register } from '../pages';
+import OTPInput from '../components/OTP/OTPInput';
+import { ForgotPassword } from '../components/ForgotPassword';
 export const AppRouter = () => {
 	return (
 		<>
 			<Routes>
 				<Route path='/' element={<Login />} />
-
 				<Route path='/login' element={<Login />} />
-
 				<Route path='/register' element={<Register/>} />
 				<Route path='/footer' element={<Footer />} />
-
-
+				<Route path='/otpinput' element={<OTPInput />} />
+				<Route path='/forgotpassword' element={<ForgotPassword />} />
 				<Route
 					path='/home'
 					element={

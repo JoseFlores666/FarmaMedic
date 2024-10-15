@@ -1,6 +1,4 @@
-// src/Api/apiService.js
-
-const API_URL = 'http://localhost:4000/api'; // URL de tu API
+const API_URL = 'http://localhost:4000/api';
 
 export const loginUser = async (username, password) => {
     const response = await fetch(`${API_URL}/login`, {

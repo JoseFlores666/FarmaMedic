@@ -1,18 +1,14 @@
-import Footer from "./components/pages/Footer";
-import { Navbar } from "./components/pages/Navbar";
+import { Navbar } from "./components/Layout/Navbar";
 import { AppRouter } from "./router/AppRouter";
+import Footer from "./components/Layout/Footer/Footer";
 
 function App() {
   return (
-    <div>
+    <>
       <Navbar />
-
       <AppRouter />
-
       <Footer />
-
-    </div>
-
+    </>
   )
 }
 export default App;
