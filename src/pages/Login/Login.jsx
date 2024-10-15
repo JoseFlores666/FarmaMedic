@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useForm } from '../../hook/useForm';
 import { useAuth } from '../../context/useAuth';
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const { correo, password, onInputChange, onResetForm } = useForm({
     correo: '',
@@ -12,11 +13,11 @@ export const Login = () => {
   });
 
   const handleForgotPassword = () => {
-    navigate('/forgotpassword'); // Navegar a la ruta de recuperación de contraseña
+    navigate('/forgotpassword');
   };
 
   const handleRegister = () => {
-    navigate('/register'); // Navegar a la ruta de registro
+    navigate('/register');
   };
 
   const handleLogin = async (e) => {
@@ -29,7 +30,7 @@ export const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          correo, 
+          correo,
           password,
         }),
       });
@@ -48,6 +49,12 @@ export const Login = () => {
       alert('Error de conexión o credenciales incorrectas');
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="container py-4 h-100">

@@ -4,16 +4,58 @@ import Footer from '../components/Layout/Footer/Footer';
 import { Login, About, Contact, Home, Services, Register } from '../pages';
 import OTPInput from '../components/OTP/OTPInput';
 import { ForgotPassword } from '../components/ForgotPassword';
+import { PublicRoute } from './PublicRoute';
+
 export const AppRouter = () => {
 	return (
 		<>
 			<Routes>
-				<Route path='/' element={<Login />} />
-				<Route path='/login' element={<Login />} />
-				<Route path='/register' element={<Register/>} />
-				<Route path='/footer' element={<Footer />} />
-				<Route path='/otpinput' element={<OTPInput />} />
-				<Route path='/forgotpassword' element={<ForgotPassword />} />
+				<Route
+					path='/'
+					element={
+						<PublicRoute>
+							<Login />
+						</PublicRoute>
+					}
+				/>
+				<Route
+					path='/login'
+					element={
+						<PublicRoute>
+							<Login />
+						</PublicRoute>
+					}
+				/>
+				<Route
+					path='/register'
+					element={
+						<PublicRoute>
+							<Register />
+						</PublicRoute>
+					}
+				/>
+				<Route
+					path='/footer'
+					element={
+						<PublicRoute>
+							<Footer />
+						</PublicRoute>
+					} />
+				<Route
+					path='/otpinput'
+					element={
+						<PublicRoute>
+							<OTPInput />
+						</PublicRoute>
+					} />
+
+				<Route
+					path='/forgotpassword'
+					element={
+						<PublicRoute>
+							<ForgotPassword />
+						</PublicRoute>
+					} />
 				<Route
 					path='/home'
 					element={

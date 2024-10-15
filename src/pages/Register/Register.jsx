@@ -6,7 +6,7 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
 import emailjs from 'emailjs-com';
-import { nanoid } from 'nanoid'; 
+import { nanoid } from 'nanoid';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -23,28 +23,28 @@ export const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-    
+
         if (password !== confirmPassword) {
             alert("Las contraseñas no coinciden");
             return;
         }
-    
+
         if (containsCommonPatterns(password)) {
             alert("La contraseña contiene patrones comunes como '12345' o 'password'.");
             return;
         }
-    
+
         const isCompromised = await checkPasswordCompromise(password);
         if (isCompromised) {
             alert("La contraseña ha sido comprometida. Por favor, elige una diferente.");
             return;
         }
-    
+
         if (!captchaValue) {
             alert("Por favor, verifica que no eres un robot.");
             return;
         }
-    
+
         const verificationToken = nanoid(6);
 
         const sendVerificationEmail = (token, correo) => {
@@ -54,7 +54,7 @@ export const Register = () => {
                 email: correo,
                 company_name: 'FarmaMedic'
             };
-    
+
             emailjs.send(
                 'service_v6e3kyv',
                 'template_l1efa7s',
@@ -66,7 +66,7 @@ export const Register = () => {
                 console.error('Error al enviar correo de verificación:', error);
             });
         };
-    
+
         try {
             const response = await fetch('http://localhost:4000/api/register', {
                 method: 'POST',
@@ -81,10 +81,10 @@ export const Register = () => {
                     correo,
                     password,
                     captcha: captchaValue,
-                    verification_token: verificationToken 
+                    verification_token: verificationToken
                 }),
             });
-    
+
             if (response.ok) {
                 sendVerificationEmail(verificationToken, correo);
                 alert('Registro exitoso! Un código de verificación ha sido enviado a tu correo.');
