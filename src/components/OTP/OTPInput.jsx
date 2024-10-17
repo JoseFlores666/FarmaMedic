@@ -1,12 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OtpInput from 'react-otp-input'; 
 
 const OTPInput = () => {
   const [otp, setOtp] = useState('');
+  const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
   const navigate = useNavigate();
   const location = useLocation();
-  const { correo } = location.state || {}; 
+  const { correo } = location.state || {};
+
+  // Obtener el token CSRF desde el backend
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/api/csrf-token', {
+          credentials: 'include' // Incluir credenciales para manejar cookies
+        });
+        const data = await response.json();
+        setCsrfToken(data.csrfToken); // Guardar el token CSRF
+      } catch (error) {
+        console.error('Error obteniendo el token CSRF:', error);
+      }
+    };
+    fetchCsrfToken();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +33,13 @@ const OTPInput = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken, // Incluir el token CSRF en el encabezado
         },
         body: JSON.stringify({
           correo: correo,
-          token: otp, 
+          token: otp,
         }),
+        credentials: 'include' // Incluir credenciales para manejar cookies
       });
 
       if (response.ok) {
@@ -47,7 +66,7 @@ const OTPInput = () => {
           <div className="card bg-white mb-5 mt-5 border-0" style={{ boxShadow: '0 12px 15px rgba(0, 0, 0, 0.02)' }}>
             <div className="card-body p-5 text-center">
               <h4>Verificar</h4>
-              <p>Tu codigo de verificación se a enviado al correo {correo}</p>
+              <p>Tu código de verificación se ha enviado al correo {correo}</p>
 
               <div className='d-flex flex-column align-items-center justify-content-center'>
                 <form onSubmit={handleSubmit} className="otp-field mb-4 d-flex flex-column align-items-center">
@@ -77,7 +96,7 @@ const OTPInput = () => {
               </div>
 
               <p className="resend text-muted mb-0">
-                No recibiste el codigo? <a href="#" onClick={handleResend}>Reenviar codigo</a>
+                No recibiste el código? <a href="#" onClick={handleResend}>Reenviar código</a>
               </p>
             </div>
           </div>

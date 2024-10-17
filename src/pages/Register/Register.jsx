@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../../hook/useForm';
 import { checkPasswordCompromise, containsCommonPatterns } from '../../services/passwordService';
@@ -11,6 +11,7 @@ import { nanoid } from 'nanoid';
 export const Register = () => {
     const navigate = useNavigate();
     const [captchaValue, setCaptchaValue] = useState(null);
+    const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
     const { nombre, apellidos, edad, telefono, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         nombre: '',
         apellidos: '',
@@ -20,6 +21,22 @@ export const Register = () => {
         password: '',
         confirmPassword: '',
     });
+
+    useEffect(() => {
+        // Obtener el token CSRF desde el backend
+        const fetchCsrfToken = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/api/csrf-token', {
+                    credentials: 'include', // Incluir cookies en la solicitud
+                });
+                const data = await response.json();
+                setCsrfToken(data.csrfToken); // Guardar el token CSRF
+            } catch (error) {
+                console.error('Error obteniendo el token CSRF:', error);
+            }
+        };
+        fetchCsrfToken();
+    }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -72,7 +89,9 @@ export const Register = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,  // Enviar el token CSRF en el encabezado
                 },
+                credentials: 'include', // Asegura que se envíen cookies (incluidas las cookies de sesión y CSRF)
                 body: JSON.stringify({
                     nombre,
                     apellidos,

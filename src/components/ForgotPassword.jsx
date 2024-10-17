@@ -1,23 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from '../hook/useForm';
 import { nanoid } from 'nanoid';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
-import OtpInput from 'react-otp-input'; // Asegúrate de tener instalada esta librería
-import PasswordStrengthBar from 'react-password-strength-bar'; // Asegúrate de tener instalada esta librería
-import PasswordChecklist from 'react-password-checklist'; // Asegúrate de tener instalada esta librería
+import OtpInput from 'react-otp-input';
+import PasswordStrengthBar from 'react-password-strength-bar';
+import PasswordChecklist from 'react-password-checklist';
 
 export const ForgotPassword = () => {
     const navigate = useNavigate();
     const [message, setMessage] = useState('');
-    const [step, setStep] = useState('request'); // Inicialmente, estamos en la solicitud
-    const [otp, setOtp] = useState(''); // Almacena el token ingresado por el usuario
+    const [step, setStep] = useState('request');
+    const [otp, setOtp] = useState('');
+    const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
     const { correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         correo: '',
         password: '',
         confirmPassword: '',
     });
 
+    // Obtener el token CSRF al cargar el componente
+    useEffect(() => {
+        const fetchCsrfToken = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/api/csrf-token', {
+                    credentials: 'include', // Enviar cookies con la solicitud
+                });
+                const data = await response.json();
+                setCsrfToken(data.csrfToken); // Guardar el token CSRF
+            } catch (error) {
+                console.error('Error obteniendo el token CSRF:', error);
+            }
+        };
+        fetchCsrfToken();
+    }, []);
+
+    // Enviar solicitud para el token de recuperación
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -29,7 +47,9 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
                 },
+                credentials: 'include', // Enviar cookies con la solicitud
                 body: JSON.stringify({
                     correo,
                     token, // Guarda el token generado en el servidor
@@ -38,7 +58,7 @@ export const ForgotPassword = () => {
 
             if (response.ok) {
                 sendVerificationEmail(token, correo);
-                setStep('verify'); // Cambia el paso a verificación
+                setStep('verify'); // Cambiar a la pantalla de verificación
                 onResetForm();
             } else {
                 setMessage('Error al procesar la solicitud.');
@@ -49,6 +69,7 @@ export const ForgotPassword = () => {
         }
     };
 
+    // Enviar correo electrónico de verificación
     const sendVerificationEmail = (token, correo) => {
         const templateParams = {
             verification_token: token,
@@ -72,6 +93,7 @@ export const ForgotPassword = () => {
             });
     };
 
+    // Verificar el token y resetear la contraseña
     const handleResetPassword = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -81,9 +103,11 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
                 },
+                credentials: 'include', // Enviar cookies con la solicitud
                 body: JSON.stringify({
-                    token: otp,
+                    token: otp, // Token ingresado por el usuario
                     correo,
                 }),
             });
@@ -98,10 +122,12 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
                 },
+                credentials: 'include', // Enviar cookies con la solicitud
                 body: JSON.stringify({
-                    token: otp,
-                    password,
+                    token: otp, // Token de verificación
+                    password, // Nueva contraseña
                 }),
             });
 
