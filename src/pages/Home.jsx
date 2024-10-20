@@ -5,7 +5,6 @@ import './Home.css';
 export const Home = () => {
   return (
     <MDBContainer fluid className="home-container">
-    {/* Hero Section */}
 <section className="hero-section">
   <div className="container-fluid">
     <MDBRow className="d-flex align-items-center text-center text-md-start">
@@ -19,7 +18,7 @@ export const Home = () => {
       </MDBCol>
       <MDBCol md="6" className="text-center">
         <img
-          src="/src/assets/clinica.jpg" // Reemplaza con una imagen de alta calidad.
+          src="/src/assets/clinica.jpg" 
           alt="Médicos trabajando"
           className="img-fluid hero-image"
         />
@@ -28,8 +27,6 @@ export const Home = () => {
   </div>
 </section>
 
-
-      {/* Sección de especialidades */}
       <section className="specialties-section py-5">
         <h2 className="text-center mb-4">Nuestras Especialidades</h2>
         <MDBRow className="d-flex justify-content-center">
@@ -54,7 +51,6 @@ export const Home = () => {
         </MDBRow>
       </section>
 
-      {/* Contacto */}
       <section className="contact-section text-center py-5">
         <h2>Contáctanos</h2>
         <p>Nos encantaría saber de ti. Llámanos o escríbenos para más información.</p>

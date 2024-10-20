@@ -12,22 +12,21 @@ export const ForgotPassword = () => {
     const [message, setMessage] = useState('');
     const [step, setStep] = useState('request');
     const [otp, setOtp] = useState('');
-    const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
+    const [csrfToken, setCsrfToken] = useState(''); 
     const { correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         correo: '',
         password: '',
         confirmPassword: '',
     });
 
-    // Obtener el token CSRF al cargar el componente
     useEffect(() => {
         const fetchCsrfToken = async () => {
             try {
                 const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include', // Enviar cookies con la solicitud
+                    credentials: 'include', 
                 });
                 const data = await response.json();
-                setCsrfToken(data.csrfToken); // Guardar el token CSRF
+                setCsrfToken(data.csrfToken); 
             } catch (error) {
                 console.error('Error obteniendo el token CSRF:', error);
             }
@@ -35,30 +34,29 @@ export const ForgotPassword = () => {
         fetchCsrfToken();
     }, []);
 
-    // Enviar solicitud para el token de recuperación
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setMessage('');
 
-        const token = nanoid(6); // Genera un token de verificación
+        const token = nanoid(6); 
 
         try {
             const response = await fetch('http://localhost:4000/api/storetoken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
+                    'X-CSRF-Token': csrfToken, 
                 },
-                credentials: 'include', // Enviar cookies con la solicitud
+                credentials: 'include', 
                 body: JSON.stringify({
                     correo,
-                    token, // Guarda el token generado en el servidor
+                    token, 
                 }),
             });
 
             if (response.ok) {
                 sendVerificationEmail(token, correo);
-                setStep('verify'); // Cambiar a la pantalla de verificación
+                setStep('verify');
                 onResetForm();
             } else {
                 setMessage('Error al procesar la solicitud.');
@@ -69,7 +67,6 @@ export const ForgotPassword = () => {
         }
     };
 
-    // Enviar correo electrónico de verificación
     const sendVerificationEmail = (token, correo) => {
         const templateParams = {
             verification_token: token,
@@ -93,7 +90,6 @@ export const ForgotPassword = () => {
             });
     };
 
-    // Verificar el token y resetear la contraseña
     const handleResetPassword = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -103,11 +99,11 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
+                    'X-CSRF-Token': csrfToken,
                 },
-                credentials: 'include', // Enviar cookies con la solicitud
+                credentials: 'include', 
                 body: JSON.stringify({
-                    token: otp, // Token ingresado por el usuario
+                    token: otp,
                     correo,
                 }),
             });
@@ -122,12 +118,12 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken, // Agregar el token CSRF
+                    'X-CSRF-Token': csrfToken, 
                 },
-                credentials: 'include', // Enviar cookies con la solicitud
+                credentials: 'include', 
                 body: JSON.stringify({
-                    token: otp, // Token de verificación
-                    password, // Nueva contraseña
+                    token: otp, 
+                    password,
                 }),
             });
 

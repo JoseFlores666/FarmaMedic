@@ -7,12 +7,18 @@ import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
 import emailjs from 'emailjs-com';
 import { nanoid } from 'nanoid';
+import Input from '../../components/Input';
+import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validatePregunta, validateGenero } from '../../validations/validacionRegistro';
 
 export const Register = () => {
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
+
     const [captchaValue, setCaptchaValue] = useState(null);
-    const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
-    const { nombre, apellidos, edad, telefono, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
+    const [csrfToken, setCsrfToken] = useState('');
+    const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, pregunta, respuestaSecreta, onInputChange, onResetForm } = useForm({
+        usuario: '',
+        genero: '',
         nombre: '',
         apellidos: '',
         edad: '',
@@ -20,17 +26,20 @@ export const Register = () => {
         correo: '',
         password: '',
         confirmPassword: '',
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        pregunta: '',
+        respuestaSecreta: ''
     });
 
     useEffect(() => {
-        // Obtener el token CSRF desde el backend
         const fetchCsrfToken = async () => {
             try {
                 const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include', // Incluir cookies en la solicitud
+                    credentials: 'include',
                 });
                 const data = await response.json();
-                setCsrfToken(data.csrfToken); // Guardar el token CSRF
+                setCsrfToken(data.csrfToken);
             } catch (error) {
                 console.error('Error obteniendo el token CSRF:', error);
             }
@@ -40,27 +49,36 @@ export const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        let newErrors = {};
 
-        if (password !== confirmPassword) {
-            alert("Las contraseñas no coinciden");
-            return;
-        }
+        newErrors.usuario = validateUsuario(usuario);
+        newErrors.nombre = validateNombre(nombre);
+        newErrors.apellidoPaterno = validateApellidoPaterno(apellidoPaterno);
+        newErrors.apellidoMaterno = validateApellidoMaterno(apellidoMaterno);
+        newErrors.edad = validateEdad(edad);
+        newErrors.telefono = validateTelefono(telefono);
+        newErrors.correo = validateCorreo(correo);
+        newErrors.password = validatePassword(password);
+        newErrors.confirmPassword = validateConfirmPassword(password, confirmPassword);
+        newErrors.pregunta = validatePregunta(pregunta);
+        newErrors.genero = validateGenero(genero);
 
         if (containsCommonPatterns(password)) {
-            alert("La contraseña contiene patrones comunes como '12345' o 'password'.");
-            return;
+            newErrors.password = "La contraseña contiene patrones comunes como '12345' o 'password'.";
         }
 
         const isCompromised = await checkPasswordCompromise(password);
         if (isCompromised) {
-            alert("La contraseña ha sido comprometida. Por favor, elige una diferente.");
-            return;
+            newErrors.password = "La contraseña ha sido comprometida. Por favor, elige una diferente.";
         }
 
         if (!captchaValue) {
-            alert("Por favor, verifica que no eres un robot.");
-            return;
+            newErrors.captcha = "Por favor, verifica que no eres un robot.";
         }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
 
         const verificationToken = nanoid(6);
 
@@ -89,12 +107,14 @@ export const Register = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,  // Enviar el token CSRF en el encabezado
+                    'X-CSRF-Token': csrfToken,
                 },
-                credentials: 'include', // Asegura que se envíen cookies (incluidas las cookies de sesión y CSRF)
+                credentials: 'include',
                 body: JSON.stringify({
+                    usuario,
                     nombre,
-                    apellidos,
+                    apellidoMaterno,
+                    apellidoPaterno,
                     edad,
                     telefono,
                     correo,
@@ -107,7 +127,7 @@ export const Register = () => {
             if (response.ok) {
                 sendVerificationEmail(verificationToken, correo);
                 alert('Registro exitoso! Un código de verificación ha sido enviado a tu correo.');
-                navigate('/otpinput', { replace: true, state: { correo } });
+                navigate('/otpInput', { replace: true, state: { correo } });
                 onResetForm();
             } else {
                 const errorMessage = await response.text();
@@ -122,7 +142,7 @@ export const Register = () => {
     return (
         <div className="container py-4 h-100">
             <div className="row d-flex justify-content-center align-items-center h-100">
-                <div className="col col-lg-6">
+                <div className="col col-lg-7">
                     <div className="card" style={{ borderRadius: '1rem' }}>
                         <div className="card-body p-4 p-lg-5 text-black">
                             <form onSubmit={handleRegister}>
@@ -130,86 +150,172 @@ export const Register = () => {
 
                                 <div className="row mb-3">
                                     <div className="col-md-6">
+                                        <label htmlFor="usuario">Usuario:</label>
+                                        <Input
+                                            id="usuario"
+                                            name="usuario"
+                                            value={usuario}
+                                            onChange={onInputChange}
+                                            placeholder={"Introduce tu usuario"}
+                                            min={3}
+                                            max={15}
+                                        />
+                                        {errors.usuario && <div className="text-danger">{errors.usuario}</div>}
+
+                                    </div>
+                                    <div className="col-md-6">
                                         <label htmlFor="nombre">Nombre:</label>
-                                        <input
-                                            type="text"
+                                        <Input
                                             id="nombre"
-                                            className="form-control"
                                             name="nombre"
                                             value={nombre}
                                             onChange={onInputChange}
-                                            required
+                                            placeholder={"Introduce tu nombre"}
                                         />
+                                        {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
+
+                                    </div>
+                                </div>
+
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
+                                        <label htmlFor="apellidoPaterno">Apellido Paterno:</label>
+                                        <Input
+                                            id="apellidoPaterno"
+                                            name="apellidoPaterno"
+                                            value={apellidoPaterno}
+                                            onChange={onInputChange}
+                                            placeholder={"Apellido paterno"}
+                                        />
+                                        {errors.apellidoPaterno && <div className="text-danger">{errors.apellidoPaterno}</div>}
+
                                     </div>
                                     <div className="col-md-6">
-                                        <label htmlFor="apellidos">Apellidos:</label>
-                                        <input
-                                            type="text"
-                                            id="apellidos"
-                                            className="form-control"
-                                            name="apellidos"
-                                            value={apellidos}
+                                        <label htmlFor="apellidoMaterno">Apellido Materno:</label>
+                                        <Input
+                                            id="apellidoMaterno"
+                                            name="apellidoMaterno"
+                                            value={apellidoMaterno}
                                             onChange={onInputChange}
-                                            required
+                                            placeholder={"Apellido Materno"}
                                         />
+                                        {errors.apellidoMaterno && <div className="text-danger">{errors.apellidoMaterno}</div>}
                                     </div>
                                 </div>
 
                                 <div className="row mb-3">
                                     <div className="col-md-6">
                                         <label htmlFor="edad">Edad:</label>
-                                        <input
+                                        <Input
                                             type="number"
                                             id="edad"
-                                            className="form-control"
                                             name="edad"
                                             value={edad}
                                             onChange={onInputChange}
-                                            required
                                             min={18}
                                             max={100}
+                                            placeholder={"Introduce tu edad"}
                                         />
+                                        {errors.edad && <div className="text-danger">{errors.edad}</div>}
                                     </div>
+
                                     <div className="col-md-6">
-                                        <label htmlFor="telefono">Número de Teléfono:</label>
-                                        <input
-                                            type="text"
+                                        <label htmlFor="telefono">Número de Teléfono/Celular:</label>
+                                        <Input
                                             id="telefono"
-                                            className="form-control"
                                             name="telefono"
                                             value={telefono}
                                             onChange={onInputChange}
-                                            required
+                                            placeholder={"Telefono o Celular"}
                                             maxLength={10}
                                         />
+                                        {errors.telefono && <div className="text-danger">{errors.telefono}</div>}
                                     </div>
                                 </div>
 
+                                <div className="row mb-3">
+                                    <label htmlFor="genero">Género:</label>
+
+                                    <div className="d-flex align-items-center mb-2">
+                                        <div className="form-check me-3">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="genero"
+                                                id="generoMasculino"
+                                                value="Masculino"
+                                                checked={genero === 'Masculino'}
+                                                onChange={onInputChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="generoMasculino">
+                                                Masculino
+                                            </label>
+                                        </div>
+
+                                        <div className="form-check me-3">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="genero"
+                                                id="generoFemenino"
+                                                value="Femenino"
+                                                checked={genero === 'Femenino'}
+                                                onChange={onInputChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="generoFemenino">
+                                                Femenino
+                                            </label>
+                                        </div>
+
+                                        <div className="form-check d-flex align-items-center">
+                                            <input
+                                                className="form-check-input me-2"
+                                                type="radio"
+                                                name="genero"
+                                                id="generoOtro"
+                                                value="Otro"
+                                                checked={genero === 'Otro'}
+                                                onChange={onInputChange}
+                                            />
+                                            <label className="form-check-label me-2" htmlFor="generoOtro">
+                                                Otro:
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className={`form-control ${genero === 'Otro' ? '' : 'd-none'}`}
+                                                placeholder="Especifica"
+                                                onChange={onInputChange}
+                                                name="generoPersonalizado"
+                                            />
+                                        </div>
+                                    </div>
+                                    {errors.genero && <div className="text-danger">{errors.genero}</div>}
+
+                                </div>
+
                                 <div className="form-outline mb-3">
-                                    <label className="form-label" htmlFor="correo">Ingresa tu correo:</label>
-                                    <input
-                                        type="email"
+                                    <label className="form-label" htmlFor="correo">Ingresa tu correo electrónico:</label>
+                                    <Input
                                         id="correo"
-                                        className="form-control"
                                         name="correo"
                                         value={correo}
                                         onChange={onInputChange}
-                                        required
+                                        placeholder={"Introduce tu correo"}
                                     />
+                                    {errors.correo && <div className="text-danger">{errors.correo}</div>}
                                 </div>
 
                                 <div className="form-outline mb-3">
                                     <label className="form-label" htmlFor="password">Ingresa tu contraseña:</label>
-                                    <input
+                                    <Input
                                         type="password"
                                         id="password"
-                                        className="form-control"
                                         name="password"
                                         value={password}
                                         onChange={onInputChange}
-                                        required
                                         minLength={8}
                                         maxLength={50}
+                                        placeholder={"Introduce tu contraseña"}
                                     />
                                     {password && (
                                         <PasswordStrengthBar
@@ -218,6 +324,7 @@ export const Register = () => {
                                             scoreWords={['Muy Corta', 'Corta', 'Bien', 'Fuerte', 'Muy fuerte']}
                                         />
                                     )}
+                                    {errors.password && <div className="text-danger">{errors.password}</div>}
 
                                     {password && (
                                         <PasswordChecklist
@@ -236,17 +343,17 @@ export const Register = () => {
 
                                 <div className="form-outline mb-3">
                                     <label className="form-label" htmlFor="confirmPassword">Repite tu contraseña:</label>
-                                    <input
+                                    <Input
                                         type="password"
                                         id="confirmPassword"
-                                        className="form-control"
                                         name="confirmPassword"
                                         value={confirmPassword}
                                         onChange={onInputChange}
-                                        required
                                         minLength={8}
                                         maxLength={50}
+                                        placeholder={"Repite tu contraseña"}
                                     />
+                                    {errors.confirmPassword && <div className="text-danger">{errors.confirmPassword}</div>}
                                     {password && confirmPassword && (
                                         <PasswordChecklist
                                             rules={["match"]}
@@ -259,11 +366,69 @@ export const Register = () => {
                                     )}
                                 </div>
 
-                                <div className="mb-3 d-flex justify-content-center">
+                                <div className='mb-3'>
+                                    <label className='form-label' htmlFor="respuestaSecreta">Método de recuperación de contraseña:</label>
+                                    <select
+                                        id="miSelect"
+                                        value={pregunta}
+                                        onChange={onInputChange}
+                                        className="form-select"
+                                        name="pregunta"
+                                    >
+                                        <option value="">Selecciona una pregunta</option>
+                                        <option value="1">¿Pregunta 1?</option>
+                                        <option value="2">¿Pregunta 2?</option>
+                                        <option value="3">¿Pregunta 3?</option>
+                                    </select>
+
+                                    {pregunta && (
+                                        <div className='mb-3'>
+                                            <Input
+                                                type="text"
+                                                id="respuestaSecreta"
+                                                name="respuestaSecreta"
+                                                value={respuestaSecreta}
+                                                onChange={onInputChange}
+                                                placeholder={"Solo tú sabrás la respuesta"}
+                                            />
+                                        </div>
+                                    )}
+                                    {errors.pregunta && <div className="text-danger">{errors.pregunta}</div>}
+
+                                </div>
+
+                                <div className="mb-3 d-flex flex-column align-items-center">
                                     <ReCAPTCHA
                                         sitekey="6LfrrmAqAAAAAO2vOQixcHrRZiYkPDOVAExv4MaE"
                                         onChange={(value) => setCaptchaValue(value)}
                                     />
+                                    {errors.captcha && <div className="text-danger mt-2">{errors.captcha}</div>}
+                                </div>
+
+                                <div className="row mb-3">
+                                    <div className="col-md-6 d-flex align-items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="terminos"
+                                            className="me-2"
+                                            required
+                                        />
+                                        <label htmlFor="terminos" className="small text-muted">
+                                            <a href="#!" className="text-muted">Acepto los Términos y Condiciones</a>
+                                        </label>
+                                    </div>
+
+                                    <div className="col-md-6 d-flex align-items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="privacidad"
+                                            className="me-2"
+                                            required
+                                        />
+                                        <label htmlFor="privacidad" className="small text-muted">
+                                            <a href="#!" className="text-muted">Acepto la Política de privacidad</a>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div className="mb-3">
@@ -281,14 +446,6 @@ export const Register = () => {
                                 <p className="small text-muted mb-3">
                                     ¿Ya tienes una cuenta? <a href="#!" style={{ color: 'blue' }}>Inicia sesión aquí</a>
                                 </p>
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <a href="#!" className="small text-muted">Términos de uso</a>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <a href="#!" className="small text-muted">Política de privacidad</a>
-                                    </div>
-                                </div>
                             </form>
                         </div>
                     </div>
