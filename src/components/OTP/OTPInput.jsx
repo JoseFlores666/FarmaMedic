@@ -1,23 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import OtpInput from 'react-otp-input'; 
+import { useLocation } from 'react-router-dom';
+import OtpInput from 'react-otp-input';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const OTPInput = () => {
   const [otp, setOtp] = useState('');
-  const [csrfToken, setCsrfToken] = useState(''); // Estado para el token CSRF
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [csrfToken, setCsrfToken] = useState(''); 
   const location = useLocation();
   const { correo } = location.state || {};
+  const navigate = useNavigate();
 
-  // Obtener el token CSRF desde el backend
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
         const response = await fetch('http://localhost:4000/api/csrf-token', {
-          credentials: 'include' // Incluir credenciales para manejar cookies
+          credentials: 'include',
         });
         const data = await response.json();
-        setCsrfToken(data.csrfToken); // Guardar el token CSRF
+        setCsrfToken(data.csrfToken);
       } catch (error) {
         console.error('Error obteniendo el token CSRF:', error);
       }
@@ -29,34 +31,40 @@ const OTPInput = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:4000/api/verify-email', {
+      const response = await fetch('http://localhost:4000/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken, // Incluir el token CSRF en el encabezado
+          'CSRF-Token': csrfToken,
         },
-        body: JSON.stringify({
-          correo: correo,
-          token: otp,
-        }),
-        credentials: 'include' // Incluir credenciales para manejar cookies
+        credentials: 'include', 
+        body: JSON.stringify({ correo }), 
       });
 
       if (response.ok) {
-        alert('Cuenta verificada con éxito!');
-        navigate('/login', { replace: true });
+        const data = await response.json();
+        Swal.fire({
+          title: '¡Éxito!',
+          text: data.message,
+          icon: 'success',
+          confirmButtonText: 'Aceptar',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
       } else {
-        const errorMessage = await response.text();
-        alert(`Error al verificar el correo: ${errorMessage}`);
+        const errorData = await response.json();
+        setError(errorData.message);
       }
-    } catch (error) {
-      console.error('Error al verificar el correo:', error);
-      alert('Error de conexión al servidor. Inténtalo de nuevo más tarde.');
+    } catch (err) {
+      console.error('Error en la solicitud:', err);
+      setError('Error en la verificación. Inténtalo de nuevo.');
     }
   };
 
   const handleResend = () => {
-    console.log('Resend Token');
+    console.log('Reenviar código');
   };
 
   return (
@@ -68,7 +76,7 @@ const OTPInput = () => {
               <h4>Verificar</h4>
               <p>Tu código de verificación se ha enviado al correo {correo}</p>
 
-              <div className='d-flex flex-column align-items-center justify-content-center'>
+              <div className="d-flex flex-column align-items-center justify-content-center">
                 <form onSubmit={handleSubmit} className="otp-field mb-4 d-flex flex-column align-items-center">
                   <OtpInput
                     value={otp}
@@ -84,7 +92,7 @@ const OTPInput = () => {
                           textAlign: 'center',
                           margin: '0 5px',
                           border: '1px solid #ccc',
-                          borderRadius: '4px'
+                          borderRadius: '4px',
                         }}
                       />
                     )}
@@ -93,6 +101,7 @@ const OTPInput = () => {
                     Verify
                   </button>
                 </form>
+                {error && <p className="text-danger">{error}</p>}
               </div>
 
               <p className="resend text-muted mb-0">

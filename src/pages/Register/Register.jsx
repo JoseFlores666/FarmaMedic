@@ -5,10 +5,9 @@ import { checkPasswordCompromise, containsCommonPatterns } from '../../services/
 import PasswordStrengthBar from 'react-password-strength-bar';
 import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
-import emailjs from 'emailjs-com';
-import { nanoid } from 'nanoid';
 import Input from '../../components/Input';
 import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validatePregunta, validateGenero } from '../../validations/validacionRegistro';
+import Swal from 'sweetalert2';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -20,7 +19,6 @@ export const Register = () => {
         usuario: '',
         genero: '',
         nombre: '',
-        apellidos: '',
         edad: '',
         telefono: '',
         correo: '',
@@ -78,29 +76,9 @@ export const Register = () => {
 
         setErrors(newErrors);
 
-        if (Object.keys(newErrors).length > 0) return;
-
-        const verificationToken = nanoid(6);
-
-        const sendVerificationEmail = (token, correo) => {
-            const templateParams = {
-                to_name: nombre,
-                verification_token: token,
-                email: correo,
-                company_name: 'FarmaMedic'
-            };
-
-            emailjs.send(
-                'service_v6e3kyv',
-                'template_l1efa7s',
-                templateParams,
-                'sRaz79F3ov2M-1wak'
-            ).then((response) => {
-                console.log('Correo enviado exitosamente', response.status, response.text);
-            }).catch((error) => {
-                console.error('Error al enviar correo de verificación:', error);
-            });
-        };
+        if (Object.keys(newErrors).some((key) => newErrors[key])) {
+            return;
+        }
 
         try {
             const response = await fetch('http://localhost:4000/api/register', {
@@ -113,21 +91,33 @@ export const Register = () => {
                 body: JSON.stringify({
                     usuario,
                     nombre,
-                    apellidoMaterno,
                     apellidoPaterno,
+                    apellidoMaterno,
                     edad,
                     telefono,
+                    genero,
                     correo,
                     password,
+                    pregunta,
+                    respuestaSecreta,
                     captcha: captchaValue,
-                    verification_token: verificationToken
                 }),
             });
 
             if (response.ok) {
-                sendVerificationEmail(verificationToken, correo);
-                alert('Registro exitoso! Un código de verificación ha sido enviado a tu correo.');
-                navigate('/otpInput', { replace: true, state: { correo } });
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Registro exitoso. Un codigo de verificacion de ha enviado a tu correo.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                });
+                navigate('/otpInput', {
+                    state: {
+                        replace: true,
+                        correo: correo
+                    },
+                    replace: true
+                });
                 onResetForm();
             } else {
                 const errorMessage = await response.text();
@@ -440,11 +430,11 @@ export const Register = () => {
                                     </button>
                                 </div>
 
-                                <p className="small text-muted mb-3">
-                                    ¿Olvidaste tu contraseña? <a href="#!" style={{ color: 'blue' }}>Recupérala aquí</a>
+                                <p className='small text-muted mb-3'>
+                                    ¿Olvidaste tu contraseña? <a href="http://localhost:5173/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
                                 </p>
-                                <p className="small text-muted mb-3">
-                                    ¿Ya tienes una cuenta? <a href="#!" style={{ color: 'blue' }}>Inicia sesión aquí</a>
+                                <p className="small text-muted mb-3" style={{ color: '#393f81' }}>
+                                    ¿Ya tienes una cuenta? <a href="http://localhost:5173/login" style={{ color: 'blue' }}>Inicia sesion aquí</a>
                                 </p>
                             </form>
                         </div>
