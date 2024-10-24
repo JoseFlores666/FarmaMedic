@@ -6,7 +6,7 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
 import Input from '../../components/Input';
-import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validatePregunta, validateGenero } from '../../validations/validacionRegistro';
+import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validateGenero } from '../../validations/validacionRegistro';
 import Swal from 'sweetalert2';
 
 export const Register = () => {
@@ -15,7 +15,7 @@ export const Register = () => {
 
     const [captchaValue, setCaptchaValue] = useState(null);
     const [csrfToken, setCsrfToken] = useState('');
-    const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, pregunta, respuestaSecreta, onInputChange, onResetForm } = useForm({
+    const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
         genero: '',
         nombre: '',
@@ -26,8 +26,6 @@ export const Register = () => {
         confirmPassword: '',
         apellidoPaterno: '',
         apellidoMaterno: '',
-        pregunta: '',
-        respuestaSecreta: ''
     });
 
     useEffect(() => {
@@ -58,7 +56,6 @@ export const Register = () => {
         newErrors.correo = validateCorreo(correo);
         newErrors.password = validatePassword(password);
         newErrors.confirmPassword = validateConfirmPassword(password, confirmPassword);
-        newErrors.pregunta = validatePregunta(pregunta);
         newErrors.genero = validateGenero(genero);
 
         if (containsCommonPatterns(password)) {
@@ -98,8 +95,6 @@ export const Register = () => {
                     genero,
                     correo,
                     password,
-                    pregunta,
-                    respuestaSecreta,
                     captcha: captchaValue,
                 }),
             });
@@ -132,12 +127,11 @@ export const Register = () => {
     return (
         <div className="container py-4 h-100">
             <div className="row d-flex justify-content-center align-items-center h-100">
-                <div className="col col-lg-7">
-                    <div className="card" style={{ borderRadius: '1rem' }}>
-                        <div className="card-body p-4 p-lg-5 text-black">
+                <div className="col col-lg-7 ">
+                    <div className="card shadow-lg" style={{ borderRadius: '1rem', border: '1px solid' }}>
+                        <div className="card-body p-4 p-lg-5">
                             <form onSubmit={handleRegister}>
-                                <h5 className="fw-normal pb-1">Regístrate</h5>
-
+                                <h5 className="fw-normal text-center pb-1">Regístrate</h5>
                                 <div className="row mb-3">
                                     <div className="col-md-6">
                                         <label htmlFor="usuario">Usuario:</label>
@@ -356,37 +350,6 @@ export const Register = () => {
                                     )}
                                 </div>
 
-                                <div className='mb-3'>
-                                    <label className='form-label' htmlFor="respuestaSecreta">Método de recuperación de contraseña:</label>
-                                    <select
-                                        id="miSelect"
-                                        value={pregunta}
-                                        onChange={onInputChange}
-                                        className="form-select"
-                                        name="pregunta"
-                                    >
-                                        <option value="">Selecciona una pregunta</option>
-                                        <option value="1">¿Pregunta 1?</option>
-                                        <option value="2">¿Pregunta 2?</option>
-                                        <option value="3">¿Pregunta 3?</option>
-                                    </select>
-
-                                    {pregunta && (
-                                        <div className='mb-3'>
-                                            <Input
-                                                type="text"
-                                                id="respuestaSecreta"
-                                                name="respuestaSecreta"
-                                                value={respuestaSecreta}
-                                                onChange={onInputChange}
-                                                placeholder={"Solo tú sabrás la respuesta"}
-                                            />
-                                        </div>
-                                    )}
-                                    {errors.pregunta && <div className="text-danger">{errors.pregunta}</div>}
-
-                                </div>
-
                                 <div className="mb-3 d-flex flex-column align-items-center">
                                     <ReCAPTCHA
                                         sitekey="6LfrrmAqAAAAAO2vOQixcHrRZiYkPDOVAExv4MaE"
@@ -423,7 +386,7 @@ export const Register = () => {
 
                                 <div className="mb-3">
                                     <button
-                                        className="btn btn-dark btn-lg btn-block w-100"
+                                        className="btn btn-primary btn-lg btn-block w-100"
                                         type="submit"
                                     >
                                         Registrarse

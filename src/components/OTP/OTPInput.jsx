@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 const OTPInput = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
-  const [csrfToken, setCsrfToken] = useState(''); 
+  const [csrfToken, setCsrfToken] = useState('');
   const location = useLocation();
   const { correo } = location.state || {};
   const navigate = useNavigate();
@@ -37,8 +37,8 @@ const OTPInput = () => {
           'Content-Type': 'application/json',
           'CSRF-Token': csrfToken,
         },
-        credentials: 'include', 
-        body: JSON.stringify({ correo }), 
+        credentials: 'include',
+        body: JSON.stringify({ correo, otp }),
       });
 
       if (response.ok) {
@@ -63,18 +63,23 @@ const OTPInput = () => {
     }
   };
 
-  const handleResend = () => {
-    console.log('Reenviar código');
+  const maskEmail = (email) => {
+    if (!email) return 'correo no disponible';
+    const [user, domain] = email.split('@');
+    const maskedUser = user.length > 2 ? `${'*'.repeat(user.length - 2)}${user.slice(-2)}` : '*'.repeat(user.length);
+    return `${maskedUser}@${domain}`;
   };
 
   return (
     <section className="container-fluid bg-body-tertiary d-block">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 col-lg-4" style={{ minWidth: '500px' }}>
-          <div className="card bg-white mb-5 mt-5 border-0" style={{ boxShadow: '0 12px 15px rgba(0, 0, 0, 0.02)' }}>
+          <div className="card shadow-lg mb-5 mt-5" style={{ borderRadius: '1rem', border: '1px solid ' }}>
+
+            {/* <div className="card mb-5 mt-5 " style={{ boxShadow: '0 12px 15px rgba(0, 0, 0, 0.02)' }}> */}
             <div className="card-body p-5 text-center">
               <h4>Verificar</h4>
-              <p>Tu código de verificación se ha enviado al correo {correo}</p>
+              <p>Tu código de verificación se ha enviado al correo {maskEmail(correo)}</p>
 
               <div className="d-flex flex-column align-items-center justify-content-center">
                 <form onSubmit={handleSubmit} className="otp-field mb-4 d-flex flex-column align-items-center">
@@ -103,10 +108,6 @@ const OTPInput = () => {
                 </form>
                 {error && <p className="text-danger">{error}</p>}
               </div>
-
-              <p className="resend text-muted mb-0">
-                No recibiste el código? <a href="#" onClick={handleResend}>Reenviar código</a>
-              </p>
             </div>
           </div>
         </div>

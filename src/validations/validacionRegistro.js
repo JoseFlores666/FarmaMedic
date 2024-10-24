@@ -35,9 +35,6 @@ export const errorMessages = {
     confirmPassword: {
         required: "La confirmación de la contraseña es obligatoria.",
     },
-    pregunta: {
-        required: "Por favor, selecciona una pregunta de recuperación."
-    },
     genero: {
         required: "Por favor, selecciona un género."
     }
@@ -97,11 +94,6 @@ export const validatePassword = (password) => {
 export const validateConfirmPassword = (password, confirmPassword) => {
     if (!confirmPassword.trim()) return errorMessages.confirmPassword.required;
     if (password !== confirmPassword);
-    return null;
-};
-
-export const validatePregunta = (pregunta) => {
-    if (!pregunta) return errorMessages.pregunta.required;
     return null;
 };
 

@@ -11,7 +11,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [csrfToken, setCsrfToken] = useState('');
-  const [errors, setErrors] = useState({}); 
+  const [errors, setErrors] = useState({});
 
   const { correo, password, onInputChange, onResetForm } = useForm({
     correo: '',
@@ -39,12 +39,12 @@ export const Login = () => {
   };
 
   const validatePassword = (password) => {
-    return password.trim() !== "";
+    return password.trim() !== '';
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const newErrors = {}; 
+    const newErrors = {};
 
     if (!correo.trim()) {
       newErrors.correo = "El correo es obligatorio.";
@@ -76,8 +76,9 @@ export const Login = () => {
       });
 
       if (response.ok) {
-        await login(correo);
-        await response.json();
+        const data = await response.json();
+        await login(data.usuario, data.isAdmin);
+
         Swal.fire({
           title: '¡Éxito!',
           text: 'Has iniciado sesión correctamente.',
@@ -86,7 +87,7 @@ export const Login = () => {
         }).then((result) => {
           if (result.isConfirmed) {
             navigate('/home', { replace: true });
-            onResetForm(); 
+            onResetForm();
           }
         });
       } else {
@@ -95,8 +96,8 @@ export const Login = () => {
           text: 'Credenciales incorrectas. Inténtalo de nuevo.',
           icon: 'error',
           confirmButtonText: 'Aceptar',
-        });     
-       }
+        });
+      }
     } catch (error) {
       console.error('Login error:', error);
       alert('Error de conexión o credenciales incorrectas');
@@ -113,8 +114,8 @@ export const Login = () => {
     <div className="container py-4 h-100">
       <div className="row d-flex justify-content-center align-items-center h-100">
         <div className="col col-lg-7">
-          <div className="card" style={{ borderRadius: '1rem' }}>
-            <div className="card-body p-4 p-lg-5 text-black">
+          <div className="card shadow-lg" style={{ borderRadius: '1rem', border: '1px solid' }}>
+            <div className="card-body p-4 p-lg-5">
               <form onSubmit={handleLogin}>
                 <h5 className="fw-normal pb-1 text-center">Inicia sesión en tu cuenta</h5>
 
@@ -131,7 +132,7 @@ export const Login = () => {
                     onChange={onInputChange}
                     placeholder="Introduce tu correo electrónico"
                   />
-                  {errors.correo && <div className="text-danger">{errors.correo}</div>} 
+                  {errors.correo && <div className="text-danger">{errors.correo}</div>}
                 </div>
 
                 <div className="form-outline mb-4">
@@ -144,12 +145,12 @@ export const Login = () => {
                     onChange={onInputChange}
                     placeholder="Introduce tu contraseña"
                   />
-                  {errors.password && <div className="text-danger">{errors.password}</div>} 
+                  {errors.password && <div className="text-danger">{errors.password}</div>}
                 </div>
 
                 <div className="mb-3">
                   <button
-                    className="btn btn-dark btn-lg btn-block w-100"
+                    className="btn btn-primary btn-lg btn-block w-100"
                     type="submit"
                   >
                     Iniciar sesión

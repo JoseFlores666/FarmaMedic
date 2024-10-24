@@ -1,6 +1,6 @@
 /* Estilos para la página Home */
 .home-container {
-    background-color: #f8f9fa;
+    /* background-color: #f8f9fa; */
   }
   
   html, body {
@@ -16,8 +16,8 @@
 }
 
 .hero-section {
-    background-color: #3b4e70;
-    color: white;
+    /* background-color: #3b4e70;
+    color: white; */
     padding: 100px;
     text-align: center;
     width: 100vw; /* Asegura que ocupa todo el ancho del viewport */
@@ -47,17 +47,17 @@
     height: 300px;  /* Establece una altura fija */
     border-radius: 15px;
     object-fit: cover;  /* Esto asegura que la imagen se recorte adecuadamente sin distorsión */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); */
   }
   
   
   .specialties-section {
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; */
     padding: 80px 0;
   }
   
   .specialty-card {
-    background: white;
+    /* background: white; */
     border-radius: 12px;
     padding: 30px;
     text-align: center;
@@ -71,8 +71,8 @@
   }
   
   .contact-section {
-    background-color: #1c2331;
-    color: white;
+    /* background-color: #1c2331;
+    color: white; */
     padding: 60px 0;
   }
   

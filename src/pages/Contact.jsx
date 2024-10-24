@@ -1,113 +1,111 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export const Contact = () => {
-  const [items, setItems] = useState({
-    privacyPolicy: '',
-    termsConditions: '',
-    legalDisclaimer: '',
-    userProfile: '',
-  });
+  const [direccion, setDireccion] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefono, setTelefono] = useState('');
 
-  const [editing, setEditing] = useState(null);
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editing) {
-      setItems({ ...items, [editing]: items[editing] });
-      setEditing(null);
-    } else {
-      console.log('Contenido guardado:', items);
+  const fetchContactInfo = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/contact');
+      const data = await response.json();
+      setDireccion(data.direccion);
+      setEmail(data.email);
+      setTelefono(data.telefono);
+    } catch (error) {
+      console.error('Error al obtener datos de contacto:', error);
     }
   };
 
-  const handleEdit = (field) => {
-    setEditing(field);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleDelete = (field) => {
-    setItems({ ...items, [field]: '' });
+    // Validación en el lado del cliente
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10,15}$/;
+
+    if (!emailRegex.test(email)) {
+      MySwal.fire('Error', 'Formato de correo electrónico inválido', 'error');
+      return;
+    }
+
+    if (!phoneRegex.test(telefono)) {
+      MySwal.fire('Error', 'Formato de número de teléfono inválido', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:4000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ direccion, email, telefono }),
+      });
+
+      if (response.ok) {
+        MySwal.fire('Éxito', 'Datos de contacto guardados correctamente', 'success');
+        fetchContactInfo();
+      } else {
+        MySwal.fire('Error', 'Error al guardar los datos de contacto', 'error');
+      }
+    } catch (error) {
+      console.error('Error al guardar los datos de contacto:', error);
+      MySwal.fire('Error', 'Error al guardar los datos de contacto', 'error');
+    }
   };
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center mb-4">Política de Privacidad, Términos y Condiciones, Deslinde Legal y Perfil de Usuario</h1>
-
+      <h1 className="text-center mb-4">Datos de Contacto</h1>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <h2>Política de Privacidad</h2>
-          <textarea
+
+        <div className="mb-3">
+          <label htmlFor="direccion" className="form-label">Dirección</label>
+          <input
+            type="text"
             className="form-control"
-            name="privacyPolicy"
-            value={items.privacyPolicy}
-            onChange={handleChange}
-            placeholder="Ingresa la política de privacidad"
-            rows="4"
+            id="direccion"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            required
           />
-          <button type="button" className="btn btn-warning mt-2" onClick={() => handleEdit('privacyPolicy')}>Editar</button>
-          <button type="button" className="btn btn-danger mt-2 ms-2" onClick={() => handleDelete('privacyPolicy')}>Eliminar</button>
         </div>
 
-        <div className="mb-4">
-          <h2>Términos y Condiciones</h2>
-          <textarea
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label">Correo Electrónico</label>
+          <input
+            type="email"
             className="form-control"
-            name="termsConditions"
-            value={items.termsConditions}
-            onChange={handleChange}
-            placeholder="Ingresa los términos y condiciones"
-            rows="4"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
-          <button type="button" className="btn btn-warning mt-2" onClick={() => handleEdit('termsConditions')}>Editar</button>
-          <button type="button" className="btn btn-danger mt-2 ms-2" onClick={() => handleDelete('termsConditions')}>Eliminar</button>
         </div>
 
-        <div className="mb-4">
-          <h2>Deslinde Legal</h2>
-          <textarea
+        <div className="mb-3">
+          <label htmlFor="telefono" className="form-label">Teléfono</label>
+          <input
+            type="text"
             className="form-control"
-            name="legalDisclaimer"
-            value={items.legalDisclaimer}
-            onChange={handleChange}
-            placeholder="Ingresa el deslinde legal"
-            rows="4"
+            id="telefono"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            required
           />
-          <button type="button" className="btn btn-warning mt-2" onClick={() => handleEdit('legalDisclaimer')}>Editar</button>
-          <button type="button" className="btn btn-danger mt-2 ms-2" onClick={() => handleDelete('legalDisclaimer')}>Eliminar</button>
         </div>
 
-        <div className="mb-4">
-          <h2>Perfil de Usuario</h2>
-          <textarea
-            className="form-control"
-            name="userProfile"
-            value={items.userProfile}
-            onChange={handleChange}
-            placeholder="Ingresa el perfil de usuario"
-            rows="4"
-          />
-          <button type="button" className="btn btn-warning mt-2" onClick={() => handleEdit('userProfile')}>Editar</button>
-          <button type="button" className="btn btn-danger mt-2 ms-2" onClick={() => handleDelete('userProfile')}>Eliminar</button>
-        </div>
-
-        <button type="submit" className="btn btn-primary">{editing ? 'Actualizar' : 'Guardar'}</button>
+        <button type="submit" className="btn btn-primary">Guardar</button>
       </form>
-
-      <h3 className="mt-5">Contenido Actual:</h3>
-      <div className="mt-3">
-        <h4>Política de Privacidad:</h4>
-        <p>{items.privacyPolicy}</p>
-        <h4>Términos y Condiciones:</h4>
-        <p>{items.termsConditions}</p>
-        <h4>Deslinde Legal:</h4>
-        <p>{items.legalDisclaimer}</p>
-        <h4>Perfil de Usuario:</h4>
-        <p>{items.userProfile}</p>
-      </div>
     </div>
   );
 };

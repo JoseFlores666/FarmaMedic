@@ -5,6 +5,14 @@ import { Login, About, Contact, Home, Services, Register } from '../pages';
 import OTPInput from '../components/OTP/OTPInput';
 import { ForgotPassword } from '../components/ForgotPassword';
 import { PublicRoute } from './PublicRoute';
+import { AdminRoute } from './AdminRoute';
+import Deslinde from '../pages/Deslinde';
+import Politicas from '../pages/Politicas';
+import Terminos from '../pages/Terminos';
+import Enlaces from '../pages/Enlaces';
+import Eslogan from '../pages/Eslogan';
+import Logo from '../pages/Logo';
+import PageTitle from '../pages/TittlePage';
 
 export const AppRouter = () => {
 	return (
@@ -65,6 +73,62 @@ export const AppRouter = () => {
 					}
 				/>
 				<Route
+					path='/Enlaces'
+					element={
+						<AdminRoute>
+							<Enlaces />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path='/Eslogan'
+					element={
+						<AdminRoute>
+							<Eslogan />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path='/Logo'
+					element={
+						<AdminRoute>
+							<Logo />
+						</AdminRoute>
+					}
+				/>
+					<Route
+					path='/PageTittle'
+					element={
+						<AdminRoute>
+							<PageTitle />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path='/CRUDDeslinde'
+					element={
+						<AdminRoute>
+							<Deslinde />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path='/CRUDPoliticas'
+					element={
+						<AdminRoute>
+							<Politicas />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path='/CRUDTerminos'
+					element={
+						<AdminRoute>
+							<Terminos />
+						</AdminRoute>
+					}
+				/>
+				<Route
 					path='/about'
 					element={
 						<PrivateRoute>
@@ -75,9 +139,9 @@ export const AppRouter = () => {
 				<Route
 					path='/contact'
 					element={
-						<PrivateRoute>
+						<AdminRoute>
 							<Contact />
-						</PrivateRoute>
+						</AdminRoute>
 					}
 				/>
 				<Route
