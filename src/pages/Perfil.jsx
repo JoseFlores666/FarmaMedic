@@ -12,7 +12,7 @@ const Perfil = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState('');
 
-  const apiUrl = 'http://localhost:5000/api/perfil';
+  const apiUrl = 'https://back-farmam.onrender.com/api/perfil';
 
   useEffect(() => {
     fetchPerfiles();

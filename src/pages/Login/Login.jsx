@@ -21,7 +21,7 @@ export const Login = () => {
   // useEffect(() => {
   //   const fetchCsrfToken = async () => {
   //     try {
-  //       const response = await fetch('http://localhost:4000/api/csrf-token', {
+  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
   //         credentials: 'include',
   //       });
   //       const data = await response.json();
@@ -62,7 +62,7 @@ export const Login = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/login', {
+      const response = await fetch('https://back-farmam.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,10 +158,10 @@ export const Login = () => {
                 </div>
 
                 <p className='small text-muted mb-3'>
-                  ¿Olvidaste tu contraseña? <a href="http://localhost:5173/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
+                  ¿Olvidaste tu contraseña? <a href="https://back-farmam.onrender.com/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
                 </p>
                 <p className="small text-muted mb-3" style={{ color: '#393f81' }}>
-                  ¿No tienes una cuenta? <a href="http://localhost:5173/register" style={{ color: 'blue' }}>Regístrate aquí</a>
+                  ¿No tienes una cuenta? <a href="https://back-farmam.onrender.com/register" style={{ color: 'blue' }}>Regístrate aquí</a>
                 </p>
 
                 <div className="row">

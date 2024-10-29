@@ -15,7 +15,7 @@ const OTPInput = () => {
   // useEffect(() => {
   //   const fetchCsrfToken = async () => {
   //     try {
-  //       const response = await fetch('http://localhost:4000/api/csrf-token', {
+  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
   //         credentials: 'include',
   //       });
   //       const data = await response.json();
@@ -31,7 +31,7 @@ const OTPInput = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:4000/api/verifyOtp', {
+      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

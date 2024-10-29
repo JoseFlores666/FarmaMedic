@@ -20,7 +20,7 @@ export const ForgotPassword = () => {
     // useEffect(() => {
     //     const fetchCsrfToken = async () => {
     //         try {
-    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
     //                 credentials: 'include',
     //             });
     //             const data = await response.json();
@@ -35,7 +35,7 @@ export const ForgotPassword = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:4000/api/recuperar-password', {
+            const response = await fetch('https://back-farmam.onrender.com/api/recuperar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:4000/api/cambiar-password', {
+            const response = await fetch('https://back-farmam.onrender.com/api/cambiar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -248,8 +248,8 @@ export const ForgotPassword = () => {
                                 )}
 
                                 <div className="d-flex gap-2 justify-content-between mt-4">
-                                    <a href="http://localhost:5173/login" className="link-primary text-decoration-none">Iniciar sesión</a>
-                                    <a href="http://localhost:5173/register" className="link-primary text-decoration-none">Registrarse</a>
+                                    <a href="https://back-farmam.onrender.com/login" className="link-primary text-decoration-none">Iniciar sesión</a>
+                                    <a href="https://back-farmam.onrender.com/register" className="link-primary text-decoration-none">Registrarse</a>
                                 </div>
                             </div>
                         </div>

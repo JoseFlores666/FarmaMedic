@@ -20,7 +20,7 @@ export const Navbar = () => {
 
   const fetchTitle = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/getTitle');
+      const response = await fetch('https://back-farmam.onrender.com/api/getTitle');
       const data = await response.json();
 
       if (data && data[0]?.title) {

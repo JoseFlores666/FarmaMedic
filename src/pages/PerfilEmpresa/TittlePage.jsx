@@ -18,7 +18,7 @@ const PageTitle = () => {
 
     // const fetchCsrfToken = async () => {
     //     try {
-    //         const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //         const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
     //             credentials: 'include',
     //         });
     //         const data = await response.json();
@@ -30,7 +30,7 @@ const PageTitle = () => {
 
     const fetchTitle = async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/getTitle', {
+            const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
                 credentials: 'include',
             });
             if (!response.ok) {
@@ -56,7 +56,7 @@ const PageTitle = () => {
 
     const updateTitle = async () => {
         try {
-            const response = await fetch(`http://localhost:4000/api/updateTitle/1`, { 
+            const response = await fetch(`https://back-farmam.onrender.com/api/updateTitle/1`, { 
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

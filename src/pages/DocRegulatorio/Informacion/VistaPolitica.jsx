@@ -9,7 +9,7 @@ const VistaPolitica = ({ showModal, onClose }) => {
   useEffect(() => {
     const fetchDeslindes = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/getCurrentPolitica');
+        const response = await fetch('https://back-farmam.onrender.com/api/getCurrentPolitica');
         const data = await response.json();
         setDeslindes(data);
       } catch (error) {

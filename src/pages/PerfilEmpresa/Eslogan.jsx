@@ -12,7 +12,7 @@ const Eslogan = () => {
     // useEffect(() => {
     //     const fetchCsrfToken = async () => {
     //         try {
-    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
     //                 credentials: 'include',
     //             });
     //             const data = await response.json();
@@ -27,7 +27,7 @@ const Eslogan = () => {
     useEffect(() => {
         const fetchEslogan = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/getEslogan');
+                const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
                 if (!response.ok) {
                     throw new Error('Error al obtener el eslogan');
                 }
@@ -52,8 +52,8 @@ const Eslogan = () => {
         try {
             const method = esloganId ? 'PUT' : 'POST'; 
             const url = esloganId
-                ? `http://localhost:4000/api/updateEslogan/${esloganId}`
-                : 'http://localhost:4000/api/createEslogan';
+                ? `https://back-farmam.onrender.com/api/updateEslogan/${esloganId}`
+                : 'https://back-farmam.onrender.com/api/createEslogan';
 
             const response = await fetch(url, {
                 method,
@@ -82,7 +82,7 @@ const Eslogan = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:4000/api/deleteEslogan/${esloganId}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/deleteEslogan/${esloganId}`, {
                 method: 'DELETE',
                 headers: {
                     // 'X-CSRF-Token': csrfToken,

@@ -14,7 +14,7 @@ const Enlaces = () => {
     // useEffect(() => {
     //     const fetchCsrfToken = async () => {
     //         try {
-    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
     //                 credentials: 'include',
     //             });
     //             const data = await response.json();
@@ -47,7 +47,7 @@ const Enlaces = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const method = editMode ? 'PUT' : 'POST';
-        const url = editMode ? `http://localhost:4000/api/updateEnlace/${newLink.id}` : 'http://localhost:4000/api/createEnlace';
+        const url = editMode ? `https://back-farmam.onrender.com/api/updateEnlace/${newLink.id}` : 'https://back-farmam.onrender.com/api/createEnlace';
        
         try {
             const response = await fetch(url, {
@@ -92,7 +92,7 @@ const Enlaces = () => {
 
         if (confirm.isConfirmed) {
             try {
-                const response = await fetch(`http://localhost:4000/api/deleteEnlace/${id}`, {
+                const response = await fetch(`https://back-farmam.onrender.com/api/deleteEnlace/${id}`, {
                     method: 'DELETE',
                     headers: {
                         // 'X-CSRF-Token': csrfToken,

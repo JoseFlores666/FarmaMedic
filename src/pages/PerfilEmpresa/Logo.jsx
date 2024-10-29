@@ -15,7 +15,7 @@ const Logo = () => {
     // Función para obtener el logo actual
     const fetchLogo = async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/getAllLogos', {
+            const response = await fetch('https://back-farmam.onrender.com/api/getAllLogos', {
                 credentials: 'include',
             });
             if (!response.ok) throw new Error('Error al obtener el logo');
@@ -49,7 +49,7 @@ const Logo = () => {
         formData.append('logo', file);
 
         try {
-            const response = await fetch('http://localhost:4000/api/uploadLogo', {
+            const response = await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
                 method: 'POST',  // Usamos POST para la carga inicial
                 body: formData,
                 credentials: 'include',

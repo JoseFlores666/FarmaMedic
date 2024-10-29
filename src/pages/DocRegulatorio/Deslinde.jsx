@@ -30,7 +30,7 @@ const Deslinde = () => {
   // useEffect(() => {
   //   const fetchCsrfToken = async () => {
   //     try {
-  //       const response = await fetch('http://localhost:4000/api/csrf-token', {
+  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
   //         credentials: 'include',
   //       });
   //       const data = await response.json();
@@ -44,7 +44,7 @@ const Deslinde = () => {
 
   const fetchDeslindes = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/getDeslindesLegales`);
+      const response = await fetch(`https://back-farmam.onrender.com/api/getDeslindesLegales`);
       if (!response.ok) {
         throw new Error('Error al obtener deslinde legal');
       }
@@ -69,7 +69,7 @@ const Deslinde = () => {
 
   const createDeslinde = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/createDeslindeLegal`, {
+      const response = await fetch(`https://back-farmam.onrender.com/api/createDeslindeLegal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ const Deslinde = () => {
 
   const updateDeslinde = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/updateDeslindeLegal/${id}`, {
+      const response = await fetch(`https://back-farmam.onrender.com/api/updateDeslindeLegal/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const Deslinde = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:4000/api/deleteDeslindeLegal/${id}`, {
+        const response = await fetch(`https://back-farmam.onrender.com/api/deleteDeslindeLegal/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

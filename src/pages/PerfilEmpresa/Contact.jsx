@@ -16,7 +16,7 @@ const Contact = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/getContactInfo'); 
+      const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo'); 
       if (!response.ok) {
         throw new Error('No se pudo obtener la información de contacto');
       }
@@ -49,7 +49,7 @@ const Contact = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/upsertContactInfo', {
+      const response = await fetch('https://back-farmam.onrender.com/api/upsertContactInfo', {
         method: 'POST', // Usa POST para upsert
         headers: {
           'Content-Type': 'application/json',
