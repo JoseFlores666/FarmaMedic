@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../../hook/useForm';
 import { checkPasswordCompromise, containsCommonPatterns } from '../../services/passwordService';
@@ -8,13 +8,19 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import Input from '../../components/Input';
 import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validateGenero } from '../../validations/validacionRegistro';
 import Swal from 'sweetalert2';
+import VistaDeslinde from '../DocRegulatorio/Informacion/VistaDeslinde';
+import VistaPolitica from '../DocRegulatorio/Informacion/VistaPolitica';
+import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
 
 export const Register = () => {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
+    const [showDeslindeModal, setShowDeslindeModal] = useState(false);
+    const [showModal2, setShowModal2] = useState(false);
+    const [showModal3, setShowModal3] = useState(false);
 
     const [captchaValue, setCaptchaValue] = useState(null);
-    const [csrfToken, setCsrfToken] = useState('');
+    // const [csrfToken, setCsrfToken] = useState('');
     const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
         genero: '',
@@ -28,20 +34,47 @@ export const Register = () => {
         apellidoMaterno: '',
     });
 
-    useEffect(() => {
-        const fetchCsrfToken = async () => {
-            try {
-                const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setCsrfToken(data.csrfToken);
-            } catch (error) {
-                console.error('Error obteniendo el token CSRF:', error);
-            }
-        };
-        fetchCsrfToken();
-    }, []);
+
+    const openDeslindeModal = () => {
+        setShowDeslindeModal(true);
+    };
+
+    const closeDeslindeModal = () => {
+        setShowDeslindeModal(false);
+    };
+
+    const openDeslindeModal2 = () => {
+        setShowModal2(true);
+    };
+
+    const closeDeslindeModal2 = () => {
+        setShowModal2(false);
+    };
+
+    const openDeslindeModal3 = () => {
+        setShowModal3(true);
+    };
+
+    const closeDeslindeModal3 = () => {
+        setShowModal3(false);
+    };
+
+
+
+    // useEffect(() => {
+    //     const fetchCsrfToken = async () => {
+    //         try {
+    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //                 credentials: 'include',
+    //             });
+    //             const data = await response.json();
+    //             setCsrfToken(data.csrfToken);
+    //         } catch (error) {
+    //             console.error('Error obteniendo el token CSRF:', error);
+    //         }
+    //     };
+    //     fetchCsrfToken();
+    // }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -82,7 +115,7 @@ export const Register = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -367,8 +400,11 @@ export const Register = () => {
                                             required
                                         />
                                         <label htmlFor="terminos" className="small text-muted">
-                                            <a href="#!" className="text-muted">Acepto los Términos y Condiciones</a>
+                                        <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
+                                        Acepto los Términos y Condiciones</a>
                                         </label>
+                                        <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
+
                                     </div>
 
                                     <div className="col-md-6 d-flex align-items-center">
@@ -379,9 +415,28 @@ export const Register = () => {
                                             required
                                         />
                                         <label htmlFor="privacidad" className="small text-muted">
-                                            <a href="#!" className="text-muted">Acepto la Política de privacidad</a>
+                                        <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
+                                        Acepto la Política de privacidad</a>
                                         </label>
+                                        <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
                                     </div>
+                                    <div>
+                                        <div className="text-center align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                id="deslinde"
+                                                className="me-2"
+                                                required
+                                            />
+                                            <label htmlFor="deslinde" className="small text-muted">
+                                                <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
+                                                    Acepto el deslinde legal
+                                                </a>
+                                            </label>
+                                        </div>
+                                        <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
+                                    </div>
+
                                 </div>
 
                                 <div className="mb-3">

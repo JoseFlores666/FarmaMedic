@@ -7,24 +7,26 @@ const MySwal = withReactContent(Swal);
 const PageTitle = () => {
     const [title, setTitle] = useState('');
     const [newTitle, setNewTitle] = useState('');
-    const [csrfToken, setCsrfToken] = useState('');
+    // const [csrfToken, setCsrfToken] = useState('');
 
     useEffect(() => {
+        console.log("Se ejecuta useeffect")
+
         fetchTitle();
-        fetchCsrfToken();
+        // fetchCsrfToken();
     }, []);
 
-    const fetchCsrfToken = async () => {
-        try {
-            const response = await fetch('http://localhost:4000/api/csrf-token', {
-                credentials: 'include',
-            });
-            const data = await response.json();
-            setCsrfToken(data.csrfToken);
-        } catch (error) {
-            console.error('Error obteniendo el token CSRF:', error);
-        }
-    };
+    // const fetchCsrfToken = async () => {
+    //     try {
+    //         const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //             credentials: 'include',
+    //         });
+    //         const data = await response.json();
+    //         setCsrfToken(data.csrfToken);
+    //     } catch (error) {
+    //         console.error('Error obteniendo el token CSRF:', error);
+    //     }
+    // };
 
     const fetchTitle = async () => {
         try {
@@ -58,7 +60,7 @@ const PageTitle = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify({ title: newTitle }),

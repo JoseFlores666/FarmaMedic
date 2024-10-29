@@ -29,7 +29,7 @@ const ThemeToggle = () => {
                     onChange={toggleTheme}
                 />
                 <label className="form-check-label text-white">
-                    {theme === 'light' ? '🌞 Ligth Mode' : '🌜 Dark Mode'}
+                    {theme === 'light' ? '🌞Ligth Mode' : '🌜Dark Mode'}
                 </label>
             </div>
         </div>

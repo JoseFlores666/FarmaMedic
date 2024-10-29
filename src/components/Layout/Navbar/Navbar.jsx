@@ -2,36 +2,36 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/useAuth';
 import ThemeToggle from '../../../util/theme-toggler';
+import { FaRedo } from 'react-icons/fa';
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, username, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [pageTitle, setPageTitle] = useState('FarmaMedic'); // Estado para almacenar el título
+  const [pageTitle, setPageTitle] = useState('FarmaMedic');
 
   useEffect(() => {
     fetchTitle();
   }, []);
 
-    useEffect(() => {
-    // Establecer el título del documento cada vez que pageTitle cambie
-    document.title = pageTitle || 'FarmaMedic'; // Usa 'FarmaMedic' si pageTitle está vacío
+  useEffect(() => {
+    document.title = pageTitle || 'FarmaMedic';
   }, [pageTitle]);
 
   const fetchTitle = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/getTitle'); 
+      const response = await fetch('http://localhost:4000/api/getTitle');
       const data = await response.json();
-      
+
       if (data && data[0]?.title) {
-        setPageTitle(data[0].title); // Si la respuesta es un array
+        setPageTitle(data[0].title);
       }
     } catch (error) {
       console.error('Error al obtener el título:', error);
-      setPageTitle('FarmaMedic'); // Valor por defecto si hay error
+      setPageTitle('FarmaMedic');
     }
   };
-  
+
 
   const onLogout = () => {
     logout();
@@ -51,6 +51,12 @@ export const Navbar = () => {
     <>
       <nav className="navbar navbar-expand-lg navbar-dark sticky-top" style={{ backgroundColor: '#1c2331' }}>
         <div className="container-fluid">
+        {isAdmin && (
+
+          <div className="refresh-icon text-end me-2" style={{ cursor: 'pointer' }} onClick={fetchTitle}>
+            <FaRedo className="text-white" size={24} />
+          </div>
+        )}
           <NavLink to="/" className="navbar-brand" onClick={closeMenu}>
             {pageTitle}
           </NavLink>
@@ -67,8 +73,10 @@ export const Navbar = () => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
+
           <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`} id="navbarNav">
-            <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+
+            <ul className="navbar-nav ms-auto ">
               {isAuthenticated ? (
                 <>
                   <li className="nav-item">
@@ -86,11 +94,6 @@ export const Navbar = () => {
                       Services
                     </NavLink>
                   </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to="/contact" onClick={closeMenu}>
-                      Contact
-                    </NavLink>
-                  </li>
 
                   {isAdmin && (
                     <>
@@ -104,39 +107,58 @@ export const Navbar = () => {
                           Perfil Empresa
                         </a>
                         <ul className="dropdown-menu dropdown-menu-end">
-                          <li className="nav-item">
-                            <NavLink className="nav-link" to="/Enlaces" onClick={closeMenu}>
-                              Enlaces
+                          <li className="nav-item active">
+                            <NavLink className="dropdown-item " to="/Enlaces" onClick={closeMenu}>
+                              Redes Sociales
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/Eslogan" onClick={closeMenu}>
+                            <NavLink className="dropdown-item" to="/Eslogan" onClick={closeMenu}>
                               Eslogan
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/Logo" onClick={closeMenu}>
+                            <NavLink className="dropdown-item" to="/Logo" onClick={closeMenu}>
                               Logo
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/PageTittle" onClick={closeMenu}>
-                              PageTittle
+                            <NavLink className="dropdown-item" to="/PageTittle" onClick={closeMenu}>
+                              Tiulo de pagina
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/CRUDDeslinde" onClick={closeMenu}>
-                              Deslinde
+                            <NavLink className="dropdown-item" to="/contact" onClick={closeMenu}>
+                              Contact
+                            </NavLink>
+                          </li>
+                        </ul>
+                      </li>
+
+                      <li className="nav-item dropdown">
+                        <a
+                          className="nav-link dropdown-toggle"
+                          role="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          Doc Regulatorio
+                        </a>
+                        <ul className="dropdown-menu dropdown-menu-end">
+
+                          <li className="nav-item">
+                            <NavLink className="dropdown-item" to="/CRUDPoliticas" onClick={closeMenu}>
+                              Politicas de Privacidad
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/CRUDPoliticas" onClick={closeMenu}>
-                              Politicas
+                            <NavLink className="dropdown-item" to="/CRUDTerminos" onClick={closeMenu}>
+                              Terminos y Condiciones
                             </NavLink>
                           </li>
                           <li className="nav-item">
-                            <NavLink className="nav-link" to="/CRUDTerminos" onClick={closeMenu}>
-                              Terminos
+                            <NavLink className="dropdown-item" to="/CRUDDeslinde" onClick={closeMenu}>
+                              Deslinde Legal
                             </NavLink>
                           </li>
                         </ul>
@@ -159,16 +181,16 @@ export const Navbar = () => {
                           Cerrar sesión
                         </a>
                       </li>
-                      <li>
-                        <NavLink className="dropdown-item" to="/profile">
-                          Perfil
-                        </NavLink>
-                      </li>
                     </ul>
                   </li>
                 </>
               ) : (
                 <>
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/home2" onClick={closeMenu}>
+                      Home
+                    </NavLink>
+                  </li>
                   <li className="nav-item">
                     <NavLink className="nav-link" to="/login" onClick={closeMenu}>
                       Iniciar sesión

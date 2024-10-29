@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 export const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
-  const [csrfToken, setCsrfToken] = useState('');
+  // const [csrfToken, setCsrfToken] = useState('');
   const [errors, setErrors] = useState({});
 
   const { correo, password, onInputChange, onResetForm } = useForm({
@@ -18,20 +18,20 @@ export const Login = () => {
     password: '',
   });
 
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/csrf-token', {
-          credentials: 'include',
-        });
-        const data = await response.json();
-        setCsrfToken(data.csrfToken);
-      } catch (error) {
-        console.error('Error obteniendo el token CSRF:', error);
-      }
-    };
-    fetchCsrfToken();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCsrfToken = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:4000/api/csrf-token', {
+  //         credentials: 'include',
+  //       });
+  //       const data = await response.json();
+  //       // setCsrfToken(data.csrfToken);
+  //     } catch (error) {
+  //       console.error('Error obteniendo el token CSRF:', error);
+  //     }
+  //   };
+  //   fetchCsrfToken();
+  // }, []);
 
   const validateCorreo = (correo) => {
     const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -66,7 +66,7 @@ export const Login = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken,
+          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({

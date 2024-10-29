@@ -16,8 +16,6 @@ export const AuthProvider = ({ children }) => {
         return localStorage.getItem('isAdmin') === 'true';
     });
 
-
-
     let timeout;
 
     const logout = () => {
@@ -27,12 +25,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('logged');
         localStorage.removeItem('username');
         localStorage.removeItem('isAdmin');
-        console.log('Sesión cerrada por inactividad o cierre del navegador.');
     };
 
     const resetTimeout = () => {
         clearTimeout(timeout);
-        timeout = setTimeout(logout, 15 * 60 * 1000);
+        timeout = setTimeout(logout, 15 * 60 * 1000); 
     };
 
     const login = (name, adminStatus = false) => {
@@ -42,7 +39,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('logged', 'true');
         localStorage.setItem('username', name);
         localStorage.setItem('isAdmin', adminStatus);
-        console.log('User logged in:', name, 'isAdmin:', adminStatus);
         resetTimeout();
     };
 
@@ -56,19 +52,7 @@ export const AuthProvider = ({ children }) => {
         return () => {
             clearTimeout(timeout);
         };
-    },);
-
-    useEffect(() => {
-        const handleBeforeUnload = () => {
-            logout();
-        };
-
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, []);
+    }, );
 
     return (
         <AuthContext.Provider value={{ isAuthenticated, isAdmin, username, login, logout }}>

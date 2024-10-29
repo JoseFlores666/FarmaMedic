@@ -4,31 +4,37 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-export const Contact = () => {
+const Contact = () => {
   const [direccion, setDireccion] = useState('');
   const [email, setEmail] = useState('');
   const [telefono, setTelefono] = useState('');
 
   useEffect(() => {
+    console.log("klksdnfk")
     fetchContactInfo();
   }, []);
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/contact');
+      const response = await fetch('http://localhost:4000/api/getContactInfo'); 
+      if (!response.ok) {
+        throw new Error('No se pudo obtener la información de contacto');
+      }
       const data = await response.json();
-      setDireccion(data.direccion);
-      setEmail(data.email);
-      setTelefono(data.telefono);
+      if (data) {
+        setDireccion(data.direccion);
+        setEmail(data.email);
+        setTelefono(data.telefono);
+      }
     } catch (error) {
       console.error('Error al obtener datos de contacto:', error);
+      MySwal.fire('Error', 'Error al obtener los datos de contacto', 'error');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación en el lado del cliente
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10,15}$/;
 
@@ -43,8 +49,8 @@ export const Contact = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/contact', {
-        method: 'POST',
+      const response = await fetch('http://localhost:4000/api/upsertContactInfo', {
+        method: 'POST', // Usa POST para upsert
         headers: {
           'Content-Type': 'application/json',
         },
@@ -53,7 +59,7 @@ export const Contact = () => {
 
       if (response.ok) {
         MySwal.fire('Éxito', 'Datos de contacto guardados correctamente', 'success');
-        fetchContactInfo();
+        fetchContactInfo(); 
       } else {
         MySwal.fire('Error', 'Error al guardar los datos de contacto', 'error');
       }
@@ -67,9 +73,8 @@ export const Contact = () => {
     <div className="container mt-5">
       <h1 className="text-center mb-4">Datos de Contacto</h1>
       <form onSubmit={handleSubmit}>
-
         <div className="mb-3">
-          <label htmlFor="direccion" className="form-label">Dirección</label>
+          <label htmlFor="direccion" className="form-label">Dirección Fisica de la empresa</label>
           <input
             type="text"
             className="form-control"
@@ -101,11 +106,14 @@ export const Contact = () => {
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
             required
+            maxLength={10}
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">Guardar</button>
+        <button type="submit" className="btn btn-primary mb-5">Guardar</button>
       </form>
     </div>
   );
 };
+
+export default Contact;

@@ -6,23 +6,23 @@ const MySwal = withReactContent(Swal);
 
 const Eslogan = () => {
     const [eslogan, setEslogan] = useState('');
-    const [csrfToken, setCsrfToken] = useState('');
+    // const [csrfToken, setCsrfToken] = useState('');
     const [esloganId, setEsloganId] = useState(null); 
 
-    useEffect(() => {
-        const fetchCsrfToken = async () => {
-            try {
-                const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setCsrfToken(data.csrfToken);
-            } catch (error) {
-                console.error('Error obteniendo el token CSRF:', error);
-            }
-        };
-        fetchCsrfToken();
-    }, []);
+    // useEffect(() => {
+    //     const fetchCsrfToken = async () => {
+    //         try {
+    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //                 credentials: 'include',
+    //             });
+    //             const data = await response.json();
+    //             setCsrfToken(data.csrfToken);
+    //         } catch (error) {
+    //             console.error('Error obteniendo el token CSRF:', error);
+    //         }
+    //     };
+    //     fetchCsrfToken();
+    // }, []);
 
     useEffect(() => {
         const fetchEslogan = async () => {
@@ -44,7 +44,7 @@ const Eslogan = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (eslogan.length > 255) {
+        if (eslogan.length > 25) {
             MySwal.fire('Error', 'El eslogan no puede tener más de 255 caracteres', 'error');
             return;
         }
@@ -59,7 +59,7 @@ const Eslogan = () => {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify({ eslogan }),
@@ -85,7 +85,7 @@ const Eslogan = () => {
             const response = await fetch(`http://localhost:4000/api/deleteEslogan/${esloganId}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
             });
@@ -118,7 +118,7 @@ const Eslogan = () => {
                         placeholder="Ingrese el eslogan"
                         required
                         className="form-control"
-                        maxLength="255"
+                        maxLength="25"
                     />
                 </div>
                 <div className="d-flex align-items-center justify-content-center gap-2">

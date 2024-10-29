@@ -1,45 +1,43 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
-
+import { fetchEnlaces } from './../../Api/apiEnlaces';
 
 const Enlaces = () => {
     const [enlaces, setEnlaces] = useState([]);
     const [newLink, setNewLink] = useState({ id: null, nombre: '', url: '' });
     const [editMode, setEditMode] = useState(false);
-    const [csrfToken, setCsrfToken] = useState('');
+    const [updated, setUpdated] = useState(false); 
 
-    // Obtiene el token CSRF al cargar el componente
+    // const [csrfToken, setCsrfToken] = useState('');
+
+    // useEffect(() => {
+    //     const fetchCsrfToken = async () => {
+    //         try {
+    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //                 credentials: 'include',
+    //             });
+    //             const data = await response.json();
+    //             setCsrfToken(data.csrfToken);
+    //         } catch (error) {
+    //             console.error('Error obteniendo el token CSRF:', error);
+    //         }
+    //     };
+    //     fetchCsrfToken();
+    // }, []);
+
     useEffect(() => {
-        const fetchCsrfToken = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setCsrfToken(data.csrfToken);
+                const data = await fetchEnlaces();
+                setEnlaces(data);
             } catch (error) {
-                console.error('Error obteniendo el token CSRF:', error);
+                console.error('Error al obtener enlaces:', error);
+                Swal.fire('Error', 'No se pudo obtener la lista de enlaces', 'error');
             }
         };
-        fetchCsrfToken();
-    }, []);
-
-    // Obtiene los enlaces de la API
-    useEffect(() => {
-        fetchEnlaces();
-    }, []);
-
-    const fetchEnlaces = async () => {
-        try {
-            const response = await fetch('http://localhost:4000/api/getEnlaces');
-            const data = await response.json();
-            setEnlaces(data);
-        } catch (error) {
-            console.error('Error al obtener enlaces:', error);
-            Swal.fire('Error', 'No se pudo obtener la lista de enlaces', 'error');
-        }
-    };
+        fetchData();
+    }, [updated]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -50,13 +48,13 @@ const Enlaces = () => {
         e.preventDefault();
         const method = editMode ? 'PUT' : 'POST';
         const url = editMode ? `http://localhost:4000/api/updateEnlace/${newLink.id}` : 'http://localhost:4000/api/createEnlace';
-
+       
         try {
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify(newLink),
@@ -68,7 +66,8 @@ const Enlaces = () => {
 
             Swal.fire('Éxito', editMode ? 'Enlace actualizado correctamente' : 'Enlace agregado correctamente', 'success');
             resetForm();
-            fetchEnlaces();
+            setUpdated(!updated);
+
         } catch (error) {
             console.error('Error al guardar enlace:', error);
             Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
@@ -96,7 +95,7 @@ const Enlaces = () => {
                 const response = await fetch(`http://localhost:4000/api/deleteEnlace/${id}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-Token': csrfToken,
+                        // 'X-CSRF-Token': csrfToken,
                     },
                     credentials: 'include',
                 });
@@ -106,7 +105,7 @@ const Enlaces = () => {
                 }
 
                 Swal.fire('Eliminado', 'Enlace eliminado correctamente', 'success');
-                fetchEnlaces();
+                setUpdated(!updated);
             } catch (error) {
                 console.error('Error al eliminar enlace:', error);
                 Swal.fire('Error', 'Ocurrió un error al eliminar el enlace', 'error');

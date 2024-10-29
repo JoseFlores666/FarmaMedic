@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from '../hook/useForm';
 import { useNavigate } from 'react-router-dom';
 import OtpInput from 'react-otp-input';
@@ -10,27 +10,27 @@ export const ForgotPassword = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [otp, setOtp] = useState('');
-    const [csrfToken, setCsrfToken] = useState('');
+    // const [csrfToken, setCsrfToken] = useState('');
     const { correo, password, confirmPassword, onInputChange } = useForm({
         correo: '',
         password: '',
         confirmPassword: '',
     });
 
-    useEffect(() => {
-        const fetchCsrfToken = async () => {
-            try {
-                const response = await fetch('http://localhost:4000/api/csrf-token', {
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setCsrfToken(data.csrfToken);
-            } catch (error) {
-                console.error('Error obteniendo el token CSRF:', error);
-            }
-        };
-        fetchCsrfToken();
-    }, []);
+    // useEffect(() => {
+    //     const fetchCsrfToken = async () => {
+    //         try {
+    //             const response = await fetch('http://localhost:4000/api/csrf-token', {
+    //                 credentials: 'include',
+    //             });
+    //             const data = await response.json();
+    //             setCsrfToken(data.csrfToken);
+    //         } catch (error) {
+    //             console.error('Error obteniendo el token CSRF:', error);
+    //         }
+    //     };
+    //     fetchCsrfToken();
+    // }, []);
 
     const handleForgotPassword = async (e) => {
         e.preventDefault();
@@ -39,7 +39,7 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 body: JSON.stringify({ email: correo }),
                 credentials: 'include',
@@ -81,7 +81,7 @@ export const ForgotPassword = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    // 'X-CSRF-Token': csrfToken,
                 },
                 body: JSON.stringify({ email: correo, token: otp, nuevaContrasena: password }),
                 credentials: 'include',
@@ -112,9 +112,7 @@ export const ForgotPassword = () => {
                         <div className="card shadow-lg" style={{ borderRadius: '1rem', border: '1px solid' }}>
                             <div className="card-body p-3 p-md-4 p-xl-5 ">
                                 <div className="text-center mb-3">
-                                    <a href="#!">
-                                        <img src="./assets/img/bsb-logo.svg" alt="BootstrapBrain Logo" width="175" height="57" />
-                                    </a>
+                                        <img src="https://res.cloudinary.com/dzppbjrlm/image/upload/v1730110530/Screenshot_2024-10-24_042615_ixczhn.png" alt="BootstrapBrain Logo" width="175" height="57" />
                                 </div>
 
                                 {step === 1 && (

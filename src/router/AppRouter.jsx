@@ -1,18 +1,19 @@
 import { Route, Routes } from 'react-router-dom';
 import { PrivateRoute } from './PrivateRoute';
-import Footer from '../components/Layout/Footer/Footer';
-import { Login, About, Contact, Home, Services, Register } from '../pages';
-import OTPInput from '../components/OTP/OTPInput';
-import { ForgotPassword } from '../components/ForgotPassword';
 import { PublicRoute } from './PublicRoute';
 import { AdminRoute } from './AdminRoute';
-import Deslinde from '../pages/Deslinde';
-import Politicas from '../pages/Politicas';
-import Terminos from '../pages/Terminos';
-import Enlaces from '../pages/Enlaces';
-import Eslogan from '../pages/Eslogan';
-import Logo from '../pages/Logo';
-import PageTitle from '../pages/TittlePage';
+import { Login, About, Home, Services, Register } from '../pages';
+import OTPInput from '../components/OTP/OTPInput';
+import { ForgotPassword } from '../pages/ForgotPassword';
+import Deslinde from '../pages/DocRegulatorio/Deslinde';
+import Politicas from '../pages/DocRegulatorio/Politicas';
+import Terminos from '../pages/DocRegulatorio/Terminos';
+import Enlaces from '../pages/PerfilEmpresa/Enlaces';
+import Eslogan from '../pages/PerfilEmpresa/Eslogan';
+import Logo from '../pages/PerfilEmpresa/Logo';
+import PageTitle from '../pages/PerfilEmpresa/TittlePage';
+import Contact from '../pages/PerfilEmpresa/Contact';
+import { Home2 } from '../pages/Home2';
 
 export const AppRouter = () => {
 	return (
@@ -22,7 +23,7 @@ export const AppRouter = () => {
 					path='/'
 					element={
 						<PublicRoute>
-							<Login />
+							<Home2 />
 						</PublicRoute>
 					}
 				/>
@@ -42,13 +43,6 @@ export const AppRouter = () => {
 						</PublicRoute>
 					}
 				/>
-				<Route
-					path='/footer'
-					element={
-						<PublicRoute>
-							<Footer />
-						</PublicRoute>
-					} />
 				<Route
 					path='/otpinput'
 					element={
@@ -70,6 +64,14 @@ export const AppRouter = () => {
 						<PrivateRoute>
 							<Home />
 						</PrivateRoute>
+					}
+				/>
+				<Route
+					path='/home2'
+					element={
+						<PublicRoute>
+							<Home />
+						</PublicRoute>
 					}
 				/>
 				<Route

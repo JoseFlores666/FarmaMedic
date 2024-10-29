@@ -10,11 +10,11 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 ReactDOM.createRoot(document.getElementById("root")).render(
   <div className="main-page">
     <AuthProvider>
-      <React.StrictMode>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </React.StrictMode>
+        <React.StrictMode>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </React.StrictMode>
     </AuthProvider>
   </div>
 );
