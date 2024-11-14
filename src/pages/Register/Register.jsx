@@ -6,7 +6,6 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
 import Input from '../../components/Input';
-import { validateUsuario, validateNombre, validateApellidoPaterno, validateApellidoMaterno, validateEdad, validateTelefono, validateCorreo, validatePassword, validateConfirmPassword, validateGenero } from '../../validations/validacionRegistro';
 import Swal from 'sweetalert2';
 import VistaDeslinde from '../DocRegulatorio/Informacion/VistaDeslinde';
 import VistaPolitica from '../DocRegulatorio/Informacion/VistaPolitica';
@@ -18,9 +17,11 @@ export const Register = () => {
     const [showDeslindeModal, setShowDeslindeModal] = useState(false);
     const [showModal2, setShowModal2] = useState(false);
     const [showModal3, setShowModal3] = useState(false);
-
+    const [terminosChecked, setTerminosChecked] = useState(false);
+    const [privacidadChecked, setPrivacidadChecked] = useState(false);
+    const [deslindeChecked, setDeslindeChecked] = useState(false);
     const [captchaValue, setCaptchaValue] = useState(null);
-    // const [csrfToken, setCsrfToken] = useState('');
+
     const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
         genero: '',
@@ -34,127 +35,146 @@ export const Register = () => {
         apellidoMaterno: '',
     });
 
-
-    const openDeslindeModal = () => {
-        setShowDeslindeModal(true);
+    const handleCheckboxChange = (checkboxName, isChecked) => {
+        if (checkboxName === "terminos") setTerminosChecked(isChecked);
+        if (checkboxName === "privacidad") setPrivacidadChecked(isChecked);
+        if (checkboxName === "deslinde") setDeslindeChecked(isChecked);
     };
 
-    const closeDeslindeModal = () => {
-        setShowDeslindeModal(false);
+    const openDeslindeModal = () => setShowDeslindeModal(true);
+    const closeDeslindeModal = () => setShowDeslindeModal(false);
+    const openDeslindeModal2 = () => setShowModal2(true);
+    const closeDeslindeModal2 = () => setShowModal2(false);
+    const openDeslindeModal3 = () => setShowModal3(true);
+    const closeDeslindeModal3 = () => setShowModal3(false);
+
+    // Validation functions
+    const validateCorreo = (correo) => /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(correo);
+    const validatePassword = (password) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d#@$!%*?&]{8,50}$/.test(password);
+    const validateUsuario = (usuario) => /^[a-zA-ZÀ-ÿ\d\s]{2,50}$/.test(usuario);
+    const validateNombre = (nombre) => /^[a-zA-ZÀ-ÿ\s]{2,50}$/.test(nombre);
+    const validateApellido = (apellido) => /^[a-zA-ZÀ-ÿ\s]{2,50}$/.test(apellido);
+    const validateEdad = (edad) => /^(1[89]|[2-9]\d|99)$/.test(edad);
+    const validateTelefono = (telefono) => /^\d{10}$/.test(telefono);
+
+    const handleValidation = (e) => {
+        const { name, value } = e.target;
+        let error = "";
+
+        if (name === "usuario") {
+            if (!value.trim()) error = "El usuario es obligatorio.";
+            else if (!validateUsuario(value)) error = "El usuario no tiene un formato válido.";
+        }
+        if (name === "nombre") {
+            if (!value.trim()) error = "El nombre es obligatorio.";
+            else if (!validateNombre(value)) error = "Formato inválido en el nombre.";
+        }
+        if (name === "apellidoPaterno") {
+            if (!value.trim()) error = "El apellido paterno es obligatorio.";
+            else if (!validateApellido(value)) error = "Formato inválido en el apellido paterno.";
+        }
+        if (name === "apellidoMaterno") {
+            if (!value.trim()) error = "El apellido materno es obligatorio.";
+            else if (!validateApellido(value)) error = "Formato inválido en el apellido materno.";
+        }
+        if (name === "edad") {
+            if (!value.trim()) error = "La edad es obligatoria.";
+            else if (!validateEdad(value)) error = "La edad debe ser entre 18 y 99 años.";
+        }
+        if (name === "telefono") {
+            if (!value.trim()) error = "El teléfono es obligatorio.";
+            else if (!validateTelefono(value)) error = "El teléfono debe tener 10 dígitos.";
+        }
+        if (name === "correo") {
+            if (!value.trim()) error = "El correo es obligatorio.";
+            else if (!validateCorreo(value)) error = "Formato de correo inválido.";
+        }
+        if (name === "password") {
+            if (!value.trim()) error = "La contraseña es obligatoria.";
+            else if (!validatePassword(value)) error = "Formato de contraseña inválido.";
+        }
+        if (name === "confirmPassword") {
+            if (!value.trim()) error = "La confirmación de la contraseña es obligatoria.";
+            else if (value !== password) error = "Las contraseñas no coinciden.";
+        }
+        if (name === "genero" && !value.trim()) error = "El género es obligatorio.";
+
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     };
-
-    const openDeslindeModal2 = () => {
-        setShowModal2(true);
-    };
-
-    const closeDeslindeModal2 = () => {
-        setShowModal2(false);
-    };
-
-    const openDeslindeModal3 = () => {
-        setShowModal3(true);
-    };
-
-    const closeDeslindeModal3 = () => {
-        setShowModal3(false);
-    };
-
-
-
-    // useEffect(() => {
-    //     const fetchCsrfToken = async () => {
-    //         try {
-    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-    //                 credentials: 'include',
-    //             });
-    //             const data = await response.json();
-    //             setCsrfToken(data.csrfToken);
-    //         } catch (error) {
-    //             console.error('Error obteniendo el token CSRF:', error);
-    //         }
-    //     };
-    //     fetchCsrfToken();
-    // }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        let newErrors = {};
+        const newErrors = {};
+        
+        if (!usuario) newErrors.usuario = "El usuario es obligatorio.";
+        else if (!validateUsuario(usuario)) newErrors.usuario = "El usuario no tiene un formato válido.";
 
-        newErrors.usuario = validateUsuario(usuario);
-        newErrors.nombre = validateNombre(nombre);
-        newErrors.apellidoPaterno = validateApellidoPaterno(apellidoPaterno);
-        newErrors.apellidoMaterno = validateApellidoMaterno(apellidoMaterno);
-        newErrors.edad = validateEdad(edad);
-        newErrors.telefono = validateTelefono(telefono);
-        newErrors.correo = validateCorreo(correo);
-        newErrors.password = validatePassword(password);
-        newErrors.confirmPassword = validateConfirmPassword(password, confirmPassword);
-        newErrors.genero = validateGenero(genero);
+        if (!nombre) newErrors.nombre = "El nombre es obligatorio.";
+        else if (!validateNombre(nombre)) newErrors.nombre = "Formato inválido en el nombre.";
 
+        if (!apellidoPaterno) newErrors.apellidoPaterno = "El apellido paterno es obligatorio.";
+        else if (!validateApellido(apellidoPaterno)) newErrors.apellidoPaterno = "Formato inválido en el apellido paterno.";
+
+        if (!apellidoMaterno) newErrors.apellidoMaterno = "El apellido materno es obligatorio.";
+        else if (!validateApellido(apellidoMaterno)) newErrors.apellidoMaterno = "Formato inválido en el apellido materno.";
+
+        if (!edad) newErrors.edad = "La edad es obligatoria.";
+        else if (!validateEdad(edad)) newErrors.edad = "La edad debe ser entre 18 y 99 años.";
+
+        if (!telefono) newErrors.telefono = "El teléfono es obligatorio.";
+        else if (!validateTelefono(telefono)) newErrors.telefono = "El teléfono debe tener 10 dígitos.";
+
+        if (!correo) newErrors.correo = "El correo es obligatorio.";
+        else if (!validateCorreo(correo)) newErrors.correo = "Formato de correo inválido.";
+
+        if (!password) newErrors.password = "La contraseña es obligatoria.";
+        else if (!validatePassword(password)) newErrors.password = "Formato de contraseña inválido.";
+
+        if (!confirmPassword) newErrors.confirmPassword = "La confirmación de la contraseña es obligatoria.";
+        else if (confirmPassword !== password) newErrors.confirmPassword = "Las contraseñas no coinciden.";
+
+        if (!genero) newErrors.genero = "El género es obligatorio.";
+
+
+        if (!terminosChecked || !privacidadChecked || !deslindeChecked) {
+            newErrors.terminos = "Debe aceptar los Términos y Condiciones, Política de privacidad y deslinde legal.";
+        }
         if (containsCommonPatterns(password)) {
-            newErrors.password = "La contraseña contiene patrones comunes como '12345' o 'password'.";
+            newErrors.password = "La contraseña contiene patrones comunes.";
         }
-
-        const isCompromised = await checkPasswordCompromise(password);
-        if (isCompromised) {
-            newErrors.password = "La contraseña ha sido comprometida. Por favor, elige una diferente.";
+        if (await checkPasswordCompromise(password)) {
+            newErrors.password = "La contraseña ha sido comprometida.";
         }
-
         if (!captchaValue) {
-            newErrors.captcha = "Por favor, verifica que no eres un robot.";
+            newErrors.captcha = "Por favor, verifica el captcha.";
         }
-
         setErrors(newErrors);
 
-        if (Object.keys(newErrors).some((key) => newErrors[key])) {
-            return;
-        }
+        if (Object.keys(newErrors).length > 0) return;
 
-        try {
             const response = await fetch('https://back-farmam.onrender.com/api/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'X-CSRF-Token': csrfToken,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    usuario,
-                    nombre,
-                    apellidoPaterno,
-                    apellidoMaterno,
-                    edad,
-                    telefono,
-                    genero,
-                    correo,
-                    password,
-                    captcha: captchaValue,
+                    usuario, nombre, apellidoPaterno, apellidoMaterno,
+                    edad, telefono, genero, correo, password, captcha: captchaValue
                 }),
             });
-
             if (response.ok) {
                 Swal.fire({
                     title: 'Éxito',
-                    text: 'Registro exitoso. Un codigo de verificacion de ha enviado a tu correo.',
+                    text: 'Registro exitoso. Revisa tu correo para el código de verificación.',
                     icon: 'success',
                     confirmButtonText: 'Aceptar',
                 });
-                navigate('/otpInput', {
-                    state: {
-                        replace: true,
-                        correo: correo
-                    },
-                    replace: true
-                });
+                navigate('/otpInput', { state: { replace: true, correo }, replace: true });
                 onResetForm();
             } else {
                 const errorMessage = await response.text();
-                alert(`Error al registrarse: ${errorMessage}`);
+                Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' });
             }
-        } catch (err) {
-            console.error('Register error:', err.message);
-            alert('Error de conexión al servidor. Inténtalo de nuevo más tarde.');
-        }
+         
     };
 
     return (
@@ -172,7 +192,10 @@ export const Register = () => {
                                             id="usuario"
                                             name="usuario"
                                             value={usuario}
-                                            onChange={onInputChange}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Introduce tu usuario"}
                                             min={3}
                                             max={15}
@@ -186,7 +209,10 @@ export const Register = () => {
                                             id="nombre"
                                             name="nombre"
                                             value={nombre}
-                                            onChange={onInputChange}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Introduce tu nombre"}
                                         />
                                         {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
@@ -201,7 +227,10 @@ export const Register = () => {
                                             id="apellidoPaterno"
                                             name="apellidoPaterno"
                                             value={apellidoPaterno}
-                                            onChange={onInputChange}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Apellido paterno"}
                                         />
                                         {errors.apellidoPaterno && <div className="text-danger">{errors.apellidoPaterno}</div>}
@@ -213,7 +242,10 @@ export const Register = () => {
                                             id="apellidoMaterno"
                                             name="apellidoMaterno"
                                             value={apellidoMaterno}
-                                            onChange={onInputChange}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Apellido Materno"}
                                         />
                                         {errors.apellidoMaterno && <div className="text-danger">{errors.apellidoMaterno}</div>}
@@ -228,9 +260,10 @@ export const Register = () => {
                                             id="edad"
                                             name="edad"
                                             value={edad}
-                                            onChange={onInputChange}
-                                            min={18}
-                                            max={100}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Introduce tu edad"}
                                         />
                                         {errors.edad && <div className="text-danger">{errors.edad}</div>}
@@ -242,7 +275,10 @@ export const Register = () => {
                                             id="telefono"
                                             name="telefono"
                                             value={telefono}
-                                            onChange={onInputChange}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
                                             placeholder={"Telefono o Celular"}
                                             maxLength={10}
                                         />
@@ -262,7 +298,10 @@ export const Register = () => {
                                                 id="generoMasculino"
                                                 value="Masculino"
                                                 checked={genero === 'Masculino'}
-                                                onChange={onInputChange}
+                                                onChange={(e) => {
+                                                    onInputChange(e);
+                                                    handleValidation(e);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="generoMasculino">
                                                 Masculino
@@ -277,7 +316,10 @@ export const Register = () => {
                                                 id="generoFemenino"
                                                 value="Femenino"
                                                 checked={genero === 'Femenino'}
-                                                onChange={onInputChange}
+                                                onChange={(e) => {
+                                                    onInputChange(e);
+                                                    handleValidation(e);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="generoFemenino">
                                                 Femenino
@@ -292,7 +334,10 @@ export const Register = () => {
                                                 id="generoOtro"
                                                 value="Otro"
                                                 checked={genero === 'Otro'}
-                                                onChange={onInputChange}
+                                                onChange={(e) => {
+                                                    onInputChange(e);
+                                                    handleValidation(e);
+                                                }}
                                             />
                                             <label className="form-check-label me-2" htmlFor="generoOtro">
                                                 Otro:
@@ -301,7 +346,10 @@ export const Register = () => {
                                                 type="text"
                                                 className={`form-control ${genero === 'Otro' ? '' : 'd-none'}`}
                                                 placeholder="Especifica"
-                                                onChange={onInputChange}
+                                                onChange={(e) => {
+                                                    onInputChange(e);
+                                                    handleValidation(e);
+                                                }}
                                                 name="generoPersonalizado"
                                             />
                                         </div>
@@ -316,7 +364,10 @@ export const Register = () => {
                                         id="correo"
                                         name="correo"
                                         value={correo}
-                                        onChange={onInputChange}
+                                        onChange={(e) => {
+                                            onInputChange(e);
+                                            handleValidation(e);
+                                        }}
                                         placeholder={"Introduce tu correo"}
                                     />
                                     {errors.correo && <div className="text-danger">{errors.correo}</div>}
@@ -329,7 +380,10 @@ export const Register = () => {
                                         id="password"
                                         name="password"
                                         value={password}
-                                        onChange={onInputChange}
+                                        onChange={(e) => {
+                                            onInputChange(e);
+                                            handleValidation(e);
+                                        }}
                                         minLength={8}
                                         maxLength={50}
                                         placeholder={"Introduce tu contraseña"}
@@ -365,7 +419,10 @@ export const Register = () => {
                                         id="confirmPassword"
                                         name="confirmPassword"
                                         value={confirmPassword}
-                                        onChange={onInputChange}
+                                        onChange={(e) => {
+                                            onInputChange(e);
+                                            handleValidation(e);
+                                        }}
                                         minLength={8}
                                         maxLength={50}
                                         placeholder={"Repite tu contraseña"}
@@ -397,11 +454,13 @@ export const Register = () => {
                                             type="checkbox"
                                             id="terminos"
                                             className="me-2"
-                                            required
+                                            checked={terminosChecked}
+                                            onChange={(e) => handleCheckboxChange("terminos", e.target.checked)}
+
                                         />
                                         <label htmlFor="terminos" className="small text-muted">
-                                        <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
-                                        Acepto los Términos y Condiciones</a>
+                                            <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
+                                                Acepto los Términos y Condiciones</a>
                                         </label>
                                         <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
 
@@ -412,11 +471,12 @@ export const Register = () => {
                                             type="checkbox"
                                             id="privacidad"
                                             className="me-2"
-                                            required
+                                            checked={privacidadChecked}
+                                            onChange={(e) => handleCheckboxChange("privacidad", e.target.checked)}
                                         />
                                         <label htmlFor="privacidad" className="small text-muted">
-                                        <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
-                                        Acepto la Política de privacidad</a>
+                                            <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
+                                                Acepto la Política de privacidad</a>
                                         </label>
                                         <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
                                     </div>
@@ -426,7 +486,8 @@ export const Register = () => {
                                                 type="checkbox"
                                                 id="deslinde"
                                                 className="me-2"
-                                                required
+                                                checked={deslindeChecked}
+                                                onChange={(e) => handleCheckboxChange("deslinde", e.target.checked)}
                                             />
                                             <label htmlFor="deslinde" className="small text-muted">
                                                 <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
@@ -436,6 +497,8 @@ export const Register = () => {
                                         </div>
                                         <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
                                     </div>
+
+                                    {errors.terminos && <div className="text-danger mt-2">{errors.terminos}</div>}
 
                                 </div>
 
@@ -449,10 +512,10 @@ export const Register = () => {
                                 </div>
 
                                 <p className='small text-muted mb-3'>
-                                    ¿Olvidaste tu contraseña? <a href="https://back-farmam.onrender.com/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
+                                    ¿Olvidaste tu contraseña? <a href="https://farmamedic.vercel.app/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
                                 </p>
                                 <p className="small text-muted mb-3" style={{ color: '#393f81' }}>
-                                    ¿Ya tienes una cuenta? <a href="https://back-farmam.onrender.com/login" style={{ color: 'blue' }}>Inicia sesion aquí</a>
+                                    ¿Ya tienes una cuenta? <a href="https://farmamedic.vercel.app/login" style={{ color: 'blue' }}>Inicia sesion aquí</a>
                                 </p>
                             </form>
                         </div>

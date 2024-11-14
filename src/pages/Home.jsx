@@ -7,43 +7,43 @@ import './Home.css';
 const MySwal = withReactContent(Swal);
 
 export const Home = () => {
-  const [eslogan, setEslogan] = useState(''); 
+  const [eslogan, setEslogan] = useState('');
   const [title, setTitle] = useState('');
 
   useEffect(() => {
     const fetchEslogan = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getEslogan'); 
+        const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
         if (!response.ok) {
           throw new Error('Error al obtener el eslogan');
         }
         const data = await response.json();
-        setEslogan(data.eslogan || ''); 
+        setEslogan(data.eslogan || '');
       } catch (error) {
         console.error('Error al obtener el eslogan:', error);
         MySwal.fire('Error', 'No se pudo obtener el eslogan', 'error');
       }
     };
 
-    fetchEslogan(); 
+    fetchEslogan();
     fetchTitle();
   }, []);
 
   const fetchTitle = async () => {
     try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
-            credentials: 'include',
-        });
-        if (!response.ok) {
-            throw new Error('Error al obtener el título');
-        }
-        const data = await response.json();
-        setTitle(data[0]?.title || ''); 
+      const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Error al obtener el título');
+      }
+      const data = await response.json();
+      setTitle(data[0]?.title || '');
     } catch (error) {
-        console.error('Error al obtener el título:', error);
-        MySwal.fire('Error', 'No se pudo obtener el título', 'error');
+      console.error('Error al obtener el título:', error);
+      MySwal.fire('Error', 'No se pudo obtener el título', 'error');
     }
-};
+  };
 
   return (
     <MDBContainer fluid className="home-container">
@@ -55,12 +55,12 @@ export const Home = () => {
               <p className="hero-description">
                 {eslogan || 'Comprometidos con tu salud, brindando soluciones médicas integrales para ti y tu familia.'}
               </p>
-              <MDBBtn color="info" size="lg" className="me-3">Más información</MDBBtn>
-              <MDBBtn outline color="light" size="lg">Contactar</MDBBtn>
+              <MDBBtn color="info" size="lg" className="hero-text me-2">Más información</MDBBtn>
+              <MDBBtn outline color="light" size="lg" className="hero-text">Contactar</MDBBtn>
             </MDBCol>
             <MDBCol md="6" className="text-center">
               <img
-                src="/src/assets/clinica.jpg" 
+                src="/src/assets/clinica.jpg"
                 alt="Médicos trabajando"
                 className="img-fluid hero-image"
               />

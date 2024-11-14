@@ -9,23 +9,6 @@ const Enlaces = () => {
     const [editMode, setEditMode] = useState(false);
     const [updated, setUpdated] = useState(false); 
 
-    // const [csrfToken, setCsrfToken] = useState('');
-
-    // useEffect(() => {
-    //     const fetchCsrfToken = async () => {
-    //         try {
-    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-    //                 credentials: 'include',
-    //             });
-    //             const data = await response.json();
-    //             setCsrfToken(data.csrfToken);
-    //         } catch (error) {
-    //             console.error('Error obteniendo el token CSRF:', error);
-    //         }
-    //     };
-    //     fetchCsrfToken();
-    // }, []);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -42,36 +25,6 @@ const Enlaces = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNewLink({ ...newLink, [name]: value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const method = editMode ? 'PUT' : 'POST';
-        const url = editMode ? `https://back-farmam.onrender.com/api/updateEnlace/${newLink.id}` : 'https://back-farmam.onrender.com/api/createEnlace';
-       
-        try {
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'X-CSRF-Token': csrfToken,
-                },
-                credentials: 'include',
-                body: JSON.stringify(newLink),
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al guardar el enlace');
-            }
-
-            Swal.fire('Éxito', editMode ? 'Enlace actualizado correctamente' : 'Enlace agregado correctamente', 'success');
-            resetForm();
-            setUpdated(!updated);
-
-        } catch (error) {
-            console.error('Error al guardar enlace:', error);
-            Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
-        }
     };
 
     const handleEdit = (link) => {
@@ -94,9 +47,6 @@ const Enlaces = () => {
             try {
                 const response = await fetch(`https://back-farmam.onrender.com/api/deleteEnlace/${id}`, {
                     method: 'DELETE',
-                    headers: {
-                        // 'X-CSRF-Token': csrfToken,
-                    },
                     credentials: 'include',
                 });
 
@@ -116,6 +66,35 @@ const Enlaces = () => {
     const resetForm = () => {
         setNewLink({ id: null, nombre: '', url: '' });
         setEditMode(false);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const method = editMode ? 'PUT' : 'POST';
+        const url = editMode ? `https://back-farmam.onrender.com/api/updateEnlace/${newLink.id}` : 'https://back-farmam.onrender.com/api/createEnlace';
+       
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(newLink),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al guardar el enlace');
+            }
+
+            Swal.fire('Éxito', editMode ? 'Enlace actualizado correctamente' : 'Enlace agregado correctamente', 'success');
+            resetForm();
+            setUpdated(!updated);
+
+        } catch (error) {
+            console.error('Error al guardar enlace:', error);
+            Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
+        }
     };
 
     return (

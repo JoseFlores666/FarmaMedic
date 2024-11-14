@@ -10,28 +10,12 @@ import Swal from 'sweetalert2';
 export const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
-  // const [csrfToken, setCsrfToken] = useState('');
   const [errors, setErrors] = useState({});
 
   const { correo, password, onInputChange, onResetForm } = useForm({
     correo: '',
     password: '',
   });
-
-  // useEffect(() => {
-  //   const fetchCsrfToken = async () => {
-  //     try {
-  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-  //         credentials: 'include',
-  //       });
-  //       const data = await response.json();
-  //       // setCsrfToken(data.csrfToken);
-  //     } catch (error) {
-  //       console.error('Error obteniendo el token CSRF:', error);
-  //     }
-  //   };
-  //   fetchCsrfToken();
-  // }, []);
 
   const validateCorreo = (correo) => {
     const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -42,31 +26,49 @@ export const Login = () => {
     return password.trim() !== '';
   };
 
+  const handleValidation = (e) => {
+    const { name, value } = e.target;
+    let error = "";
+
+    if (name === "correo") {
+      if (!value.trim()) {
+        error = "El correo es obligatorio.";
+      } else if (!validateCorreo(value)) {
+        error = "El correo no tiene un formato válido.";
+      }
+    }
+
+    if (name === "password") {
+      if (!validatePassword(value)) {
+        error = "La contraseña es obligatoria.";
+      }
+    }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error
+    }));
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
-    if (!correo.trim()) {
-      newErrors.correo = "El correo es obligatorio.";
-    } else if (!validateCorreo(correo)) {
-      newErrors.correo = "El correo no tiene un formato válido.";
-    }
+    if (!correo) newErrors.correo = "El correo es obligatorio.";
+    else if (!validateCorreo(correo)) newErrors.correo = "Formato de correo inválido.";
 
-    if (!validatePassword(password)) {
-      newErrors.password = "La contraseña es obligatoria.";
-    }
+    if (!password) newErrors.password = "La contraseña es obligatoria.";
+    else if (!validatePassword(password)) newErrors.password = "Formato de contraseña inválido.";
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
 
     try {
       const response = await fetch('https://back-farmam.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -129,7 +131,10 @@ export const Login = () => {
                     id="correo"
                     name="correo"
                     value={correo}
-                    onChange={onInputChange}
+                    onChange={(e) => {
+                      onInputChange(e);
+                      handleValidation(e);
+                    }}
                     placeholder="Introduce tu correo electrónico"
                   />
                   {errors.correo && <div className="text-danger">{errors.correo}</div>}
@@ -142,7 +147,10 @@ export const Login = () => {
                     id="password"
                     name="password"
                     value={password}
-                    onChange={onInputChange}
+                    onChange={(e) => {
+                      onInputChange(e);
+                      handleValidation(e);
+                    }}
                     placeholder="Introduce tu contraseña"
                   />
                   {errors.password && <div className="text-danger">{errors.password}</div>}
@@ -158,10 +166,10 @@ export const Login = () => {
                 </div>
 
                 <p className='small text-muted mb-3'>
-                  ¿Olvidaste tu contraseña? <a href="https://back-farmam.onrender.com/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
+                  ¿Olvidaste tu contraseña? <a href="https://farmamedic.vercel.app/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
                 </p>
                 <p className="small text-muted mb-3" style={{ color: '#393f81' }}>
-                  ¿No tienes una cuenta? <a href="https://back-farmam.onrender.com/register" style={{ color: 'blue' }}>Regístrate aquí</a>
+                  ¿No tienes una cuenta? <a href="https://farmamedic.vercel.app/register" style={{ color: 'blue' }}>Regístrate aquí</a>
                 </p>
 
                 <div className="row">
