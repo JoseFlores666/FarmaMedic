@@ -10,6 +10,9 @@ import Swal from 'sweetalert2';
 import VistaDeslinde from '../DocRegulatorio/Informacion/VistaDeslinde';
 import VistaPolitica from '../DocRegulatorio/Informacion/VistaPolitica';
 import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
+import { NavLink } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -21,6 +24,8 @@ export const Register = () => {
     const [privacidadChecked, setPrivacidadChecked] = useState(false);
     const [deslindeChecked, setDeslindeChecked] = useState(false);
     const [captchaValue, setCaptchaValue] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
@@ -48,12 +53,12 @@ export const Register = () => {
     const openDeslindeModal3 = () => setShowModal3(true);
     const closeDeslindeModal3 = () => setShowModal3(false);
 
-    // Validation functions
     const validateCorreo = (correo) => /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(correo);
-    const validatePassword = (password) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d#@$!%*?&]{8,50}$/.test(password);
-    const validateUsuario = (usuario) => /^[a-zA-ZÀ-ÿ\d\s]{2,50}$/.test(usuario);
-    const validateNombre = (nombre) => /^[a-zA-ZÀ-ÿ\s]{2,50}$/.test(nombre);
-    const validateApellido = (apellido) => /^[a-zA-ZÀ-ÿ\s]{2,50}$/.test(apellido);
+    const validatePassword = (password) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{8,50}$/.test(password);
+    const validateUsuario = (usuario) => /^[a-zA-ZÀ-ÿ\d\s\S]{2,50}$/.test(usuario);
+    const validateNombre = (nombre) => /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]{2,50}$/.test(nombre);
+    const validateApellido = (apellido) => /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]{2,50}$/.test(apellido);
+
     const validateEdad = (edad) => /^(1[89]|[2-9]\d|99)$/.test(edad);
     const validateTelefono = (telefono) => /^\d{10}$/.test(telefono);
 
@@ -93,6 +98,12 @@ export const Register = () => {
             if (!value.trim()) error = "La contraseña es obligatoria.";
             else if (!validatePassword(value)) error = "Formato de contraseña inválido.";
         }
+        if (name === "password" && containsCommonPatterns(value)) {
+            error = "La contraseña contiene patrones comunes.";
+        }
+        // if (name === "password" && checkPasswordCompromise(value)) {
+        //     error = "La contraseña a sido comprometida.";
+        // }
         if (name === "confirmPassword") {
             if (!value.trim()) error = "La confirmación de la contraseña es obligatoria.";
             else if (value !== password) error = "Las contraseñas no coinciden.";
@@ -105,7 +116,7 @@ export const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         const newErrors = {};
-        
+
         if (!usuario) newErrors.usuario = "El usuario es obligatorio.";
         else if (!validateUsuario(usuario)) newErrors.usuario = "El usuario no tiene un formato válido.";
 
@@ -151,30 +162,28 @@ export const Register = () => {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) return;
-
-            const response = await fetch('https://back-farmam.onrender.com/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    usuario, nombre, apellidoPaterno, apellidoMaterno,
-                    edad, telefono, genero, correo, password, captcha: captchaValue
-                }),
+        const response = await fetch('https://back-farmam.onrender.com/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                usuario, nombre, apellidoPaterno, apellidoMaterno,
+                edad, telefono, genero, correo, password, captcha: captchaValue
+            }),
+        });
+        if (response.ok) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Registro exitoso. Revisa tu correo para el código de verificación.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar',
             });
-            if (response.ok) {
-                Swal.fire({
-                    title: 'Éxito',
-                    text: 'Registro exitoso. Revisa tu correo para el código de verificación.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                });
-                navigate('/otpInput', { state: { replace: true, correo }, replace: true });
-                onResetForm();
-            } else {
-                const errorMessage = await response.text();
-                Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' });
-            }
-         
+            navigate('/otpInput', { state: { replace: true, correo }, replace: true });
+            onResetForm();
+        } else {
+            const errorMessage = await response.text();
+            Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' });
+        }
     };
 
     return (
@@ -216,7 +225,6 @@ export const Register = () => {
                                             placeholder={"Introduce tu nombre"}
                                         />
                                         {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
-
                                     </div>
                                 </div>
 
@@ -375,19 +383,29 @@ export const Register = () => {
 
                                 <div className="form-outline mb-3">
                                     <label className="form-label" htmlFor="password">Ingresa tu contraseña:</label>
-                                    <Input
-                                        type="password"
-                                        id="password"
-                                        name="password"
-                                        value={password}
-                                        onChange={(e) => {
-                                            onInputChange(e);
-                                            handleValidation(e);
-                                        }}
-                                        minLength={8}
-                                        maxLength={50}
-                                        placeholder={"Introduce tu contraseña"}
-                                    />
+                                    <div className='input-group'>
+                                        <Input
+                                            type={showPassword ? "text" : "password"}
+                                            id="password"
+                                            name="password"
+                                            value={password}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
+                                            minLength={8}
+                                            maxLength={50}
+                                            placeholder={"Introduce tu contraseña"}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
+
                                     {password && (
                                         <PasswordStrengthBar
                                             password={password}
@@ -414,19 +432,29 @@ export const Register = () => {
 
                                 <div className="form-outline mb-3">
                                     <label className="form-label" htmlFor="confirmPassword">Repite tu contraseña:</label>
-                                    <Input
-                                        type="password"
-                                        id="confirmPassword"
-                                        name="confirmPassword"
-                                        value={confirmPassword}
-                                        onChange={(e) => {
-                                            onInputChange(e);
-                                            handleValidation(e);
-                                        }}
-                                        minLength={8}
-                                        maxLength={50}
-                                        placeholder={"Repite tu contraseña"}
-                                    />
+                                    <div className='input-group'>
+                                        <Input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            value={confirmPassword}
+                                            onChange={(e) => {
+                                                onInputChange(e);
+                                                handleValidation(e);
+                                            }}
+                                            minLength={8}
+                                            maxLength={50}
+                                            placeholder={"Repite tu contraseña"}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
+
                                     {errors.confirmPassword && <div className="text-danger">{errors.confirmPassword}</div>}
                                     {password && confirmPassword && (
                                         <PasswordChecklist
@@ -459,11 +487,10 @@ export const Register = () => {
 
                                         />
                                         <label htmlFor="terminos" className="small text-muted">
-                                            <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
+                                            <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
                                                 Acepto los Términos y Condiciones</a>
                                         </label>
                                         <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
-
                                     </div>
 
                                     <div className="col-md-6 d-flex align-items-center">
@@ -475,7 +502,7 @@ export const Register = () => {
                                             onChange={(e) => handleCheckboxChange("privacidad", e.target.checked)}
                                         />
                                         <label htmlFor="privacidad" className="small text-muted">
-                                            <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
+                                            <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
                                                 Acepto la Política de privacidad</a>
                                         </label>
                                         <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
@@ -489,17 +516,15 @@ export const Register = () => {
                                                 checked={deslindeChecked}
                                                 onChange={(e) => handleCheckboxChange("deslinde", e.target.checked)}
                                             />
-                                            <label htmlFor="deslinde" className="small text-muted">
-                                                <a href="#!" className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
+                                            <label htmlFor="deslinde" className="small text-muted m-3">
+                                                <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
                                                     Acepto el deslinde legal
                                                 </a>
                                             </label>
                                         </div>
                                         <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
                                     </div>
-
                                     {errors.terminos && <div className="text-danger mt-2">{errors.terminos}</div>}
-
                                 </div>
 
                                 <div className="mb-3">
@@ -512,10 +537,10 @@ export const Register = () => {
                                 </div>
 
                                 <p className='small text-muted mb-3'>
-                                    ¿Olvidaste tu contraseña? <a href="https://farmamedic.vercel.app/ForgotPassword" style={{ color: 'blue' }}>Recupérala aquí</a>
+                                    ¿Olvidaste tu contraseña? <NavLink to="/forgotpassword">Recuperala aquí</NavLink>
                                 </p>
-                                <p className="small text-muted mb-3" style={{ color: '#393f81' }}>
-                                    ¿Ya tienes una cuenta? <a href="https://farmamedic.vercel.app/login" style={{ color: 'blue' }}>Inicia sesion aquí</a>
+                                <p className="small text-muted mb-3">
+                                    ¿Ya tienes una cuenta? <NavLink to="/login">Inicia sesión aquí</NavLink>
                                 </p>
                             </form>
                         </div>

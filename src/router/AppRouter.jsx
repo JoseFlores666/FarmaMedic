@@ -13,6 +13,7 @@ import Logo from '../pages/PerfilEmpresa/Logo';
 import Contact from '../pages/PerfilEmpresa/Contact';
 import { Home2 } from '../pages/Home2';
 import Auditoria from '../pages/PerfilEmpresa/Auditoria';
+import GestionUsuarios from '../pages/MonitorDeIncidencias/GestionUsuarios';
 
 export const AppRouter = () => {
 	return (
@@ -34,6 +35,7 @@ export const AppRouter = () => {
 				<Route path='/contact' element={<AdminRoute><Contact /></AdminRoute>}/>
 				<Route path='/auditoria' element={<AdminRoute><Auditoria /></AdminRoute>}/>
 				<Route path='/services' element={<PrivateRoute><Services /></PrivateRoute>}/>
+				<Route path='/gestionUsuarios' element={<AdminRoute><GestionUsuarios /></AdminRoute>}/>
 			</Routes>
 		</>
 	);

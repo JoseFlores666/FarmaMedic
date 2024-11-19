@@ -176,7 +176,6 @@ const Enlaces = () => {
                         </tr>
                     )}
                 </tbody>
-
             </table>
         </div>
     );

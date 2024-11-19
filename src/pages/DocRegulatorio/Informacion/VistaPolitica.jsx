@@ -46,7 +46,7 @@ const VistaPolitica = ({ showModal, onClose }) => {
       }}
     >
       <div className="text-center mb-4">
-        <h2>Politicas de Privacidad Vigente</h2>
+        <h2 className='text-black'>Politicas de Privacidad Vigente</h2>
       </div>
       <div className="container">
         {deslindes.map((item) => (

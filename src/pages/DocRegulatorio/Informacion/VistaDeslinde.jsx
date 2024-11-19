@@ -46,7 +46,7 @@ const VistaDeslinde = ({ showModal, onClose }) => {
       }}
     >
       <div className="text-center mb-4">
-        <h2>Deslinde Legal Vigente</h2>
+        <h2 className='text-black'>Deslinde Legal Vigente</h2>
       </div>
       <div className="container">
         {deslindes.map((item) => (
@@ -59,7 +59,7 @@ const VistaDeslinde = ({ showModal, onClose }) => {
               <button className='btn btn-danger btn-sm' onClick={onClose}>Cerrar</button>
             </div>
 
-            <div className="card-body text-center"> {/* Centro el contenido del card-body */}
+            <div className="card-body text-center"> 
               <label>Contenido: </label>
               <p className="form-control-plaintext">{item.contenido}</p>
               <div className="row mt-4">

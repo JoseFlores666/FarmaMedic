@@ -46,7 +46,7 @@ const VistaTerminos = ({ showModal, onClose }) => {
       }}
     >
       <div className="text-center mb-4">
-        <h2>Terminos y Condiciones Vigentes</h2>
+        <h2 className='text-black'>Terminos y Condiciones Vigentes</h2>
       </div>
       <div className="container">
         {deslindes.map((item) => (

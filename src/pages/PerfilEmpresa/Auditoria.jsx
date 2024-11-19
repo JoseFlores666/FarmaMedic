@@ -6,8 +6,7 @@ const Auditoria = () => {
   useEffect(() => {
     const fetchAuditLogs = async () => {
       try {
-        // Solicitar los registros de auditoría desde el backend
-        const response = await fetch('http://localhost:4000/api/getAuditLogs'); // Asegúrate de que esta URL coincida con tu API
+        const response = await fetch('http://localhost:4000/api/getAuditLogs'); 
         if (!response.ok) {
           throw new Error('Error al obtener los registros de auditoría');
         }

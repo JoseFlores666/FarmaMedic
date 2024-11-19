@@ -10,40 +10,49 @@ export const Home = () => {
   const [eslogan, setEslogan] = useState('');
   const [title, setTitle] = useState('');
 
+ 
   useEffect(() => {
     const fetchEslogan = async () => {
-      try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
-        if (!response.ok) {
-          throw new Error('Error al obtener el eslogan');
+        try {
+            const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
+            if (!response.ok) {
+                throw new Error('Error al obtener el eslogan');
+            }
+            const data = await response.json();
+            setEslogan(data.eslogan || '');
+        } catch (error) {
+            console.error('Error al obtener el eslogan:', error);
+            MySwal.fire('Error', 'No se pudo obtener el eslogan', 'error');
         }
-        const data = await response.json();
-        setEslogan(data.eslogan || '');
-      } catch (error) {
-        console.error('Error al obtener el eslogan:', error);
-        MySwal.fire('Error', 'No se pudo obtener el eslogan', 'error');
-      }
     };
 
-    fetchEslogan();
-    fetchTitle();
-  }, []);
+    const fetchTitle = async () => {
+        try {
+            const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
+                credentials: 'include',
+            });
+            if (!response.ok) {
+                throw new Error('Error al obtener el título');
+            }
+            const data = await response.json();
+            setTitle(data[0]?.title || '');
+        } catch (error) {
+            console.error('Error al obtener el título:', error);
+            MySwal.fire('Error', 'No se pudo obtener el título', 'error');
+        }
+    };
 
-  const fetchTitle = async () => {
-    try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('Error al obtener el título');
-      }
-      const data = await response.json();
-      setTitle(data[0]?.title || '');
-    } catch (error) {
-      console.error('Error al obtener el título:', error);
-      MySwal.fire('Error', 'No se pudo obtener el título', 'error');
-    }
-  };
+    const fetchData = () => {
+        fetchEslogan();
+        fetchTitle();
+    };
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 20000);
+
+    return () => clearInterval(interval);
+}, []); 
 
   return (
     <MDBContainer fluid className="home-container">
@@ -56,11 +65,11 @@ export const Home = () => {
                 {eslogan || 'Comprometidos con tu salud, brindando soluciones médicas integrales para ti y tu familia.'}
               </p>
               <MDBBtn color="info" size="lg" className="hero-text me-2">Más información</MDBBtn>
-              <MDBBtn outline color="light" size="lg" className="hero-text">Contactar</MDBBtn>
+              <MDBBtn color="info" size="lg" className="hero-text">Contactar</MDBBtn>
             </MDBCol>
             <MDBCol md="6" className="text-center">
               <img
-                src="/src/assets/clinica.jpg"
+                src="https://res.cloudinary.com/dzppbjrlm/image/upload/v1731989800/clinica_wqmjz0.jpg"
                 alt="Médicos trabajando"
                 className="img-fluid hero-image"
               />

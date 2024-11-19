@@ -18,7 +18,7 @@ export const checkPasswordCompromise = async (password) => {
     }
 };
 
-const commonPatterns = ["12345678","87654321", "password", "qwertyui", "abcd1234"];
+const commonPatterns = ["12345678","987654321","09876","012345678", "password", "qwertyui", "abcd1234","abcdefgh", "12345", "54321"];
 
 export const containsCommonPatterns = (password) => {
     return commonPatterns.some((pattern) => password.toLowerCase().includes(pattern));

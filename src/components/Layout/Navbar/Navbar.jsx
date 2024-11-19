@@ -80,7 +80,7 @@ export const Navbar = () => {
               {isAuthenticated ? (
                 <>
                   <li className="nav-item">
-                    <NavLink className="nav-link" to="/home" onClick={closeMenu}>Home</NavLink>
+                    <NavLink className="nav-link" to="/home" onClick={closeMenu}>Inicio</NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink className="nav-link" to="/about" onClick={closeMenu}>About</NavLink>
@@ -109,6 +109,9 @@ export const Navbar = () => {
                           </li>
                           <li className="nav-item">
                             <NavLink className="dropdown-item" to="/Logo" onClick={closeMenu}>Logo</NavLink>
+                          </li>
+                          <li className="nav-item">
+                            <NavLink className="dropdown-item" to="/gestionUsuarios" onClick={closeMenu}>Gestion De Usuarios</NavLink>
                           </li>
                           <li className="nav-item">
                             <NavLink className="dropdown-item" to="/auditoria" onClick={closeMenu}>Auditoria</NavLink>
@@ -159,7 +162,7 @@ export const Navbar = () => {
               ) : (
                 <>
                   <li className="nav-item">
-                    <NavLink className="nav-link" to="/home2" onClick={closeMenu}>Home</NavLink>
+                    <NavLink className="nav-link" to="/home2" onClick={closeMenu}>Inicio</NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink className="nav-link" to="/login" onClick={closeMenu}>Iniciar sesión</NavLink>

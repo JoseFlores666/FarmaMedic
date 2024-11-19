@@ -3,7 +3,6 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
-
 const Terminos = () => {
     const [terminos, setTerminos] = useState([]);
     const [titulo, setTitulo] = useState('');
@@ -11,9 +10,8 @@ const Terminos = () => {
     const [fechaVigencia, setFechaVigencia] = useState('');
     const [editMode, setEditMode] = useState(false);
     const [currentId, setCurrentId] = useState('');
-    // const [csrfToken, setCsrfToken] = useState('');
     const [expandir, setExpandir] = useState([]);
-    const [filtroEstado, setFiltroEstado] = useState('Todos'); // Nuevo estado para el filtro
+    const [filtroEstado, setFiltroEstado] = useState('Todos');
 
     const manejoExpansion = (id) => {
         if (expandir.includes(id)) {
@@ -27,32 +25,18 @@ const Terminos = () => {
         fetchTerminos();
     }, []);
 
-    // useEffect(() => {
-    //     const fetchCsrfToken = async () => {
-    //         try {
-    //             const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-    //                 credentials: 'include',
-    //             });
-    //             const data = await response.json();
-    //             setCsrfToken(data.csrfToken);
-    //         } catch (error) {
-    //             console.error('Error obteniendo el token CSRF:', error);
-    //         }
-    //     };
-    //     fetchCsrfToken();
-    // }, []);
-
     const fetchTerminos = async () => {
         try {
             const response = await fetch(`https://back-farmam.onrender.com/api/getTerminosCondiciones`);
             if (!response.ok) {
-                throw new Error('Error al obtener términos y condiciones');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al obtener términos y condiciones');
             }
             const data = await response.json();
             setTerminos(data);
         } catch (error) {
             console.error('Error al obtener términos y condiciones:', error);
-            MySwal.fire('Error', 'No se pudo obtener la lista de términos y condiciones', 'error');
+            MySwal.fire('Error', error.message || 'No se pudo obtener la lista de términos y condiciones', 'error');
         }
     };
 
@@ -73,18 +57,18 @@ const Terminos = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
             });
             if (!response.ok) {
-                throw new Error('Error al crear término y condición');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear término y condición');
             }
             MySwal.fire('Éxito', 'Término y condición agregado correctamente', 'success');
         } catch (error) {
             console.error('Error al crear término y condición:', error);
-            MySwal.fire('Error', 'No se pudo crear el término y condición', 'error');
+            MySwal.fire('Error', error.message || 'No se pudo crear el término y condición', 'error');
         }
     };
 
@@ -94,18 +78,18 @@ const Terminos = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 'X-CSRF-Token': csrfToken,
                 },
                 credentials: 'include',
                 body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
             });
             if (!response.ok) {
-                throw new Error('Error al actualizar término y condición');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar término y condición');
             }
             MySwal.fire('Éxito', 'Término y condición actualizado correctamente', 'success');
         } catch (error) {
             console.error('Error al actualizar término y condición:', error);
-            MySwal.fire('Error', 'No se pudo actualizar el término y condición', 'error');
+            MySwal.fire('Error', error.message || 'No se pudo actualizar el término y condición', 'error');
         }
     };
 
@@ -120,25 +104,24 @@ const Terminos = () => {
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
         });
-
         if (confirm.isConfirmed) {
             try {
                 const response = await fetch(`https://back-farmam.onrender.com/api/deleteTerminosCondiciones/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        // 'X-CSRF-Token': csrfToken,
                     },
                     credentials: 'include',
                 });
                 if (!response.ok) {
-                    throw new Error('Error al eliminar término y condición');
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al eliminar término y condición');
                 }
                 MySwal.fire('Eliminado', 'Eliminado correctamente', 'success');
                 fetchTerminos();
             } catch (error) {
                 console.error('Error al eliminar término y condición:', error);
-                MySwal.fire('Error', 'No se pudo eliminar el término y condición', 'error');
+                MySwal.fire('Error', error.message || 'No se pudo eliminar el término y condición', 'error');
             }
         }
     };
@@ -173,12 +156,10 @@ const Terminos = () => {
         return `${day}/${month}/${year}`;
     };
 
-    // Filtrando términos según el estado seleccionado
     const terminosFiltrados = terminos.filter((item) => {
-        if (filtroEstado === 'Todos') return true; // Mostrar todos
-        return item.vigencia === filtroEstado; // Filtrar según el estado
+        if (filtroEstado === 'Todos') return true;
+        return item.vigencia === filtroEstado;
     });
-
     return (
         <div className="container mt-2">
             <h1 className="text-center mb-4">Gestión de Términos y Condiciones</h1>
@@ -216,9 +197,6 @@ const Terminos = () => {
                         className="form-control"
                     />
                 </div>
-
-                {/* Dropdown para filtrar por estado */}
-
 
                 <div className="d-flex justify-content-center gap-2 mt-3">
                     <button type="submit" className="btn btn-primary">
@@ -293,13 +271,17 @@ const Terminos = () => {
                                     </div>
                                 </div>
                                 <div className="row">
-                                    <div className="col-md-6 text-center">
+                                    <div className="col-md-4 text-center">
                                         <label>Fecha de Creación</label>
                                         <p className="form-control-plaintext">{formatDate(item.fecha_creacion)}</p>
                                     </div>
-                                    <div className="col-md-6 text-center">
+                                    <div className="col-md-4 text-center">
                                         <label>Fecha de Vigencia</label>
                                         <p className="form-control-plaintext">{formatDate(item.fecha_vigencia)}</p>
+                                    </div>
+                                    <div className="col-md-4 text-center">
+                                        <label>Fecha de Actualizacion</label>
+                                        <p className="form-control-plaintext">{formatDate(item.fecha_actualizacion)}</p>
                                     </div>
                                 </div>
                             </div>

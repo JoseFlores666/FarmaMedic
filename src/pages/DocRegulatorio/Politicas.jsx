@@ -11,9 +11,8 @@ const Politicas = () => {
   const [fechaVigencia, setFechaVigencia] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState('');
-  // const [csrfToken, setCsrfToken] = useState('');
   const [expandir, setExpandir] = useState([]);
-  const [filtroEstado, setFiltroEstado] = useState('Todos'); // Estado del filtro
+  const [filtroEstado, setFiltroEstado] = useState('Todos');
 
   const manejoExpansion = (id) => {
     if (expandir.includes(id)) {
@@ -27,32 +26,18 @@ const Politicas = () => {
     fetchPoliticas();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchCsrfToken = async () => {
-  //     try {
-  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-  //         credentials: 'include',
-  //       });
-  //       // const data = await response.json();
-  //       // // setCsrfToken(data.csrfToken);
-  //     } catch (error) {
-  //       console.error('Error obteniendo el token CSRF:', error);
-  //     }
-  //   };
-  //   fetchCsrfToken();
-  // }, []);
-
   const fetchPoliticas = async () => {
     try {
       const response = await fetch(`https://back-farmam.onrender.com/api/getPoliticas`);
       if (!response.ok) {
-        throw new Error('Error al obtener políticas');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener políticas');
       }
       const data = await response.json();
       setPoliticas(data);
     } catch (error) {
       console.error('Error al obtener políticas:', error);
-      MySwal.fire('Error', 'No se pudo obtener la lista de políticas', 'error');
+      MySwal.fire('Error', error.message, 'error');
     }
   };
 
@@ -73,18 +58,18 @@ const Politicas = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
       });
       if (!response.ok) {
-        throw new Error('Error al crear política');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al crear política');
       }
       MySwal.fire('Éxito', 'Se insertó correctamente', 'success');
     } catch (error) {
       console.error('Error al crear política:', error);
-      MySwal.fire('Error', 'No se pudo crear la política', 'error');
+      MySwal.fire('Error', error.message, 'error');
     }
   };
 
@@ -94,18 +79,18 @@ const Politicas = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
       });
       if (!response.ok) {
-        throw new Error('Error al actualizar política');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al actualizar política');
       }
       MySwal.fire('Éxito', 'Actualizado correctamente', 'success');
     } catch (error) {
       console.error('Error al actualizar política:', error);
-      MySwal.fire('Error', 'No se pudo actualizar la política', 'error');
+      MySwal.fire('Error', error.message, 'error');
     }
   };
 
@@ -127,18 +112,18 @@ const Politicas = () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRF-Token': csrfToken,
           },
           credentials: 'include',
         });
         if (!response.ok) {
-          throw new Error('Error al eliminar política');
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al eliminar política');
         }
         MySwal.fire('Eliminado', 'Eliminado correctamente', 'success');
         fetchPoliticas();
       } catch (error) {
         console.error('Error al eliminar política:', error);
-        MySwal.fire('Error', 'No se pudo eliminar la política', 'error');
+        MySwal.fire('Error', error.message, 'error');
       }
     }
   };
@@ -174,8 +159,8 @@ const Politicas = () => {
   };
 
   const politicasFiltradas = politicas.filter((item) => {
-    if (filtroEstado === 'Todos') return true; // Mostrar todas
-    return item.vigencia === filtroEstado; // Filtrar según el estado
+    if (filtroEstado === 'Todos') return true;
+    return item.vigencia === filtroEstado;
   });
 
   return (
@@ -215,7 +200,6 @@ const Politicas = () => {
             className="form-control"
           />
         </div>
-
 
         <div className="d-flex justify-content-center gap-2 mt-3">
           <button type="submit" className="btn btn-primary">
@@ -290,13 +274,17 @@ const Politicas = () => {
                   </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6 text-center">
+                  <div className="col-md-4 text-center">
                     <label>Fecha de Creación</label>
                     <p className="form-control-plaintext">{formatDate(item.fecha_creacion)}</p>
                   </div>
-                  <div className="col-md-6 text-center">
+                  <div className="col-md-4 text-center">
                     <label>Fecha de Vigencia</label>
                     <p className="form-control-plaintext">{formatDate(item.fecha_vigencia)}</p>
+                  </div>
+                  <div className="col-md-4 text-center">
+                    <label>Fecha de Actualizacion</label>
+                    <p className="form-control-plaintext">{formatDate(item.fecha_actualizacion)}</p>
                   </div>
                 </div>
               </div>

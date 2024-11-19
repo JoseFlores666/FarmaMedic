@@ -11,9 +11,8 @@ const Deslinde = () => {
   const [fechaVigencia, setFechaVigencia] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState('');
-  // const [csrfToken, setCsrfToken] = useState('');
   const [expandir, setExpandir] = useState([]);
-  const [filtroEstado, setFiltroEstado] = useState('Todos'); // Nuevo estado para filtro
+  const [filtroEstado, setFiltroEstado] = useState('Todos');
 
   const manejoExpansion = (id) => {
     if (expandir.includes(id)) {
@@ -27,32 +26,18 @@ const Deslinde = () => {
     fetchDeslindes();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchCsrfToken = async () => {
-  //     try {
-  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-  //         credentials: 'include',
-  //       });
-  //       const data = await response.json();
-  //       setCsrfToken(data.csrfToken);
-  //     } catch (error) {
-  //       console.error('Error obteniendo el token CSRF:', error);
-  //     }
-  //   };
-  //   fetchCsrfToken();
-  // }, []);
-
   const fetchDeslindes = async () => {
     try {
       const response = await fetch(`https://back-farmam.onrender.com/api/getDeslindesLegales`);
       if (!response.ok) {
-        throw new Error('Error al obtener deslinde legal');
+        const errorData = await response.json();  // Captura el mensaje de error
+        throw new Error(errorData.message || 'Error al obtener deslinde legal');
       }
       const data = await response.json();
       setDeslindes(data);
     } catch (error) {
       console.error('Error al obtener deslinde legal:', error);
-      MySwal.fire('Error', 'No se pudo obtener la lista de deslindes legales', 'error');
+      MySwal.fire('Error', error.message || 'No se pudo obtener la lista de deslindes legales', 'error');
     }
   };
 
@@ -73,18 +58,19 @@ const Deslinde = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
       });
+
       if (!response.ok) {
-        throw new Error('Error al crear deslinde legal');
+        const errorData = await response.json();  // Captura el mensaje de error
+        throw new Error(errorData.message || 'Error al crear deslinde legal');
       }
       MySwal.fire('Éxito', 'Deslinde legal agregado correctamente', 'success');
     } catch (error) {
       console.error('Error al crear deslinde legal:', error);
-      MySwal.fire('Error', 'No se pudo crear el deslinde legal', 'error');
+      MySwal.fire('Error', error.message || 'No se pudo crear el deslinde legal', 'error');
     }
   };
 
@@ -94,18 +80,19 @@ const Deslinde = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          // 'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
       });
+
       if (!response.ok) {
-        throw new Error('Error al actualizar deslinde legal');
+        const errorData = await response.json();  // Captura el mensaje de error
+        throw new Error(errorData.message || 'Error al actualizar deslinde legal');
       }
       MySwal.fire('Éxito', 'Deslinde legal actualizado correctamente', 'success');
     } catch (error) {
       console.error('Error al actualizar deslinde legal:', error);
-      MySwal.fire('Error', 'No se pudo actualizar el deslinde legal', 'error');
+      MySwal.fire('Error', error.message || 'No se pudo actualizar el deslinde legal', 'error');
     }
   };
 
@@ -127,18 +114,20 @@ const Deslinde = () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRF-Token': csrfToken,
           },
           credentials: 'include',
         });
+
         if (!response.ok) {
-          throw new Error('Error al eliminar deslinde legal');
+          const errorData = await response.json();  // Captura el mensaje de error
+          throw new Error(errorData.message || 'Error al eliminar deslinde legal');
         }
+
         MySwal.fire('Eliminado', 'Eliminado correctamente', 'success');
         fetchDeslindes();
       } catch (error) {
         console.error('Error al eliminar deslinde legal:', error);
-        MySwal.fire('Error', 'No se pudo eliminar el deslinde legal', 'error');
+        MySwal.fire('Error', error.message || 'No se pudo eliminar el deslinde legal', 'error');
       }
     }
   };
@@ -289,13 +278,17 @@ const Deslinde = () => {
                   </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-6 text-center">
+                  <div className="col-md-4 text-center">
                     <label>Fecha de Creación</label>
                     <p className="form-control-plaintext">{formatDate(item.fecha_creacion)}</p>
                   </div>
-                  <div className="col-md-6 text-center">
+                  <div className="col-md-4 text-center">
                     <label>Fecha de Vigencia</label>
                     <p className="form-control-plaintext">{formatDate(item.fecha_vigencia)}</p>
+                  </div>
+                  <div className="col-md-4 text-center">
+                    <label>Fecha de Actualizacion</label>
+                    <p className="form-control-plaintext">{formatDate(item.fecha_actualizacion)}</p>
                   </div>
                 </div>
               </div>
