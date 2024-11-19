@@ -5,12 +5,12 @@ const GestionUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [updated, setUpdated] = useState(false);
     const [filteredUsuarios, setFilteredUsuarios] = useState([]);
-    const [filter, setFilter] = useState('all'); // Valores posibles: 'day', 'week', 'month', 'all'
+    const [filter, setFilter] = useState('all'); 
 
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/getUsuariosAll', {
+                const response = await fetch('https://back-farmam.onrender.com/api/getUsuariosAll', {
                     credentials: 'include',
                 });
 
@@ -20,7 +20,7 @@ const GestionUsuarios = () => {
 
                 const data = await response.json();
                 setUsuarios(data);
-                setFilteredUsuarios(data); // Mostrar todos inicialmente
+                setFilteredUsuarios(data); 
             } catch (error) {
                 console.error('Error al obtener usuarios:', error);
                 Swal.fire('Error', 'No se pudo obtener la lista de usuarios', 'error');
@@ -39,20 +39,20 @@ const GestionUsuarios = () => {
         if (selectedFilter === 'day') {
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt.toDateString() === now.toDateString(); // Mismo día
+                return createdAt.toDateString() === now.toDateString(); 
             });
         } else if (selectedFilter === 'week') {
-            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); // Domingo anterior
+            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); 
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt >= startOfWeek && createdAt <= new Date(); // Dentro de la semana actual
+                return createdAt >= startOfWeek && createdAt <= new Date(); 
             });
         } else if (selectedFilter === 'month') {
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear; // Mismo mes y año
+                return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear; 
             });
         }
 
@@ -61,7 +61,7 @@ const GestionUsuarios = () => {
 
     const handleBloquear = async (id) => {
         try {
-            const response = await fetch(`http://localhost:4000/api/bloquearUsuario/${id}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/bloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });
@@ -71,7 +71,7 @@ const GestionUsuarios = () => {
             }
 
             Swal.fire('Éxito', 'Usuario bloqueado exitosamente', 'success');
-            setUpdated(!updated); // Actualiza la lista
+            setUpdated(!updated); 
         } catch (error) {
             console.error('Error al bloquear usuario:', error);
             Swal.fire('Error', 'Ocurrió un error al bloquear el usuario', 'error');
@@ -80,7 +80,7 @@ const GestionUsuarios = () => {
 
     const handleDesbloquear = async (id) => {
         try {
-            const response = await fetch(`http://localhost:4000/api/desbloquearUsuario/${id}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/desbloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });
