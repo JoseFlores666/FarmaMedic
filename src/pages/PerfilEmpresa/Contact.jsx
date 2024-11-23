@@ -21,7 +21,7 @@ const Contact = () => {
   }, [updated]);
 
   const fetchContactInfo = async () => {
-    const response = await fetch('https://localhost:4000/api/getContactInfo');
+    const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo');
     if (!response.ok) throw new Error('No se pudo obtener la información de contacto');
     const data = await response.json();
     setDireccion(data.direccion);
@@ -30,7 +30,7 @@ const Contact = () => {
   };
 
   const fetchEslogan = async () => {
-    const response = await fetch('https://localhost:4000/api/getEslogan');
+    const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
     if (!response.ok) throw new Error('Error al obtener el eslogan');
     const data = await response.json();
     setEslogan(data.eslogan || '');
@@ -38,7 +38,7 @@ const Contact = () => {
   };
 
   const fetchTitle = async () => {
-    const response = await fetch('https://localhost:4000/api/getTitle', { credentials: 'include' });
+    const response = await fetch('https://back-farmam.onrender.com/api/getTitle', { credentials: 'include' });
     if (!response.ok) throw new Error('Error al obtener el título');
     const data = await response.json();
     setTitle(data[0]?.title || '');
@@ -50,7 +50,7 @@ const Contact = () => {
   
     if (!validateInputs()) return;
     try {
-      let response = await fetch('https://localhost:4000/api/upsertContactInfo', {
+      let response = await fetch('https://back-farmam.onrender.com/api/upsertContactInfo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ direccion, email, telefono }),
@@ -63,7 +63,7 @@ const Contact = () => {
         return;
       }
   
-      response = await fetch('https://localhost:4000/api/updateTitle/1', {
+      response = await fetch('https://back-farmam.onrender.com/api/updateTitle/1', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -77,8 +77,8 @@ const Contact = () => {
   
       const esloganMethod = esloganId ? 'PUT' : 'POST';
       const esloganUrl = esloganId
-        ? `https://localhost:4000/api/updateEslogan/${esloganId}`
-        : 'https://localhost:4000/api/createEslogan';
+        ? `https://back-farmam.onrender.com/api/updateEslogan/${esloganId}`
+        : 'https://back-farmam.onrender.com/api/createEslogan';
       response = await fetch(esloganUrl, {
         method: esloganMethod,
         headers: { 'Content-Type': 'application/json' },

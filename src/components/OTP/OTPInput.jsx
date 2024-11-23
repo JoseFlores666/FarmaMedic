@@ -15,7 +15,7 @@ const OTPInput = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://localhost:4000/api/verifyOtp', {
+      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

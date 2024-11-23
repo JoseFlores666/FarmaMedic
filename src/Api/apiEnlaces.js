@@ -1,6 +1,6 @@
 export const fetchEnlaces = async () => {
     try {
-        const response = await fetch('https://localhost:4000/api/getEnlaces', {
+        const response = await fetch('https://back-farmam.onrender.com/api/getEnlaces', {
             credentials: 'include',
         });
         const data = await response.json();

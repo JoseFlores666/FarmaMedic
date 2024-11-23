@@ -14,7 +14,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchEslogan = async () => {
         try {
-            const response = await fetch('https://localhost:4000/api/getEslogan');
+            const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
             if (!response.ok) {
                 throw new Error('Error al obtener el eslogan');
             }
@@ -28,7 +28,7 @@ export const Home = () => {
 
     const fetchTitle = async () => {
         try {
-            const response = await fetch('https://localhost:4000/api/getTitle', {
+            const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
                 credentials: 'include',
             });
             if (!response.ok) {
