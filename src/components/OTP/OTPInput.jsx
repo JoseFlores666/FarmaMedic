@@ -7,35 +7,18 @@ import Swal from 'sweetalert2';
 const OTPInput = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
-  // const [csrfToken, setCsrfToken] = useState('');
   const location = useLocation();
   const { correo } = location.state || {};
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const fetchCsrfToken = async () => {
-  //     try {
-  //       const response = await fetch('https://back-farmam.onrender.com/api/csrf-token', {
-  //         credentials: 'include',
-  //       });
-  //       const data = await response.json();
-  //       setCsrfToken(data.csrfToken);
-  //     } catch (error) {
-  //       console.error('Error obteniendo el token CSRF:', error);
-  //     }
-  //   };
-  //   fetchCsrfToken();
-  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
+      const response = await fetch('https://localhost:4000/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'CSRF-Token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ correo, otp }),

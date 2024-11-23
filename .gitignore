@@ -13,9 +13,8 @@ dist-ssr
 *.local
 
 # Cetificados
-ssl/
-
-
+ssl/*
+!ssl/
 
 # Editor directories and files
 .vscode/*
