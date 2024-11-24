@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import './Home.css';
@@ -7,43 +7,44 @@ import './Home.css';
 const MySwal = withReactContent(Swal);
 
 export const Home2 = () => {
-  const [eslogan, setEslogan] = useState(''); 
+  const [eslogan, setEslogan] = useState('');
   const [title, setTitle] = useState('');
+
 
   useEffect(() => {
     const fetchEslogan = async () => {
-        try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
-            if (!response.ok) {
-                throw new Error('Error al obtener el eslogan');
-            }
-            const data = await response.json();
-            setEslogan(data.eslogan || '');
-        } catch (error) {
-            console.error('Error al obtener el eslogan:', error);
-            MySwal.fire('Error', 'No se pudo obtener el eslogan', 'error');
+      try {
+        const response = await fetch('https://back-farmam.onrender.com/api/getEslogan');
+        if (!response.ok) {
+          throw new Error('Error al obtener el eslogan');
         }
+        const data = await response.json();
+        setEslogan(data.eslogan || '');
+      } catch (error) {
+        console.error('Error al obtener el eslogan:', error);
+        MySwal.fire('Error', 'No se pudo obtener el eslogan', 'error');
+      }
     };
 
     const fetchTitle = async () => {
-        try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
-                credentials: 'include',
-            });
-            if (!response.ok) {
-                throw new Error('Error al obtener el título');
-            }
-            const data = await response.json();
-            setTitle(data[0]?.title || '');
-        } catch (error) {
-            console.error('Error al obtener el título:', error);
-            MySwal.fire('Error', 'No se pudo obtener el título', 'error');
+      try {
+        const response = await fetch('https://back-farmam.onrender.com/api/getTitle', {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Error al obtener el título');
         }
+        const data = await response.json();
+        setTitle(data[0]?.title || '');
+      } catch (error) {
+        console.error('Error al obtener el título:', error);
+        MySwal.fire('Error', 'No se pudo obtener el título', 'error');
+      }
     };
 
     const fetchData = () => {
-        fetchEslogan();
-        fetchTitle();
+      fetchEslogan();
+      fetchTitle();
     };
 
     fetchData();
@@ -51,25 +52,27 @@ export const Home2 = () => {
     const interval = setInterval(fetchData, 20000);
 
     return () => clearInterval(interval);
-}, []); 
-
+  }, []);
 
   return (
-    <MDBContainer fluid className="home-container">
-      <section className="hero-section">
-        <div className="container-fluid">
+    <MDBContainer className='margen'>
+      <section>
+        <div>
           <MDBRow className="d-flex align-items-center text-center text-md-start">
             <MDBCol md="6">
-              <h1 className="hero-title">{title}</h1>
-              <p className="hero-description">
+            <h1 className="text-center text-md-start fs-2 fs-md-1 mb-4">{title}</h1>
+            <p className="hero-description">
                 {eslogan || 'Comprometidos con tu salud, brindando soluciones médicas integrales para ti y tu familia.'}
               </p>
-              <MDBBtn color="info" size="lg" className="me-3">Más información</MDBBtn>
-              <MDBBtn color="light" size="lg">Contactar</MDBBtn>
+              <div className="d-grid gap-2 d-md-flex flex-md-row flex-column">
+                <button className="btn btn-primary btn-lg me-md-2">Más información</button>
+                <button className="btn btn-primary btn-lg">Contactar</button>
+              </div>
+
             </MDBCol>
             <MDBCol md="6" className="text-center">
               <img
-                src="https://res.cloudinary.com/dzppbjrlm/image/upload/v1731989800/clinica_wqmjz0.jpg" 
+                src="https://res.cloudinary.com/dzppbjrlm/image/upload/v1731989800/clinica_wqmjz0.jpg"
                 alt="Médicos trabajando"
                 className="img-fluid hero-image"
               />
@@ -105,7 +108,7 @@ export const Home2 = () => {
       <section className="contact-section text-center py-5">
         <h2>Contáctanos</h2>
         <p>Nos encantaría saber de ti. Llámanos o escríbenos para más información.</p>
-        <MDBBtn color="info" size="lg">Contactar</MDBBtn>
+        <button className="btn btn-primary btn-lg btn-block">Contactar</button>
       </section>
     </MDBContainer>
   );
