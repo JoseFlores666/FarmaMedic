@@ -26,8 +26,8 @@ export const Login = () => {
     password: '',
   });
 
-//back-farmam.onrender.com
-//back-farmam.onrender.com
+  //back-farmam.onrender.com
+  //back-farmam.onrender.com
 
   const openDeslindeModal = () => setShowDeslindeModal(true);
   const closeDeslindeModal = () => setShowDeslindeModal(false);
@@ -72,17 +72,17 @@ export const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     const newErrors = {};
-  
+
     if (!correo) newErrors.correo = "El correo es obligatorio.";
     else if (!validateCorreo(correo)) newErrors.correo = "Formato de correo inválido.";
-  
+
     if (!password) newErrors.password = "La contraseña es obligatoria.";
     else if (!validatePassword(password)) newErrors.password = "Formato de contraseña inválido.";
-  
+
     setErrors(newErrors);
-  
+
     if (Object.keys(newErrors).length > 0) return;
-  
+
     try {
       const response = await fetch('https://back-farmam.onrender.com/api/login', {
         method: 'POST',
@@ -95,11 +95,11 @@ export const Login = () => {
           password,
         }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         await login(data.usuario, data.isAdmin);
-  
+
         Swal.fire({
           title: '¡Éxito!',
           text: 'Has iniciado sesión correctamente.',
@@ -113,11 +113,11 @@ export const Login = () => {
         });
       } else {
         const errorData = await response.json();
-  
+
         if (response.status === 403 && errorData.message.includes('bloqueada')) {
           Swal.fire({
             title: 'Cuenta Bloqueada',
-            text: errorData.message,  
+            text: errorData.message,
             icon: 'error',
             confirmButtonText: 'Aceptar',
           });
@@ -135,7 +135,7 @@ export const Login = () => {
       alert('Error de conexión o credenciales incorrectas');
     }
   };
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/home', { replace: true });
@@ -172,8 +172,7 @@ export const Login = () => {
 
                 <div className="form-outline mb-4">
                   <label className="form-label" htmlFor="password">Ingresa tu contraseña:</label>
-                  <div className='input-group'>
-
+                  <div className="input-group">
                     <Input
                       type={showPassword ? "text" : "password"}
                       id="password"
@@ -187,7 +186,8 @@ export const Login = () => {
                     />
                     <button
                       type="button"
-                      className="btn btn-outline-secondary"
+                      className="btn btn-outline-secondary "
+                      style={{ zIndex: 0 }}
                       onClick={() => setShowPassword(!showPassword)}
                     >
 

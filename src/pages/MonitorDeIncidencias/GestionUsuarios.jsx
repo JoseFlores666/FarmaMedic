@@ -5,7 +5,7 @@ const GestionUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [updated, setUpdated] = useState(false);
     const [filteredUsuarios, setFilteredUsuarios] = useState([]);
-    const [filter, setFilter] = useState('all'); 
+    const [filter, setFilter] = useState('all');
 
     useEffect(() => {
         const fetchUsuarios = async () => {
@@ -20,7 +20,7 @@ const GestionUsuarios = () => {
 
                 const data = await response.json();
                 setUsuarios(data);
-                setFilteredUsuarios(data); 
+                setFilteredUsuarios(data);
             } catch (error) {
                 console.error('Error al obtener usuarios:', error);
                 Swal.fire('Error', 'No se pudo obtener la lista de usuarios', 'error');
@@ -39,20 +39,20 @@ const GestionUsuarios = () => {
         if (selectedFilter === 'day') {
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt.toDateString() === now.toDateString(); 
+                return createdAt.toDateString() === now.toDateString();
             });
         } else if (selectedFilter === 'week') {
-            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); 
+            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt >= startOfWeek && createdAt <= new Date(); 
+                return createdAt >= startOfWeek && createdAt <= new Date();
             });
         } else if (selectedFilter === 'month') {
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
             filtered = usuarios.filter(usuario => {
                 const createdAt = new Date(usuario.created_at);
-                return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear; 
+                return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear;
             });
         }
 
@@ -71,7 +71,7 @@ const GestionUsuarios = () => {
             }
 
             Swal.fire('Éxito', 'Usuario bloqueado exitosamente', 'success');
-            setUpdated(!updated); 
+            setUpdated(!updated);
         } catch (error) {
             console.error('Error al bloquear usuario:', error);
             Swal.fire('Error', 'Ocurrió un error al bloquear el usuario', 'error');
@@ -90,7 +90,7 @@ const GestionUsuarios = () => {
             }
 
             Swal.fire('Éxito', 'Usuario desbloqueado exitosamente', 'success');
-            setUpdated(!updated); 
+            setUpdated(!updated);
         } catch (error) {
             console.error('Error al desbloquear usuario:', error);
             Swal.fire('Error', 'Ocurrió un error al desbloquear el usuario', 'error');
@@ -100,7 +100,8 @@ const GestionUsuarios = () => {
     return (
         <div className="container mt-5 mb-5">
             <h1 className="text-center">Gestión de Usuarios</h1>
-            <div className="d-flex justify-content-center gap-3 my-4">
+
+            <div className="d-flex justify-content-center gap-2 my-4">
                 <button
                     className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
                     onClick={() => handleFilterChange('all')}
@@ -126,51 +127,55 @@ const GestionUsuarios = () => {
                     Último Mes
                 </button>
             </div>
-            <table className="table table-bordered table-striped mt-4">
-                <thead className="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Intentos</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(filteredUsuarios) && filteredUsuarios.length > 0 ? (
-                        filteredUsuarios.map((usuario) => (
-                            <tr key={usuario.id}>
-                                <td>{usuario.id}</td>
-                                <td>{usuario.nombre}</td>
-                                <td>{usuario.correo}</td>
-                                <td>{usuario.intentos}</td>
-                                <td>
-                                    {usuario.intentos === 5 ? (
-                                        <button
-                                            onClick={() => handleDesbloquear(usuario.id)}
-                                            className="btn btn-success btn-sm me-2"
-                                        >
-                                            Desbloquear
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleBloquear(usuario.id)}
-                                            className="btn btn-danger btn-sm"
-                                        >
-                                            Bloquear
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
+
+            <div className="table-responsive">
+                <table className="table table-bordered table-striped mt-4">
+                    <thead className="table-dark">
                         <tr>
-                            <td colSpan="5" className="text-center">No hay usuarios disponibles</td>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Intentos</th>
+                            <th>Acciones</th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {Array.isArray(filteredUsuarios) && filteredUsuarios.length > 0 ? (
+                            filteredUsuarios.map((usuario) => (
+                                <tr key={usuario.id}>
+                                    <td>{usuario.id}</td>
+                                    <td>{usuario.nombre}</td>
+                                    <td>{usuario.correo}</td>
+                                    <td>{usuario.intentos}</td>
+                                    <td>
+                                        {usuario.intentos === 5 ? (
+                                            <button
+                                                onClick={() => handleDesbloquear(usuario.id)}
+                                                className="btn btn-success btn-sm me-2"
+                                            >
+                                                Desbloquear
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleBloquear(usuario.id)}
+                                                className="btn btn-danger btn-sm"
+                                            >
+                                                Bloquear
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center">No hay usuarios disponibles</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     );
 };
 

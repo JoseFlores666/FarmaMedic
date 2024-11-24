@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 
 const MySwal = withReactContent(Swal);
 
@@ -233,25 +235,32 @@ const Politicas = () => {
             <div className="card-header d-flex align-items-center"
               onClick={() => manejoExpansion(item.id)}
               style={{ borderRadius: '1rem', borderBottom: '1px solid', cursor: 'pointer', position: 'relative' }}>
-              <strong className="me-2">Título:</strong>{item.titulo}
+              <strong>{item.titulo}</strong>
 
-              <div style={{ marginLeft: 'auto', position: 'absolute', right: '10px' }}>
+              <div style={{ marginLeft: 'auto', position: 'absolute', right: '5px' }}>
                 {item.vigencia === 'Vigente' && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); editPolitica(item.id, item.titulo, item.contenido, item.fecha_vigencia, item.vigencia); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      editPolitica(item.id, item.titulo, item.contenido, item.fecha_vigencia, item.vigencia);
+                    }}
                     className="btn btn-warning btn-sm me-1"
+                    title="Editar"
                   >
-                    Editar
+                    <FontAwesomeIcon icon={faPen} />
                   </button>
                 )}
+
                 {item.estado !== 'eliminado' && (
                   <button
                     onClick={(e) => { e.stopPropagation(); deletePolitica(item.id); }}
                     className="btn btn-danger btn-sm"
+                    title="Eliminar"
                   >
-                    Eliminar
+                    <FontAwesomeIcon icon={faTrash} />
                   </button>
                 )}
+
               </div>
             </div>
 

@@ -99,85 +99,90 @@ const Enlaces = () => {
 
     return (
         <div className="container mt-5 mb-5">
-            <h1 className="text-center">Gestión de Enlaces de Redes Sociales</h1>
-            <form onSubmit={handleSubmit} className="mb-4">
-                <div className="mb-3">
-                    <label className='mb-1' htmlFor="">Nombre de la red social:</label>
-                    <input
-                        type="text"
-                        name="nombre"
-                        value={newLink.nombre}
-                        onChange={handleChange}
-                        placeholder="Ingrese nombre de la red social"
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className='mb-1' htmlFor="">URL:</label>
-                    <input
-                        type="url"
-                        name="url"
-                        value={newLink.url}
-                        onChange={handleChange}
-                        placeholder="Ingrese URL de la red social"
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <div className="d-flex align-items-center justify-content-center gap-2">
-                    <button type="submit" className="btn btn-primary">
-                        {editMode ? 'Actualizar' : 'Agregar'}
-                    </button>
-                    {editMode && (
-                        <button type="button" onClick={resetForm} className="btn btn-secondary">
-                            Cancelar
-                        </button>
-                    )}
-                </div>
-            </form>
-            <table className="table table-bordered table-striped">
-                <thead className="table-dark">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>URL</th>
-                        <th className="text-end">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(enlaces) && enlaces.length > 0 ? (
-                        enlaces.map((item) => (
-                            <tr key={item.id}>
-                                <td>
-                                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
-                                        {item.nombre === 'Facebook' && <FaFacebook className="me-2" />}
-                                        {item.nombre === 'Twitter' && <FaTwitter className="me-2" />}
-                                        {item.nombre === 'LinkedIn' && <FaLinkedin className="me-2" />}
-                                        {item.nombre === 'Instagram' && <FaInstagram className="me-2" />}
-                                        {item.nombre}
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
-                                </td>
-                                <td className="text-end ">
-                                    <button onClick={() => handleEdit(item)} className="btn btn-warning btn-sm me-2">
-                                        Editar
-                                    </button>
-                                    <button onClick={() => handleDelete(item.id)} className="btn btn-danger btn-sm">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="4" className="text-center">No hay enlaces disponibles</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+        <h1 className="text-center">Gestión de Enlaces de Redes Sociales</h1>
+        
+        <form onSubmit={handleSubmit} className="mb-4">
+          <div className="mb-3">
+            <label className="form-label mb-1" htmlFor="nombre">Nombre de la red social:</label>
+            <input
+              type="text"
+              name="nombre"
+              value={newLink.nombre}
+              onChange={handleChange}
+              placeholder="Ingrese nombre de la red social"
+              required
+              className="form-control"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label mb-1" htmlFor="url">URL:</label>
+            <input
+              type="url"
+              name="url"
+              value={newLink.url}
+              onChange={handleChange}
+              placeholder="Ingrese URL de la red social"
+              required
+              className="form-control"
+            />
+          </div>
+          <div className="d-grid gap-2 d-md-flex justify-content-center">
+            <button type="submit" className="btn btn-primary">
+              {editMode ? 'Actualizar' : 'Agregar'}
+            </button>
+            {editMode && (
+              <button type="button" onClick={resetForm} className="btn btn-secondary">
+                Cancelar
+              </button>
+            )}
+          </div>
+        </form>
+      
+        <div className="table-responsive">
+          <table className="table table-bordered table-striped">
+            <thead className="table-dark">
+              <tr>
+                <th>Nombre</th>
+                <th>URL</th>
+                <th className="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(enlaces) && enlaces.length > 0 ? (
+                enlaces.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
+                        {item.nombre === 'Facebook' && <FaFacebook className="me-2" />}
+                        {item.nombre === 'Twitter' && <FaTwitter className="me-2" />}
+                        {item.nombre === 'LinkedIn' && <FaLinkedin className="me-2" />}
+                        {item.nombre === 'Instagram' && <FaInstagram className="me-2" />}
+                        {item.nombre}
+                      </a>
+                    </td>
+                    <td>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
+                    </td>
+                    <td className="text-end">
+                      <button onClick={() => handleEdit(item)} className="btn btn-warning btn-sm me-2">
+                        Editar
+                      </button>
+                      <button onClick={() => handleDelete(item.id)} className="btn btn-danger btn-sm">
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center">No hay enlaces disponibles</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
+      
     );
 };
 

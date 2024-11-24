@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 
 const MySwal = withReactContent(Swal);
 
@@ -30,7 +32,7 @@ const Deslinde = () => {
     try {
       const response = await fetch(`https://back-farmam.onrender.com/api/getDeslindesLegales`);
       if (!response.ok) {
-        const errorData = await response.json();  // Captura el mensaje de error
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener deslinde legal');
       }
       const data = await response.json();
@@ -64,7 +66,7 @@ const Deslinde = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();  // Captura el mensaje de error
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Error al crear deslinde legal');
       }
       MySwal.fire('Éxito', 'Deslinde legal agregado correctamente', 'success');
@@ -86,7 +88,7 @@ const Deslinde = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();  // Captura el mensaje de error
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Error al actualizar deslinde legal');
       }
       MySwal.fire('Éxito', 'Deslinde legal actualizado correctamente', 'success');
@@ -119,7 +121,7 @@ const Deslinde = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();  // Captura el mensaje de error
+          const errorData = await response.json();
           throw new Error(errorData.message || 'Error al eliminar deslinde legal');
         }
 
@@ -162,7 +164,6 @@ const Deslinde = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Filtrar deslindes según el estado seleccionado
   const deslindesFiltrados = deslindes.filter(item => {
     if (filtroEstado === 'Todos') return true;
     return item.vigencia === filtroEstado;
@@ -237,24 +238,26 @@ const Deslinde = () => {
             <div className="card-header d-flex align-items-center"
               onClick={() => manejoExpansion(item.id)}
               style={{ borderRadius: '1rem', borderBottom: '1px solid', cursor: 'pointer', position: 'relative' }}>
-              <strong className="me-2">Título:</strong>{item.titulo}
+              <strong>{item.titulo}</strong>
 
-              <div style={{ marginLeft: 'auto', position: 'absolute', right: '10px' }}>
+              <div style={{ marginLeft: 'auto', position: 'absolute', right: '5px' }}>
                 {item.vigencia === 'Vigente' && (
                   <button
                     onClick={(e) => { e.stopPropagation(); editDeslinde(item.id, item.titulo, item.contenido, item.fecha_vigencia, item.vigencia); }}
                     className="btn btn-warning btn-sm me-1"
-                  >
-                    Editar
-                  </button>
+                    title="Editar"
+                    >
+                      <FontAwesomeIcon icon={faPen} />
+                    </button>
                 )}
                 {item.estado !== 'eliminado' && (
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteDeslinde(item.id); }}
                     className="btn btn-danger btn-sm"
-                  >
-                    Eliminar
-                  </button>
+                    title="Eliminar"
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
                 )}
               </div>
             </div>

@@ -401,6 +401,7 @@ export const Register = () => {
                                             type="button"
                                             className="btn btn-outline-secondary"
                                             onClick={() => setShowPassword(!showPassword)}
+                                            style={{ zIndex: 0 }}
                                         >
                                             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                                         </button>
@@ -449,6 +450,7 @@ export const Register = () => {
                                         <button
                                             type="button"
                                             className="btn btn-outline-secondary"
+                                            style={{ zIndex: 0 }}
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                         >
                                             <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
