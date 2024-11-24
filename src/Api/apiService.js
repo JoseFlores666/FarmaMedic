@@ -1,4 +1,4 @@
-const API_URL = 'https://back-farmam.onrender.com/api';
+const API_URL = 'https://localhost:4000/api';
 
 export const loginUser = async (username, password) => {
     const response = await fetch(`${API_URL}/login`, {

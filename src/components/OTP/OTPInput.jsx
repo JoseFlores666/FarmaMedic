@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 const OTPInput = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); 
   const location = useLocation();
   const { correo } = location.state || {};
   const navigate = useNavigate();
@@ -14,15 +15,25 @@ const OTPInput = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (otp.length !== 6) {
+      setError('El código de verificación debe tener 6 dígitos.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
+      const response = await fetch('https://localhost:4000/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
+        credentials: 'include', 
         body: JSON.stringify({ correo, otp }),
       });
+
+      setLoading(false);
 
       if (response.ok) {
         const data = await response.json();
@@ -38,9 +49,10 @@ const OTPInput = () => {
         });
       } else {
         const errorData = await response.json();
-        setError(errorData.message);
+        setError(errorData.message || 'Error al verificar el código.');
       }
     } catch (err) {
+      setLoading(false);
       console.error('Error en la solicitud:', err);
       setError('Error en la verificación. Inténtalo de nuevo.');
     }
@@ -83,8 +95,8 @@ const OTPInput = () => {
                       />
                     )}
                   />
-                  <button className="btn btn-primary mt-3" type="submit">
-                    Verify
+                  <button className="btn btn-primary mt-3" type="submit" disabled={loading}>
+                    {loading ? 'Verificando...' : 'Verify'}
                   </button>
                 </form>
                 {error && <p className="text-danger">{error}</p>}

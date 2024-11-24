@@ -22,7 +22,7 @@ const Footer = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo');
+      const response = await fetch('https://localhost:4000/api/getContactInfo');
       if (!response.ok) {
         throw new Error('No se pudo obtener la información de contacto');
       }

@@ -6,7 +6,7 @@ const Auditoria = () => {
   useEffect(() => {
     const fetchAuditLogs = async () => {
       try {
-        const response = await fetch('http://back-farmam.onrender.com/api/getAuditLogs'); 
+        const response = await fetch('http://localhost:4000/api/getAuditLogs'); 
         if (!response.ok) {
           throw new Error('Error al obtener los registros de auditoría');
         }
