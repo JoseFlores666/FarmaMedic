@@ -5,7 +5,7 @@ import path from 'path';
 
 const __dirname = path.resolve();
 
-const useHttps = true; // true = https y false = http
+const useHttps = false; // true = https y false = http
 
 export default defineConfig({
   plugins: [react()],
