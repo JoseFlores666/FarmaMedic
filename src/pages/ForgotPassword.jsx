@@ -86,8 +86,45 @@ export const ForgotPassword = () => {
 
     const handleVerifyToken = async (e) => {
         e.preventDefault();
-        setStep(3);
+    
+        try {
+            // Enviar el token al backend para verificarlo
+            const response = await fetch('https://back-farmam.onrender.com/api/verificarToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: otp }), // Enviar el token ingresado
+                credentials: 'include', // Asegurarte de que las cookies se incluyan
+            });
+    
+            if (response.ok) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'El token es válido.',
+                    icon: 'success',
+                    confirmButtonText: 'Continuar',
+                });
+                setStep(3); // Avanzar al paso 3 para restablecer la contraseña
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'El token ingresado no es válido. Por favor, inténtalo nuevamente.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar',
+                });
+            }
+        } catch (error) {
+            console.error('Error verificando el token:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al verificar el token. Por favor, inténtalo de nuevo más tarde.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+        }
     };
+    
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
