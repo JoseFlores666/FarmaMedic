@@ -8,14 +8,14 @@ const Logo = () => {
     const preset_name = "FarmaciaMedic";
     const cloud_name = "dzppbjrlm";
 
-    const [selectedFile, setSelectedFile] = useState(null); 
-    const [image, setImage] = useState(''); 
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [image, setImage] = useState('');
     const [loading, setLoading] = useState(false);
     const [logos, setLogos] = useState([]);
 
     const fetchLogos = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getAllLogos');
+            const response = await fetch('https://localhost:4000/api/getAllLogos');
             if (!response.ok) throw new Error("Error fetching logos");
             const data = await response.json();
             setLogos(data);
@@ -35,7 +35,7 @@ const Logo = () => {
                 return;
             }
 
-            if (file.size > 2 * 1024 * 1024) { 
+            if (file.size > 2 * 1024 * 1024) {
                 MySwal.fire('Error', 'El archivo excede el tamaño máximo permitido de 2 MB.', 'error');
                 setSelectedFile(null);
                 return;
@@ -70,10 +70,11 @@ const Logo = () => {
             const file = await response.json();
             setImage(file.secure_url);
 
-            await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
+            await fetch('https://localhost:4000/api/uploadLogo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: file.secure_url })
+                body: JSON.stringify({ url: file.secure_url }),
+                credentials: 'include',
             });
             MySwal.fire('Éxito', 'Imagen subida y guardada correctamente.', 'success');
             fetchLogos();
@@ -82,7 +83,7 @@ const Logo = () => {
             MySwal.fire('Error', 'No se pudo cargar la imagen. Inténtalo de nuevo.', 'error');
         } finally {
             setLoading(false);
-            setSelectedFile(null); 
+            setSelectedFile(null);
         }
     };
 
@@ -97,7 +98,10 @@ const Logo = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, { method: 'DELETE' });
+                    await fetch(`https://localhost:4000/api/deleteLogo/${id}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                    });
                     MySwal.fire('Eliminado', 'Logo eliminado correctamente.', 'success');
                     fetchLogos();
                 } catch (error) {
@@ -114,10 +118,11 @@ const Logo = () => {
             return;
         }
         try {
-            await fetch(`https://back-farmam.onrender.com/api/updateLogo/${id}`, {
+            await fetch(`https://localhost:4000/api/updateLogo/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isActive: true, url }) 
+                body: JSON.stringify({ isActive: true, url }),
+                credentials: 'include',
             });
             MySwal.fire('Éxito', 'Logo activado correctamente.', 'success');
             fetchLogos();
