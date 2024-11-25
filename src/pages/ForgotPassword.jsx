@@ -34,7 +34,7 @@ export const ForgotPassword = () => {
 
     const fetchLogoActivo = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getLogoActivo');
+            const response = await fetch('https://localhost:4000/api/getLogoActivo');
             if (!response.ok) throw new Error("Error fetching active logo");
             const data = await response.json();
 
@@ -52,7 +52,7 @@ export const ForgotPassword = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/recuperar-password', {
+            const response = await fetch('https://localhost:4000/api/recuperar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export const ForgotPassword = () => {
     
         try {
             // Enviar el token al backend para verificarlo
-            const response = await fetch('https://back-farmam.onrender.com/api/verificarToken', {
+            const response = await fetch('https://localhost:4000/api/verificarToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ export const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/cambiar-password', {
+            const response = await fetch('https://localhost:4000/api/cambiar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

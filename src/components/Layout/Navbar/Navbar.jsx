@@ -21,7 +21,7 @@ export const Navbar = () => {
 
   const fetchLogoActivo = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getLogoActivo');
+      const response = await fetch('https://localhost:4000/api/getLogoActivo');
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 
