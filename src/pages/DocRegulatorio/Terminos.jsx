@@ -29,7 +29,7 @@ const Terminos = () => {
 
     const fetchTerminos = async () => {
         try {
-            const response = await fetch(`https://localhost:4000/api/getTerminosCondiciones`);
+            const response = await fetch(`https://back-farmam.onrender.com/api/getTerminosCondiciones`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Error al obtener términos y condiciones');
@@ -55,7 +55,7 @@ const Terminos = () => {
 
     const createTermino = async () => {
         try {
-            const response = await fetch(`https://localhost:4000/api/createTerminosCondiciones`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/createTerminosCondiciones`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const Terminos = () => {
 
     const updateTermino = async (id) => {
         try {
-            const response = await fetch(`https://localhost:4000/api/updateTerminosCondiciones/${id}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/updateTerminosCondiciones/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const Terminos = () => {
         });
         if (confirm.isConfirmed) {
             try {
-                const response = await fetch(`https://localhost:4000/api/deleteTerminosCondiciones/${id}`, {
+                const response = await fetch(`https://back-farmam.onrender.com/api/deleteTerminosCondiciones/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
