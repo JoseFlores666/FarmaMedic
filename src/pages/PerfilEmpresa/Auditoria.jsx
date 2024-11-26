@@ -6,7 +6,7 @@ const Auditoria = () => {
   useEffect(() => {
     const fetchAuditLogs = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getAuditLogs'); 
+        const response = await fetch('https://localhost:4000/api/getAuditLogs'); 
         if (!response.ok) {
           throw new Error('Error al obtener los registros de auditoría');
         }
@@ -48,8 +48,8 @@ const Auditoria = () => {
                 <td>{log.table_name}</td>
                 <td>{log.old_data}</td>
                 <td>{log.new_data}</td>
-                <td>{log.fecha_creacion}</td>
-              </tr>
+                <td>{new Date(log.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ')}</td>
+                </tr>
             ))
           )}
         </tbody>
