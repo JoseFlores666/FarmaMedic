@@ -6,7 +6,7 @@ const Auditoria = () => {
   useEffect(() => {
     const fetchAuditLogs = async () => {
       try {
-        const response = await fetch('http://back-farmam.onrender.com/api/getAuditLogs'); 
+        const response = await fetch('https://back-farmam.onrender.com/api/getAuditLogs'); 
         if (!response.ok) {
           throw new Error('Error al obtener los registros de auditoría');
         }
@@ -22,14 +22,15 @@ const Auditoria = () => {
 
   return (
     <div className="container mt-5">
-      <h2>Registro de Auditoría</h2>
+    <h2>Registro de Auditoría</h2>
+    <div className="table-responsive">
       <table className="table table-striped">
         <thead>
           <tr>
-            <th scope="col">ID Administrador</th>
+            <th scope="col">Administrador</th>
             <th scope="col">Acción</th>
-            <th scope="col">Tabla</th>
-            <th scope="col">ID Registro</th>
+            <th scope="col">Tabla Modificada</th>
+            <th scope="col">Datos Anteriores</th>
             <th scope="col">Datos Nuevos</th>
             <th scope="col">Fecha</th>
           </tr>
@@ -42,20 +43,20 @@ const Auditoria = () => {
           ) : (
             auditLogs.map((log, index) => (
               <tr key={index}>
-                <td>{log.admin_id}</td>
+                <td>{log.admin_usuario}</td>
                 <td>{log.action_type}</td>
                 <td>{log.table_name}</td>
-                <td>{log.record_id}</td>
-                <td>
-                  <pre>{log.new_data}</pre>
-                </td>
-                <td>{new Date(log.created_at).toLocaleString()}</td>
+                <td>{log.old_data}</td>
+                <td>{log.new_data}</td>
+                <td>{log.fecha_creacion}</td>
               </tr>
             ))
           )}
         </tbody>
       </table>
     </div>
+  </div>
+  
   );
 };
 
