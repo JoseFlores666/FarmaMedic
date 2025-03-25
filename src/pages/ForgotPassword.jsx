@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-
+import { motion } from 'framer-motion';
 export const ForgotPassword = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
@@ -22,6 +22,8 @@ export const ForgotPassword = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [logoActivo, setLogoActivo] = useState(null);
 
+    const totalSteps = 3;
+
     useEffect(() => {
         fetchLogoActivo();
 
@@ -34,7 +36,7 @@ export const ForgotPassword = () => {
 
     const fetchLogoActivo = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getLogoActivo');
+            const response = await fetch('https://localhost:4000/api/getLogoActivo');
             if (!response.ok) throw new Error("Error fetching active logo");
             const data = await response.json();
 
@@ -52,7 +54,7 @@ export const ForgotPassword = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/recuperar-password', {
+            const response = await fetch('https://localhost:4000/api/recuperar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,18 +88,17 @@ export const ForgotPassword = () => {
 
     const handleVerifyToken = async (e) => {
         e.preventDefault();
-    
+
         try {
-            // Enviar el token al backend para verificarlo
-            const response = await fetch('https://back-farmam.onrender.com/api/verificarToken', {
+            const response = await fetch('https://localhost:4000/api/verificarToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: otp }), // Enviar el token ingresado
-                credentials: 'include', // Asegurarte de que las cookies se incluyan
+                body: JSON.stringify({ token: otp, email: correo }),
+                credentials: 'include', 
             });
-    
+
             if (response.ok) {
                 Swal.fire({
                     title: '¡Éxito!',
@@ -105,7 +106,7 @@ export const ForgotPassword = () => {
                     icon: 'success',
                     confirmButtonText: 'Continuar',
                 });
-                setStep(3); // Avanzar al paso 3 para restablecer la contraseña
+                setStep(3); 
             } else {
                 Swal.fire({
                     title: 'Error',
@@ -124,12 +125,12 @@ export const ForgotPassword = () => {
             });
         }
     };
-    
+
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/cambiar-password', {
+            const response = await fetch('https://localhost:4000/api/cambiar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ export const ForgotPassword = () => {
                     icon: 'success',
                     confirmButtonText: 'Genial',
                 })
-                navigate('/login');
+                navigate('/Acceder');
             } else {
                 const errorData = await response.json();
                 console.error('Error:', errorData.message);
@@ -169,9 +170,29 @@ export const ForgotPassword = () => {
                                         'FarmaMedic'
                                     )}
                                 </div>
-
+                                <div className="progress" style={{ height: '10px' }}>
+                                    <motion.div
+                                        className="progress-bar"
+                                        role="progressbar"
+                                        style={{ width: `${(step / totalSteps) * 100}%` }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(step / totalSteps) * 100}%` }}
+                                        transition={{ duration: 0.5 }}
+                                    ></motion.div>
+                                </div>
                                 {step === 1 && (
                                     <form onSubmit={handleForgotPassword}>
+                                        <motion.h5
+                                            className=" text-decoration-none text-center rounded-circle p-2"
+                                            whileHover={{ scale: 1.1, rotate: 2, transition: { type: 'spring', stiffness: 500 } }}
+                                            whileTap={{ scale: 1 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.4 }}
+                                        >
+                                            PASO 1
+                                        </motion.h5>
                                         <h2 className="fs-6 fw-normal text-center mb-4">
                                             Proporciona la dirección de correo asociada a tu cuenta para recuperar tu contraseña.
                                         </h2>
@@ -197,6 +218,17 @@ export const ForgotPassword = () => {
 
                                 {step === 2 && (
                                     <form onSubmit={handleVerifyToken}>
+                                          <motion.h5
+                                            className=" text-decoration-none text-center rounded-circle p-2"
+                                            whileHover={{ scale: 1.1, rotate: 2, transition: { type: 'spring', stiffness: 500 } }}
+                                            whileTap={{ scale: 1 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.4 }}
+                                        >
+                                            PASO 2
+                                        </motion.h5>
                                         <h2 className="fs-6 fw-normal text-center text-secondary mb-4">
                                             Ingresa el token que llegó a tu correo asociado a tu cuenta.
                                         </h2>
@@ -233,6 +265,17 @@ export const ForgotPassword = () => {
 
                                 {step === 3 && (
                                     <form onSubmit={handleResetPassword}>
+                                          <motion.h5
+                                            className=" text-decoration-none text-center rounded-circle p-2"
+                                            whileHover={{ scale: 1.1, rotate: 2, transition: { type: 'spring', stiffness: 500 } }}
+                                            whileTap={{ scale: 1 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.4 }}
+                                        >
+                                            PASO 3
+                                        </motion.h5>
                                         <h2 className="fs-6 fw-normal text-center text-secondary mb-4">
                                             Ingresa tu nueva contraseña.
                                         </h2>
@@ -325,8 +368,8 @@ export const ForgotPassword = () => {
                                 )}
 
                                 <div className="d-flex gap-2 justify-content-between mt-4">
-                                    <NavLink to="/login">Iniciar Sesión</NavLink>
-                                    <NavLink to="/register">Registrate</NavLink>
+                                    <NavLink to="/Acceder">Iniciar Sesión</NavLink>
+                                    <NavLink to="/Registrarse">Registrate</NavLink>
                                 </div>
                             </div>
                         </div>

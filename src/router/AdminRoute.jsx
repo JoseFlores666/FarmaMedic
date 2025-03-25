@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 export const AdminRoute = ({ children }) => {
     const { isAuthenticated, isAdmin } = useAuth();
 
-    return isAuthenticated && isAdmin ? children : <Navigate to="/login" replace />;
+    return isAuthenticated && isAdmin ? children : <Navigate to="/Acceder" replace />;
 };
 
 AdminRoute.propTypes = {

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 export const PrivateRoute = ({ children }) => {
     const { isAuthenticated } = useAuth(); 
 
-    return isAuthenticated ? children : <Navigate to="/login" />;
+    return isAuthenticated ? children : <Navigate to="/Acceder" />;
 };
 
 PrivateRoute.propTypes = {

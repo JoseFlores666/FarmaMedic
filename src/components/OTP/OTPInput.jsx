@@ -24,7 +24,7 @@ const OTPInput = () => {
     setError('');
 
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
+      const response = await fetch('https://localhost:4000/api/verifyOtp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const OTPInput = () => {
           confirmButtonText: 'Aceptar',
         }).then((result) => {
           if (result.isConfirmed) {
-            navigate('/login');
+            navigate('/Acceder');
           }
         });
       } else {

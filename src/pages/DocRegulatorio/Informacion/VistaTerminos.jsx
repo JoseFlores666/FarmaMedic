@@ -9,7 +9,7 @@ const VistaTerminos = ({ showModal, onClose }) => {
   useEffect(() => {
     const fetchDeslindes = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getCurrentTerminos');
+        const response = await fetch('https://localhost:4000/api/getCurrentTerminos');
         const data = await response.json();
         setDeslindes(data);
       } catch (error) {

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 const ThemeToggle = () => {
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
-    const toggleTheme = (event) => {
-        const newTheme = event.target.checked ? 'dark' : 'light';
+    const toggleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         localStorage.setItem('theme', newTheme);
         document.documentElement.setAttribute('data-bs-theme', newTheme);
@@ -18,22 +19,11 @@ const ThemeToggle = () => {
     }, []);
 
     return (
-        <div className="d-flex justify-content-center align-items-center">
-            <div className="form-check form-switch">
-                <input
-                    className="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    id="flexSwitchCheckDefault"
-                    checked={theme === 'dark'}
-                    onChange={toggleTheme}
-                />
-                <label className="form-check-label text-white">
-                    {theme === 'light' ? '🌞 Claro' : '🌜 Oscuro'}
-                </label>
-            </div>
+        <div >
+            <button className="btn btn-primary  " onClick={toggleTheme}>
+                {theme === 'light' ? <FaSun color='yellow' size={20} /> : <FaMoon size={20} color='white' />}
+            </button>
         </div>
-
     );
 };
 

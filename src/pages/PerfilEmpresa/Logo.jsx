@@ -7,6 +7,7 @@ const MySwal = withReactContent(Swal);
 const Logo = () => {
     const preset_name = "FarmaciaMedic";
     const cloud_name = "dzppbjrlm";
+    const folderName = "logotipos";
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [image, setImage] = useState('');
@@ -15,7 +16,7 @@ const Logo = () => {
 
     const fetchLogos = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getAllLogos');
+            const response = await fetch('https://localhost:4000/api/getAllLogos');
             if (!response.ok) throw new Error("Error fetching logos");
             const data = await response.json();
             setLogos(data);
@@ -46,6 +47,8 @@ const Logo = () => {
     };
 
     const uploadImage = async () => {
+        const authData = JSON.parse(localStorage.getItem("authData"));
+        const userId = authData ? authData.id : null;
         if (!selectedFile) {
             MySwal.fire('Error', 'Por favor, selecciona una imagen primero.', 'error');
             return;
@@ -54,6 +57,7 @@ const Logo = () => {
         const data = new FormData();
         data.append('file', selectedFile);
         data.append('upload_preset', preset_name);
+        data.append('folder', folderName);
 
         setLoading(true);
 
@@ -70,10 +74,10 @@ const Logo = () => {
             const file = await response.json();
             setImage(file.secure_url);
 
-            await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
+            await fetch('https://localhost:4000/api/uploadLogo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: file.secure_url }),
+                body: JSON.stringify({ url: file.secure_url,id_usuario:userId }),
                 credentials: 'include',
             });
             MySwal.fire('Éxito', 'Imagen subida y guardada correctamente.', 'success');
@@ -88,6 +92,8 @@ const Logo = () => {
     };
 
     const deleteLogo = async (id) => {
+        const authData = JSON.parse(localStorage.getItem("authData"));
+        const userId = authData ? authData.id : null;
         MySwal.fire({
             title: '¿Estás seguro?',
             text: 'Una vez eliminada, no podrás recuperar esta imagen.',
@@ -98,9 +104,11 @@ const Logo = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, {
+                    await fetch(`https://localhost:4000/api/deleteLogo/${id}`, {
                         method: 'DELETE',
                         credentials: 'include',
+                        body: JSON.stringify({ id_usuario:userId }),
+                        headers: { 'Content-Type': 'application/json' }, 
                     });
                     MySwal.fire('Eliminado', 'Logo eliminado correctamente.', 'success');
                     fetchLogos();
@@ -113,15 +121,17 @@ const Logo = () => {
     };
 
     const activateLogo = async (id, url) => {
+        const authData = JSON.parse(localStorage.getItem("authData"));
+        const userId = authData ? authData.id : null;
         if (!url) {
             MySwal.fire('Error', 'No se ha asignado una URL a este logo.', 'error');
             return;
         }
         try {
-            await fetch(`https://back-farmam.onrender.com/api/updateLogo/${id}`, {
+            await fetch(`https://localhost:4000/api/updateLogo/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isActive: true, url }),
+                body: JSON.stringify({ isActive: true, url,id_usuario:userId }),
                 credentials: 'include',
             });
             MySwal.fire('Éxito', 'Logo activado correctamente.', 'success');

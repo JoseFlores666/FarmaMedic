@@ -4,58 +4,62 @@ import PropTypes from 'prop-types';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return localStorage.getItem('logged') === 'true';
-    });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [username, setUsername] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [userId, setUserId] = useState(null);
+    const [role, setRole] = useState(null);  
 
-    const [username, setUsername] = useState(() => {
-        return localStorage.getItem('username');
-    });
-
-    const [isAdmin, setIsAdmin] = useState(() => {
-        return localStorage.getItem('isAdmin') === 'true';
-    });
-
-    let timeout;
-
-    const logout = () => {
-        setIsAuthenticated(false);
-        setUsername(null);
-        setIsAdmin(false);
-        localStorage.removeItem('logged');
-        localStorage.removeItem('username');
-        localStorage.removeItem('isAdmin');
-    };
-
-    const resetTimeout = () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(logout, 15 * 60 * 1000); 
-    };
-
-    const login = (name, adminStatus = false) => {
+    const login = async(name, adminStatus,userRole, id) => {
         setIsAuthenticated(true);
         setUsername(name);
         setIsAdmin(adminStatus);
-        localStorage.setItem('logged', 'true');
-        localStorage.setItem('username', name);
-        localStorage.setItem('isAdmin', adminStatus);
-        resetTimeout();
+        setUserId(id);
+        setRole(userRole); 
+
+        localStorage.setItem('authData', JSON.stringify({ usuario: name, isAdmin: adminStatus,role:userRole, id }));
+    };
+
+    const logout = async () => {
+        await fetch('https://localhost:4000/api/logout', {
+            method: 'POST',
+            credentials: 'include',
+        });
+
+        setIsAuthenticated(false);
+        setUsername(null);
+        setIsAdmin(false);
+        setUserId(null);
+        setRole(null);  
+
+        localStorage.removeItem('authData');
     };
 
     useEffect(() => {
-        window.onload = resetTimeout;
-        document.onmousemove = resetTimeout;
-        document.onkeydown = resetTimeout;
-        document.onclick = resetTimeout;
-        document.onscroll = resetTimeout;
-
-        return () => {
-            clearTimeout(timeout);
+        const checkSession = async () => {
+            try {
+                const response = await fetch('https://localhost:4000/api/session', {
+                    credentials: 'include',
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    login(data.usuario, data.isAdmin,data.role, data.id);
+                } else if (response.status === 401) {
+                    console.log("No hay sesión activa.");
+                } else {
+                    logout(); 
+                }
+            } catch (error) {
+                console.error('Error verificando la sesión:', error);
+            }
         };
-    }, );
-
+    
+        checkSession();
+    }, []);
+    
     return (
-        <AuthContext.Provider value={{ isAuthenticated, isAdmin, username, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, isAdmin, role,username, userId, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

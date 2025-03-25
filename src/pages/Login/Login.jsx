@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../../hook/useForm';
 import { useAuth } from '../../context/useAuth';
-import Input from '../../components/Input';
 import Lottie from 'lottie-react';
 import lockAnimation from '../../assets/Animation - 1729172775488.json';
 import Swal from 'sweetalert2';
@@ -12,7 +11,8 @@ import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-
+import { Button, Card, Col, Container, Form, InputGroup, Row } from 'react-bootstrap';
+import { motion } from 'framer-motion';
 export const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
@@ -21,13 +21,12 @@ export const Login = () => {
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);  // Variable para saber si el usuario es doctor
+
   const { correo, password, onInputChange, onResetForm } = useForm({
     correo: '',
     password: '',
   });
-
-  //back-farmam.onrender.com
-  //back-farmam.onrender.com
 
   const openDeslindeModal = () => setShowDeslindeModal(true);
   const closeDeslindeModal = () => setShowDeslindeModal(false);
@@ -68,23 +67,28 @@ export const Login = () => {
       [name]: error
     }));
   };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     const newErrors = {};
-
+  
     if (!correo) newErrors.correo = "El correo es obligatorio.";
     else if (!validateCorreo(correo)) newErrors.correo = "Formato de correo inválido.";
-
+  
     if (!password) newErrors.password = "La contraseña es obligatoria.";
     else if (!validatePassword(password)) newErrors.password = "Formato de contraseña inválido.";
-
+  
     setErrors(newErrors);
-
+  
     if (Object.keys(newErrors).length > 0) return;
-
+  
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/login', {
+      let url = 'https://localhost:4000/api/login'; 
+  
+      if (isDoctor) { 
+        url = 'https://localhost:4000/api/loginDoc';
+      }
+  
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,11 +99,15 @@ export const Login = () => {
           password,
         }),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
-        await login(data.usuario, data.isAdmin);
-
+        if (isDoctor) {
+          await login(data.doctor.nombre, data.doctor.isAdmin, data.doctor.role, data.doctor.id);
+        } else {
+          await login(data.user.usuario, data.user.isAdmin, data.user.role, data.user.id);
+        }
+  
         Swal.fire({
           title: '¡Éxito!',
           text: 'Has iniciado sesión correctamente.',
@@ -107,13 +115,13 @@ export const Login = () => {
           confirmButtonText: 'Continuar',
         }).then((result) => {
           if (result.isConfirmed) {
-            navigate('/home', { replace: true });
+            navigate('/Inicio', { replace: true });
             onResetForm();
           }
         });
       } else {
         const errorData = await response.json();
-
+  
         if (response.status === 403 && errorData.message.includes('bloqueada')) {
           Swal.fire({
             title: 'Cuenta Bloqueada',
@@ -124,7 +132,7 @@ export const Login = () => {
         } else {
           Swal.fire({
             title: 'Error',
-            text: errorData.message || 'Credenciales incorrectas o error desconocido.',
+            text: errorData.message,
             icon: 'error',
             confirmButtonText: 'Aceptar',
           });
@@ -135,114 +143,141 @@ export const Login = () => {
       alert('Error de conexión o credenciales incorrectas');
     }
   };
+  
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home', { replace: true });
+      navigate('/Inicio', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="container py-4 h-100">
-      <div className="row d-flex justify-content-center align-items-center h-100">
-        <div className="col col-lg-7">
-          <div className="card shadow-lg" style={{ borderRadius: '1rem', border: '1px solid' }}>
-            <div className="card-body p-4 p-lg-5">
-              <form onSubmit={handleLogin}>
-                <h5 className="fw-normal pb-1 text-center">Inicia sesión en tu cuenta</h5>
+    <Container className='mt-5 mb-5'>
+      <Row className="justify-content-center">
+        <Col md={10} lg={11}>
 
-                <div className="d-flex justify-content-center">
-                  <Lottie animationData={lockAnimation} style={{ width: '150px' }} />
-                </div>
-                <div className="form-outline mb-4">
-                  <label className="form-label" htmlFor="correo">Ingresa tu correo:</label>
-                  <Input
-                    type="email"
-                    id="correo"
-                    name="correo"
-                    value={correo}
-                    onChange={(e) => {
-                      onInputChange(e);
-                      handleValidation(e);
-                    }}
-                    placeholder="Introduce tu correo electrónico"
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Card className="shadow-lg overflow-hidden">
+              <Row className="g-0">
+                <Col md={5} className="d-none d-md-block">
+                  <img
+                    src="https://medicinainternaynefrologiaenmonterrey.com/assets/image/img-seo/los-mejores-doctores-en-medicina-interna.png"
+                    alt="login"
+                    className="img-fluid h-100"
+                    style={{ objectFit: "cover" }}
                   />
-                  {errors.correo && <div className="text-danger">{errors.correo}</div>}
-                </div>
+                </Col>
 
-                <div className="form-outline mb-4">
-                  <label className="form-label" htmlFor="password">Ingresa tu contraseña:</label>
-                  <div className="input-group">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      value={password}
-                      onChange={(e) => {
-                        onInputChange(e);
-                        handleValidation(e);
-                      }}
-                      placeholder="Introduce tu contraseña"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary "
-                      style={{ zIndex: 0 }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
+                <Col md={7} className="d-flex align-items-center">
+                  <Card.Body className="p-5">
+                    <h3 className="fw-bold text-center text-primary mb-3">¡Bienvenido!</h3>
+                    <p className="text-muted text-center">Inicia sesión en tu cuenta</p>
 
-                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                    </button>
-                  </div>
-                  {errors.password && <div className="text-danger">{errors.password}</div>}
-                </div>
+                    <div className="d-flex justify-content-center mb-3">
+                      <Lottie animationData={lockAnimation} style={{ width: "100px" }} />
+                    </div>
+                    <Form.Group className="mb-3">
+                      <Form.Check
+                        type="switch"
+                        id="custom-switch"
+                        label={isDoctor ? "Doctor" : "Usuario"} 
+                        checked={isDoctor}
+                        onChange={() => setIsDoctor(!isDoctor)} 
+                      />
+                    </Form.Group>
 
-                <div className="mb-3">
-                  <button
-                    className="btn btn-primary btn-lg btn-block w-100"
-                    type="submit"
-                  >
-                    Iniciar sesión
-                  </button>
-                </div>
+                    <Form onSubmit={handleLogin}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Correo electrónico</Form.Label>
+                        <Form.Control
+                          type="email"
+                          name="correo"
+                          placeholder="Introduce tu correo"
+                          onChange={(e) => {
+                            onInputChange(e);
+                            handleValidation(e);
+                          }}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: errors.password ? 1 : 0, height: errors.password ? "20px" : "0px" }}
+                          transition={{ duration: 0.3 }}
+                          style={{ overflow: "hidden", minHeight: "20px" }}
+                        >
+                          {errors.correo && <div className="text-danger">{errors.correo}</div>}
+                        </motion.div>
+                      </Form.Group>
 
-                <p className='small text-muted mb-3'>
-                  ¿Olvidaste tu contraseña? <NavLink to="/forgotpassword">Recuperala aquí</NavLink>
-                </p>
-                <p className="small text-muted mb-3">
-                  ¿No tienes una cuenta? <NavLink to="/register">Registrate aquí</NavLink>
-                </p>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Contraseña</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Introduce tu contraseña"
+                            onChange={(e) => {
+                              onInputChange(e);
+                              handleValidation(e);
+                            }}
+                          />
+                          <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                          </Button>
+                        </InputGroup>
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: errors.password ? 1 : 0, height: errors.password ? "20px" : "0px" }}
+                          transition={{ duration: 0.3 }}
+                          style={{ overflow: "hidden", minHeight: "20px" }}
+                        >
+                          {errors.password && <div className="text-danger">{errors.password}</div>}
+                        </motion.div>
+                      </Form.Group>
 
-                <div className="row mb-3  text-center">
-                  <div className="col-md-4 ">
-                    <label htmlFor="terminos" className="small text-muted">
-                      <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
-                        Términos y Condiciones</a>
-                    </label>
-                    <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
-                  </div>
+                      <Button variant="primary" className="w-100 mb-3" type="submit">
+                        Iniciar sesión
+                      </Button>
 
-                  <div className="col-md-4">
-                    <label htmlFor="privacidad" className="small text-muted">
-                      <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
-                        Política de privacidad</a>
-                    </label>
-                    <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor="deslinde" className="small text-muted">
-                      <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
-                        Deslinde legal
-                      </a>
-                    </label>
-                    <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                      <div className="text-center">
+                        <NavLink to="/Recuperacion" className="small ">¿Olvidaste tu contraseña?</NavLink>
+                      </div>
+                      <div className="text-center">
+                        <NavLink to="/Registrarse" className="small ">¿No tienes cuenta? Regístrate aquí</NavLink>
+                      </div>
+
+                      <Row className="mt-4 text-center">
+                        <Col md={4}>
+                          <a href="#" className="small " onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
+                            Términos y Condiciones
+                          </a>
+                          <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
+                        </Col>
+                        <Col md={4}>
+                          <a href="#" className="small " onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
+                            Política de Privacidad
+                          </a>
+                          <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
+                        </Col>
+                        <Col md={4}>
+                          <a href="#" className="small " onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
+                            Deslinde Legal
+                          </a>
+                          <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
+                        </Col>
+                      </Row>
+                    </Form>
+                  </Card.Body>
+                </Col>
+              </Row>
+            </Card>
+          </motion.div>
+
+        </Col>
+      </Row>
+    </Container>
   );
 };

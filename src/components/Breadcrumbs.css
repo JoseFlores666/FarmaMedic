@@ -1,0 +1,39 @@
+/* html{
+    overflow-x: hidden;
+} */
+
+.breadcrumbs {
+    width: 100%; 
+    background-color: #0b0342;
+    position: fixed; 
+    top: 66px; 
+    left: 0;
+    z-index: 997;
+    padding: 4px;
+    
+}
+
+.container {
+    padding-top: 10px; 
+}
+
+.breadcrumbs>* {
+    display: inline-block;
+    margin-left: 20px;
+    color: rgb(180, 185, 186);
+}
+
+.breadcrumbs .crumb:after {
+    content: '/';
+    margin-left: 10px;
+}
+
+.breadcrumbs .crumb:last-child:after {
+    display: none;
+}
+
+.breadcrumbs .crumb .disabled {
+    pointer-events: none;
+    cursor: default;
+    font: bold;
+}

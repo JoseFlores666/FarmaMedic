@@ -13,6 +13,7 @@ import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { motion } from 'framer-motion';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -162,7 +163,7 @@ export const Register = () => {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) return;
-        const response = await fetch('https://back-farmam.onrender.com/api/register', {
+        const response = await fetch('https://localhost:4000/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -178,7 +179,7 @@ export const Register = () => {
                 icon: 'success',
                 confirmButtonText: 'Aceptar',
             });
-            navigate('/otpInput', { state: { replace: true, correo }, replace: true });
+            navigate('/Verificacion', { state: { replace: true, correo }, replace: true });
             onResetForm();
         } else {
             const errorMessage = await response.text();
@@ -187,7 +188,12 @@ export const Register = () => {
     };
 
     return (
-        <div className="container py-4 h-100">
+        <motion.div
+            className="container py-4 h-100"
+            initial={{ x: '100vw' }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1 }}
+        >
             <div className="row d-flex justify-content-center align-items-center h-100">
                 <div className="col col-lg-7 ">
                     <div className="card shadow-lg" style={{ borderRadius: '1rem', border: '1px solid' }}>
@@ -489,7 +495,7 @@ export const Register = () => {
 
                                         />
                                         <label htmlFor="terminos" className="small text-muted">
-                                            <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
+                                            <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
                                                 Acepto los Términos y Condiciones</a>
                                         </label>
                                         <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
@@ -504,7 +510,7 @@ export const Register = () => {
                                             onChange={(e) => handleCheckboxChange("privacidad", e.target.checked)}
                                         />
                                         <label htmlFor="privacidad" className="small text-muted">
-                                            <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
+                                            <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
                                                 Acepto la Política de privacidad</a>
                                         </label>
                                         <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
@@ -519,7 +525,7 @@ export const Register = () => {
                                                 onChange={(e) => handleCheckboxChange("deslinde", e.target.checked)}
                                             />
                                             <label htmlFor="deslinde" className="small text-muted m-3">
-                                                <a className="text-muted" onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
+                                                <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
                                                     Acepto el deslinde legal
                                                 </a>
                                             </label>
@@ -539,16 +545,16 @@ export const Register = () => {
                                 </div>
 
                                 <p className='small text-muted mb-3'>
-                                    ¿Olvidaste tu contraseña? <NavLink to="/forgotpassword">Recuperala aquí</NavLink>
+                                    ¿Olvidaste tu contraseña? <NavLink to="/Recuperacion">Recuperala aquí</NavLink>
                                 </p>
                                 <p className="small text-muted mb-3">
-                                    ¿Ya tienes una cuenta? <NavLink to="/login">Inicia sesión aquí</NavLink>
+                                    ¿Ya tienes una cuenta? <NavLink to="/Acceder">Inicia sesión aquí</NavLink>
                                 </p>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };

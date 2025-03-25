@@ -30,7 +30,7 @@ const Deslinde = () => {
 
   const fetchDeslindes = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getDeslindesLegales`);
+      const response = await fetch(`https://localhost:4000/api/getDeslindesLegales`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener deslinde legal');
@@ -56,7 +56,7 @@ const Deslinde = () => {
 
   const createDeslinde = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/createDeslindeLegal`, {
+      const response = await fetch(`https://localhost:4000/api/createDeslindeLegal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Deslinde = () => {
 
   const updateDeslinde = async (id) => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/updateDeslindeLegal/${id}`, {
+      const response = await fetch(`https://localhost:4000/api/updateDeslindeLegal/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const Deslinde = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://back-farmam.onrender.com/api/deleteDeslindeLegal/${id}`, {
+        const response = await fetch(`https://localhost:4000/api/deleteDeslindeLegal/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ const Deslinde = () => {
   });
 
   return (
-    <div className="container mt-2">
+    <div className="container mt-5">
       <h1 className="text-center mb-4">Gestión de Deslinde Legal</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <label htmlFor="">Título</label>
