@@ -6,7 +6,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Swal from "sweetalert2";
 
-import './verDoctores.css'
+import '../Clients/verDoctores.css'
 import { FaCheckCircle } from "react-icons/fa";
 
 const VerDoctores = () => {
