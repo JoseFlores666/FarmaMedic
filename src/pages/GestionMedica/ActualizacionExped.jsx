@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaTrash } from 'react-icons/fa';
 
-const API_URL = 'https://localhost:4000/api/';
+const API_URL = 'https://back-farmam.onrender.com/api/';
 
 const getActuExpe = async (setActuExpe) => {
     try {

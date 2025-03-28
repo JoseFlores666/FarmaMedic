@@ -19,7 +19,7 @@ const Chatbot = () => {
 
     const fetchEmpresaInfo = async () => {
         try {
-            const response = await fetch("https://localhost:4000/api/getEmpresa");
+            const response = await fetch("https://back-farmam.onrender.com/api/getEmpresa");
             if (!response.ok) throw new Error("Error en la respuesta del servidor");
             
             const data = await response.json();

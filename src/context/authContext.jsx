@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await fetch('https://localhost:4000/api/logout', {
+        await fetch('https://back-farmam.onrender.com/api/logout', {
             method: 'POST',
             credentials: 'include',
         });
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                const response = await fetch('https://localhost:4000/api/session', {
+                const response = await fetch('https://back-farmam.onrender.com/api/session', {
                     credentials: 'include',
                 });
     

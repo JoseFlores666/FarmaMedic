@@ -13,7 +13,7 @@ const ContactoEmpresa = () => {
 
     const getContacto = async () => {
         try {
-            const response = await fetch('https://localhost:4000/api/getContactInfo', {
+            const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo', {
                 credentials: 'include',
             });
 
@@ -35,7 +35,7 @@ const ContactoEmpresa = () => {
 
     const updateContacto = async () => {
         try {
-            const response = await fetch('https://localhost:4000/api/upsertContactInfo', {
+            const response = await fetch('https://back-farmam.onrender.com/api/upsertContactInfo', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

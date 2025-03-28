@@ -16,7 +16,7 @@ const Logo = () => {
 
     const fetchLogos = async () => {
         try {
-            const response = await fetch('https://localhost:4000/api/getAllLogos');
+            const response = await fetch('https://back-farmam.onrender.com/api/getAllLogos');
             if (!response.ok) throw new Error("Error fetching logos");
             const data = await response.json();
             setLogos(data);
@@ -74,7 +74,7 @@ const Logo = () => {
             const file = await response.json();
             setImage(file.secure_url);
 
-            await fetch('https://localhost:4000/api/uploadLogo', {
+            await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: file.secure_url,id_usuario:userId }),
@@ -104,7 +104,7 @@ const Logo = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await fetch(`https://localhost:4000/api/deleteLogo/${id}`, {
+                    await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, {
                         method: 'DELETE',
                         credentials: 'include',
                         body: JSON.stringify({ id_usuario:userId }),
@@ -128,7 +128,7 @@ const Logo = () => {
             return;
         }
         try {
-            await fetch(`https://localhost:4000/api/updateLogo/${id}`, {
+            await fetch(`https://back-farmam.onrender.com/api/updateLogo/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ isActive: true, url,id_usuario:userId }),

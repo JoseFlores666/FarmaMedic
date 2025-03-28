@@ -13,7 +13,7 @@ const Servicios = () => {
 
   const fetchServicios = async () => {
     try {
-      const response = await fetch('https://localhost:4000/api/getServicios', {
+      const response = await fetch('https://back-farmam.onrender.com/api/getServicios', {
         credentials: 'include',
       });
       const data = await response.json();
@@ -54,7 +54,7 @@ const Servicios = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://localhost:4000/api/deleteServicios/${id}`, {
+        const response = await fetch(`https://back-farmam.onrender.com/api/deleteServicios/${id}`, {
           method: 'DELETE',
           credentials: 'include',
           body: JSON.stringify({ id_usuario: userId }),
@@ -91,7 +91,7 @@ const Servicios = () => {
       return;
     }
     const method = editMode ? 'PUT' : 'POST';
-    const descripcion = editMode ? `https://localhost:4000/api/updateServicios/${nuevoEnlace.id}` : 'https://localhost:4000/api/crearServicios';
+    const descripcion = editMode ? `https://back-farmam.onrender.com/api/updateServicios/${nuevoEnlace.id}` : 'https://back-farmam.onrender.com/api/crearServicios';
 
     try {
       const response = await fetch(descripcion, {

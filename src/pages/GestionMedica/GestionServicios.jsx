@@ -7,7 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
 
 
-const API_URL = 'https://localhost:4000/api';
+const API_URL = 'https://back-farmam.onrender.com/api';
 
 const fetchServices = async (setServices) => {
   try {

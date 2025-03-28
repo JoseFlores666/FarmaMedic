@@ -2,13 +2,13 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../context/useAuth';
 import ScrollToTop from './ScrollTop';
-import { FaCog, FaHome, FaSearch, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { FaCog, FaHome, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Navbar from 'react-bootstrap/Navbar';
-import { Button, FormControl, InputGroup, ListGroup } from 'react-bootstrap';
+import SearchBar from '../SearchBar/Search';
 
 export const Navbar2 = () => {
   //elimine isAdmin para recordarlo
@@ -16,28 +16,10 @@ export const Navbar2 = () => {
   const { isAuthenticated, username, logout, role } = useAuth();
   const navigate = useNavigate();
   const [logoActivo, setLogoActivo] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState("");
-
-  const URL = "https://localhost:4000/api/getDoc";
-
-  const showData = async () => {
-    try {
-      const response = await fetch(URL);
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-      const data = await response.json();
-      setUsers(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error al obtener los datos:", error);
-      setUsers([]);
-    }
-  };
 
   const fetchLogoActivo = useCallback(async () => {
     try {
-      const response = await fetch("https://localhost:4000/api/getLogoActivo");
+      const response = await fetch("https://back-farmam.onrender.com/api/getLogoActivo");
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 
@@ -53,18 +35,9 @@ export const Navbar2 = () => {
     }
   }, [navigate]);
 
-  const handleSearchChange = (e) => setSearch(e.target.value);
 
-  const results =
-    search.length > 0
-      ? users.filter((user) =>
-        user.nomdoc?.toLowerCase().includes(search.toLowerCase())
-      )
-      : [];
 
-  useEffect(() => {
-    showData();
-  }, []);
+
 
   useEffect(() => {
     fetchLogoActivo();
@@ -105,7 +78,10 @@ export const Navbar2 = () => {
             </Navbar.Brand>
           </div>
 
-         
+          <div style={{ position: "relative", flexGrow: 1 }}>
+  <SearchBar />
+</div>
+
 
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={toggleMenu} />
           <Navbar.Offcanvas id="offcanvasNavbar" placement="end" show={menuOpen} onHide={closeMenu}>
@@ -114,35 +90,7 @@ export const Navbar2 = () => {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="ms-auto">
-                <div>
-                  <InputGroup>
-                    <InputGroup.Text>
-                      <FaSearch size={15} />
-                    </InputGroup.Text>
-                    <FormControl
-                      value={search}
-                      onChange={handleSearchChange}
-                      type="search"
-                      placeholder="Busca Servicios o Doctores"
-                    />
-                    <Button variant="success">Buscar</Button>
-                  </InputGroup>
-                </div>
 
-                {search.length > 0 && results.length > 0 && (
-                  <div
-                    className="search-results"
-                    style={{ position: "absolute", top: "100%", left: "0", width: "100%", zIndex: 100 }}
-                  >
-                    <ListGroup>
-                      {results.map((user, index) => (
-                        <ListGroup.Item key={user.coddoc || index}>
-                          <strong>{user.nomdoc}</strong>
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
-                  </div>
-                )}
                 <Nav.Link as={NavLink} to="/Inicio" end onClick={closeMenu}>
                   <FaHome className="me-2" /> Inicio
                 </Nav.Link>
@@ -208,8 +156,11 @@ export const Navbar2 = () => {
                           <NavDropdown.Item as={NavLink} to="/Inicio/Doctor" onClick={closeMenu}>
                             Doctores disponibles
                           </NavDropdown.Item>
-                          <NavDropdown.Item as={NavLink} to="" onClick={closeMenu}>
+                          <NavDropdown.Item as={NavLink} to="/Inicio/Expediente" onClick={closeMenu}>
                             Mi expediente medico
+                          </NavDropdown.Item>
+                          <NavDropdown.Item as={NavLink} to="" onClick={closeMenu}>
+                            Mis Reservaciones
                           </NavDropdown.Item>
                         </NavDropdown>
                       </>

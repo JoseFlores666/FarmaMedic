@@ -34,7 +34,7 @@ export const Home = () => {
 
   const getEmpresa = async () => {
     try {
-      const response = await fetch('https://localhost:4000/api/getEmpresa');
+      const response = await fetch('https://back-farmam.onrender.com/api/getEmpresa');
       if (!response.ok) throw new Error('Error al obtener datos de la empresa');
       const data = await response.json();
       const empresaData = data[0];
@@ -46,7 +46,7 @@ export const Home = () => {
 
   const getServicios = async () => {
     try {
-      const response = await fetch(`https://localhost:4000/api/getServicios`);
+      const response = await fetch(`https://back-farmam.onrender.com/api/getServicios`);
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setServicios(data);
@@ -57,7 +57,7 @@ export const Home = () => {
 
   const getDoctores = async () => {
     try {
-      const response = await fetch(`https://localhost:4000/api/getDoc`);
+      const response = await fetch(`https://back-farmam.onrender.com/api/getDoc`);
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setDoctores(data);
@@ -68,7 +68,7 @@ export const Home = () => {
 
   const getValores = async () => {
     try {
-      const response = await fetch(`https://localhost:4000/api/getValores`);
+      const response = await fetch(`https://back-farmam.onrender.com/api/getValores`);
       if (!response.ok) throw new Error('Error al obtener opiniones');
       const data = await response.json();
       setValores(data);
@@ -79,7 +79,7 @@ export const Home = () => {
 
   const getOpinions = async () => {
     try {
-      const response = await fetch(`https://localhost:4000/api/getOpinions`);
+      const response = await fetch(`https://back-farmam.onrender.com/api/getOpinions`);
       if (!response.ok) throw new Error('Error al obtener opiniones');
       const data = await response.json();
       setOpiniones(data);
@@ -227,7 +227,7 @@ export const Home = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <Card className="shadow-lg border service-card" style={{ height: '450px' }}>
+                <Card className="shadow-lg border service-card" style={{ height: '350px' }}>
                   <Card.Img
                     variant="top"
                     src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
@@ -244,7 +244,6 @@ export const Home = () => {
                     <Card.Text className="text-muted">
                       {service.descripcion || "Descripción no disponible"}
                     </Card.Text>
-                    <Button variant="primary p-0">Ir a detalle</Button>
                   </Card.Body>
                 </Card>
               </motion.div>

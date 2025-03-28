@@ -31,7 +31,7 @@ const Footer = () => {
 
   const loadEnlaces = async () => {
     try {
-      const response = await fetch('https://localhost:4000/api/getEnlaces', {
+      const response = await fetch('https://back-farmam.onrender.com/api/getEnlaces', {
         credentials: 'include',
       });
       const data = await response.json();
@@ -45,7 +45,7 @@ const Footer = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('https://localhost:4000/api/getContactInfo');
+      const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo');
       if (!response.ok) {
         throw new Error('No se pudo obtener la información de contacto');
       }

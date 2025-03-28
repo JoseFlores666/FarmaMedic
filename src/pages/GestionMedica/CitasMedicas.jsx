@@ -6,7 +6,7 @@ import { FaCalendarCheck, FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
-const API_URL = 'https://localhost:4000/api';
+const API_URL = 'https://back-farmam.onrender.com/api';
 
 const fetchCitas = async (setCitas) => {
   try {
@@ -117,7 +117,6 @@ const userColumns = (setCitas, handleEditCita, abrirModal) => [
   { name: 'Especialidad', selector: row => row.especialidad, sortable: true },
   { name: 'Fecha Cita', selector: row => row.fecha, sortable: true, format: row => new Date(row.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) },
   { name: 'Hora', selector: row => row.hora, sortable: true },
-  { name: 'Día', selector: row => row.dia_horario, sortable: true },
   { name: 'Atendido', selector: row => (row.atendido === "0" ? "NO" : "SI"), sortable: true },
   { name: 'Estado', selector: row => row.estado, sortable: true },
   { name: 'Motivo de la cita', selector: row => row.motivo_cita || 'Sin motivo', sortable: true },

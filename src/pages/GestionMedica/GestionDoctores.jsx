@@ -7,7 +7,7 @@ import { Button, Form, Row, Col } from 'react-bootstrap';
 
 const fetchDoctores = async (setServices) => {
   try {
-    const response = await fetch('https://localhost:4000/api/getDoc', {
+    const response = await fetch('https://back-farmam.onrender.com/api/getDoc', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -29,7 +29,7 @@ const fetchDoctores = async (setServices) => {
 
 const createDoctor = async (doctorData) => {
   try {
-    const response = await fetch('https://localhost:4000/api/createDoc', {
+    const response = await fetch('https://back-farmam.onrender.com/api/createDoc', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -53,7 +53,7 @@ const createDoctor = async (doctorData) => {
 
 const updateDoctor = async (id, doctorData) => {
   try {
-    const response = await fetch(`https://localhost:4000/api/updateDoc/${id}`, {
+    const response = await fetch(`https://back-farmam.onrender.com/api/updateDoc/${id}`, {
       method: 'PUT',
       credentials: 'include',
       headers: {
@@ -106,7 +106,7 @@ const GestionDoctores = () => {
   useEffect(() => {
     const fetchDoctores = async () => {
       try {
-        const response = await fetch('https://localhost:4000/api/getDoc', {
+        const response = await fetch('https://back-farmam.onrender.com/api/getDoc', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -128,7 +128,7 @@ const GestionDoctores = () => {
   
     const fetchEspecialidades = async () => {
       try {
-        const response = await fetch('https://localhost:4000/api/getServicios');
+        const response = await fetch('https://back-farmam.onrender.com/api/getServicios');
         const data = await response.json();
         setEspecialidades(data);
       } catch (error) {
@@ -195,7 +195,7 @@ const GestionDoctores = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`https://localhost:4000/api/deleteDoc/${id}`, {
+          const response = await fetch(`https://back-farmam.onrender.com/api/deleteDoc/${id}`, {
             method: "DELETE",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

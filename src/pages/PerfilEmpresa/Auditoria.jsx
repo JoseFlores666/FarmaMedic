@@ -7,7 +7,7 @@ const Auditoria = () => {
 
   const fetchAuditLogs = useCallback(async () => {
     try {
-      const response = await fetch('https://localhost:4000/api/getAuditLogs');
+      const response = await fetch('https://back-farmam.onrender.com/api/getAuditLogs');
       
       if (response.status === 404) {
         const errorMessage = await response.text();

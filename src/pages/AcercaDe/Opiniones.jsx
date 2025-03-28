@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 const Opiniones = () => {
-    const API_URL = "https://localhost:4000/api/";
+    const API_URL = "https://back-farmam.onrender.com/api/";
     const navigate = useNavigate();
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
@@ -18,7 +18,7 @@ const Opiniones = () => {
 
     const handleReaction = async (reactionType, opinionId) => {
         try {
-            const response = await fetch(`https://localhost:4000/api/updateReaction/${opinionId}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/updateReaction/${opinionId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ reaction: reactionType }),
@@ -71,7 +71,7 @@ const Opiniones = () => {
             return;
         }
         try {
-            const response = await fetch("https://localhost:4000/api/createOpinion", {
+            const response = await fetch("https://back-farmam.onrender.com/api/createOpinion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: userId, rating, opinion })

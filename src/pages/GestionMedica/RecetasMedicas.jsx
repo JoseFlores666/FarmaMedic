@@ -6,7 +6,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
-const API_URL = 'https://localhost:4000/api';
+const API_URL = 'https://back-farmam.onrender.com/api';
 
 const fetchRecetas = async (setRecetas) => {
   try {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-
 const GestionUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [updated, setUpdated] = useState(false);
@@ -10,7 +9,7 @@ const GestionUsuarios = () => {
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('https://localhost:4000/api/getUsuariosAll', {
+                const response = await fetch('https://back-farmam.onrender.com/api/getUsuariosAll', {
                     credentials: 'include',
                 });
 
@@ -61,7 +60,7 @@ const GestionUsuarios = () => {
 
     const handleBloquear = async (id) => {
         try {
-            const response = await fetch(`https://localhost:4000/api/bloquearUsuario/${id}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/bloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });
@@ -80,7 +79,7 @@ const GestionUsuarios = () => {
 
     const handleDesbloquear = async (id) => {
         try {
-            const response = await fetch(`https://localhost:4000/api/desbloquearUsuario/${id}`, {
+            const response = await fetch(`https://back-farmam.onrender.com/api/desbloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });
@@ -175,7 +174,6 @@ const GestionUsuarios = () => {
                 </table>
             </div>
         </div>
-
     );
 };
 

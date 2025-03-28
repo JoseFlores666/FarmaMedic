@@ -24,7 +24,7 @@ const PerfilEmpresa = () => {
     setEditField(null);
   };
 
-  const apiUrl = 'https://localhost:4000/api/';
+  const apiUrl = 'https://back-farmam.onrender.com/api/';
   const getEmpresa = async () => {
     try {
       const response = await fetch(`${apiUrl}getEmpresa`);
@@ -63,7 +63,7 @@ const PerfilEmpresa = () => {
       id_usuario:userId
     };
 
-    const response = await fetch(`https://localhost:4000/api/updateEmpresa/${1}`, {
+    const response = await fetch(`https://back-farmam.onrender.com/api/updateEmpresa/${1}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedEmpresa),

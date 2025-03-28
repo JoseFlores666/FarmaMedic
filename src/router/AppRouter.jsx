@@ -35,7 +35,9 @@ import PerfilEmpresa from '../pages/PerfilEmpresa/PerfilEmpresa';
 import ContactoEmpresa from '../pages/PerfilEmpresa/ContactoEmpresa';
 import PerfilUsuario from '../pages/PerfilEmpresa/PerfilUsuario';
 import VerDoctores from '../pages/Clients/VerDoctores';
-import ReservarCita from '../pages/Clients/ReservarCita';
+import ReservarCita from '../pages/Clients/ExpedienteUsuario';
+import ExpedienteUsuario from '../pages/Clients/ExpedienteUsuario';
+import Busqueda from '../pages/Clients/Busqueda';
 
 export const AppRouter = () => {
 	return (
@@ -68,6 +70,8 @@ export const AppRouter = () => {
 			{/* Cliente */}
 			<Route path='/Inicio/Doctor' element={<PrivateRoute><VerDoctores /></PrivateRoute>}/>
 			<Route path='/Inicio/Doctor/Reservar_Cita' element={<PrivateRoute><ReservarCita /></PrivateRoute>} />
+			<Route path='/Inicio/Expediente' element={<PrivateRoute><ExpedienteUsuario /></PrivateRoute>} />
+			<Route path='/Inicio/Busqueda' element={<Busqueda />} />
 
 
 			{/* {Documentos Regulatorios} */}
