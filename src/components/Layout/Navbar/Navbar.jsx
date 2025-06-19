@@ -8,10 +8,12 @@ import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Navbar from 'react-bootstrap/Navbar';
-import SearchBar from '../SearchBar/Search';
+import { SearchB } from '../SearchBar/Search';
+import { AppRouter } from '../../../router/AppRouter';
+import Breadcrumbs from '../../Breadcrumbs';
+import "../../Layout/Navbar/style.css"
 
 export const Navbar2 = () => {
-  //elimine isAdmin para recordarlo
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, username, logout, role } = useAuth();
   const navigate = useNavigate();
@@ -29,22 +31,9 @@ export const Navbar2 = () => {
         setLogoActivo(null);
       }
     } catch (error) {
-      navigate("/error500");
       console.error("Error fetching active logo:", error);
-      setLogoActivo(null);
     }
-  }, [navigate]);
-
-
-
-
-
-  useEffect(() => {
-    fetchLogoActivo();
-    const interval = setInterval(fetchLogoActivo, 20000);
-
-    return () => clearInterval(interval);
-  }, [fetchLogoActivo]);
+  }, []);
 
   const onLogout = () => {
     logout();
@@ -60,6 +49,10 @@ export const Navbar2 = () => {
     setMenuOpen(!menuOpen);
   };
 
+  useEffect(() => {
+    fetchLogoActivo()
+  }, []);
+
   return (
     <>
       <ScrollToTop />
@@ -70,7 +63,8 @@ export const Navbar2 = () => {
               {logoActivo ? (
                 <img
                   src={logoActivo}
-                  style={{ height: "50px", width: "auto" }}
+                  className="navbar-brand-img"
+
                 />
               ) : (
                 "Cargando..."
@@ -79,9 +73,8 @@ export const Navbar2 = () => {
           </div>
 
           <div style={{ position: "relative", flexGrow: 1 }}>
-  <SearchBar />
-</div>
-
+            <SearchB />
+          </div>
 
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={toggleMenu} />
           <Navbar.Offcanvas id="offcanvasNavbar" placement="end" show={menuOpen} onHide={closeMenu}>
@@ -92,7 +85,7 @@ export const Navbar2 = () => {
               <Nav className="ms-auto">
 
                 <Nav.Link as={NavLink} to="/Inicio" end onClick={closeMenu}>
-                  <FaHome className="me-2" /> Inicio
+                  <FaHome className="me-1" /> Inicio
                 </Nav.Link>
                 {isAuthenticated ? (
                   <>
@@ -205,15 +198,18 @@ export const Navbar2 = () => {
                       <NavDropdown.Item onClick={onLogout}>
                         Cerrar sesión
                       </NavDropdown.Item>
+                      <NavDropdown.Item as={NavLink} to={"/Wear_OS"}>
+                        Wear Os
+                      </NavDropdown.Item>
                     </NavDropdown>
                   </>
                 ) : (
                   <>
                     <Nav.Link as={NavLink} to="/Acceder" onClick={closeMenu}>
-                      <FaSignInAlt className="me-2" /> Iniciar Sesion
+                      <FaSignInAlt className="me-1" /> Iniciar Sesion
                     </Nav.Link>
                     <Nav.Link as={NavLink} to="/Registrarse" onClick={closeMenu}>
-                      <FaUserPlus className="me-2" /> Registrarse
+                      <FaUserPlus className="me-1" /> Registrarse
                     </Nav.Link>
                   </>
                 )}
@@ -222,6 +218,15 @@ export const Navbar2 = () => {
           </Navbar.Offcanvas>
         </Container>
       </Navbar>
+      <div style={{
+        width: '100%', backgroundColor: '#0b0342',
+        position: 'fixed', color: 'rgba(0, 0, 0, 0.2)', zIndex: '997'
+      }}>
+        <Breadcrumbs />
+      </div>
+      <div>
+        <AppRouter />
+      </div>
       <Outlet />
     </>
   );

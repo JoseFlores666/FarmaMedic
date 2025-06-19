@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-
+import { Container, Row, Col, Button, Form, Table, Image } from "react-bootstrap";
+import { motion } from "framer-motion";
+import { FaUpload, FaTrash, FaCheck, FaTimes } from "react-icons/fa"
 const MySwal = withReactContent(Swal);
 
 const Logo = () => {
@@ -49,6 +51,7 @@ const Logo = () => {
     const uploadImage = async () => {
         const authData = JSON.parse(localStorage.getItem("authData"));
         const userId = authData ? authData.id : null;
+
         if (!selectedFile) {
             MySwal.fire('Error', 'Por favor, selecciona una imagen primero.', 'error');
             return;
@@ -77,9 +80,14 @@ const Logo = () => {
             await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: file.secure_url,id_usuario:userId }),
                 credentials: 'include',
+                body: JSON.stringify({
+                    url: file.secure_url,
+                    public_id: file.public_id,
+                    id_usuario: userId
+                }),
             });
+
             MySwal.fire('Éxito', 'Imagen subida y guardada correctamente.', 'success');
             fetchLogos();
         } catch (error) {
@@ -94,6 +102,7 @@ const Logo = () => {
     const deleteLogo = async (id) => {
         const authData = JSON.parse(localStorage.getItem("authData"));
         const userId = authData ? authData.id : null;
+
         MySwal.fire({
             title: '¿Estás seguro?',
             text: 'Una vez eliminada, no podrás recuperar esta imagen.',
@@ -104,17 +113,24 @@ const Logo = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, {
+                    const response = await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, {
                         method: 'DELETE',
                         credentials: 'include',
-                        body: JSON.stringify({ id_usuario:userId }),
-                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ id_usuario: userId }),
+                        headers: { 'Content-Type': 'application/json' },
                     });
-                    MySwal.fire('Eliminado', 'Logo eliminado correctamente.', 'success');
-                    fetchLogos();
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        MySwal.fire('Eliminado', 'Logo eliminado correctamente.', 'success');
+                        fetchLogos();
+                    } else {
+                        MySwal.fire('Error', data.message || 'No se pudo eliminar el logo de la base de datos.', 'error');
+                    }
                 } catch (error) {
                     console.error("Error deleting logo:", error);
-                    MySwal.fire('Error', 'No se pudo eliminar la imagen.', 'error');
+                    MySwal.fire('Error', 'No se pudo eliminar el logo.', 'error');
                 }
             }
         });
@@ -131,7 +147,7 @@ const Logo = () => {
             await fetch(`https://back-farmam.onrender.com/api/updateLogo/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isActive: true, url,id_usuario:userId }),
+                body: JSON.stringify({ isActive: true, url, id_usuario: userId }),
                 credentials: 'include',
             });
             MySwal.fire('Éxito', 'Logo activado correctamente.', 'success');
@@ -147,65 +163,114 @@ const Logo = () => {
     }, []);
 
     return (
-        <div className="container text-center mt-5">
-            <h1>Gestión de Logos</h1>
-            <input
-                type="file"
-                name="file"
-                onChange={handleFileSelect}
-                className="form-control mt-3"
-            />
-            <button
-                onClick={uploadImage}
-                className="btn btn-primary mt-3"
-                disabled={!selectedFile || loading}
-            >
-                {loading ? "Subiendo..." : "Subir Imagen"}
-            </button>
+
+        <Container className="mb-5">
+            <h2 className="text-center text-primary fw-bold">Gestión de Logos</h2>
+
+            <div className="d-flex justify-content-center">
+                <Form.Group controlId="formFile" className="d-flex flex-column align-items-center">
+                    <Form.Control
+                        type="file"
+                        onChange={handleFileSelect}
+                        className="my-3 w-100"
+                        style={{ maxWidth: "300px" }}
+                    />
+                    <Button
+                        variant="success"
+                        onClick={uploadImage}
+                        disabled={!selectedFile || loading}
+                        className="d-flex align-items-center"
+                    >
+                        <FaUpload className="me-2" />
+                        {loading ? "Subiendo..." : "Subir Imagen"}
+                    </Button>
+                </Form.Group>
+            </div>
+
             {image && (
-                <img src={image} alt="Imagen subida" className="img-fluid mt-3" />
+                <Row className="justify-content-center mt-4">
+                    <Col md={4}>
+                        <Image src={image} alt="Imagen subida" fluid rounded className="shadow" />
+                    </Col>
+                </Row>
             )}
 
-            <div className="mt-5">
-                <h2>Lista de Logos</h2>
-                <table className="table table-striped">
-                    <thead>
+            <motion.div
+                className="table-responsive mt-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <Table striped bordered hover responsive className="text-center">
+                    <thead className="table-primary">
                         <tr>
-                            <th>ID</th>
-                            <th>URL</th>
-                            <th>Activo</th>
-                            <th>Acciones</th>
+                            <th style={{ minWidth: "100px" }}>ID</th>
+                            <th style={{ minWidth: "150px" }}>Logo</th>
+                            <th style={{ minWidth: "100px" }}>Activo</th>
+                            <th style={{ minWidth: "200px" }}>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {logos.map((logo) => (
-                            <tr key={logo.id}>
-                                <td>{logo.id}</td>
-                                <td>
-                                    <img src={logo.url} alt="Logo" width="50" />
-                                </td>
-                                <td>{logo.isActive ? "Sí" : "No"}</td>
-                                <td>
-                                    <button
-                                        onClick={() => activateLogo(logo.id, logo.url)}
-                                        className="btn btn-success btn-sm me-2"
-                                        disabled={logo.isActive}
-                                    >
-                                        Activar
-                                    </button>
-                                    <button
-                                        onClick={() => deleteLogo(logo.id)}
-                                        className="btn btn-danger btn-sm"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </td>
+                        {logos.length > 0 ? (
+                            logos.map((logo) => (
+                                <motion.tr
+                                    key={logo.id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.1 }}
+                                >
+                                    <td>{logo.id}</td>
+                                    <td>
+                                        <Image
+                                            src={logo.url}
+                                            alt="Logo"
+                                            width="60"
+                                            height="60"
+                                            style={{ objectFit: "contain", borderRadius: "4px" }}
+                                        />
+                                    </td>
+                                    <td>{logo.isActive ? <FaCheck className="text-success" /> : <FaTimes className="text-danger" />
+                                    }</td>
+                                    <td className="text-center">
+                                        <Row className="justify-content-center g-2">
+                                            <Col xs="auto">
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        className="px-3 py-2 shadow-sm"
+                                                        disabled={logo.isActive}
+                                                        onClick={() => activateLogo(logo.id, logo.url)}
+                                                    >
+                                                        Activar
+                                                    </Button>
+                                                </motion.div>
+                                            </Col>
+                                            <Col xs="auto">
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        className="px-3 py-2 shadow-sm"
+                                                        onClick={() => deleteLogo(logo.id, logo.public_id)}
+                                                    >
+                                                        <FaTrash className="me-2 fs-6" /> Eliminar
+                                                    </Button>
+                                                </motion.div>
+                                            </Col>
+                                        </Row>
+                                    </td>
+                                </motion.tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="text-center text-muted">No hay logos disponibles</td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
-                </table>
-            </div>
-        </div>
+                </Table>
+            </motion.div>
+        </Container>
     );
 };
 

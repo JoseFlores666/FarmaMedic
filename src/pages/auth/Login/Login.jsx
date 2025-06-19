@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from '../../hook/useForm';
-import { useAuth } from '../../context/useAuth';
+import { useForm } from '../../../hook/useForm';
+import { useAuth } from '../../../context/useAuth';
 import Lottie from 'lottie-react';
-import lockAnimation from '../../assets/Animation - 1729172775488.json';
+import lockAnimation from '../../../assets/Animation - 1729172775488.json';
 import Swal from 'sweetalert2';
-import VistaDeslinde from '../DocRegulatorio/Informacion/VistaDeslinde';
-import VistaPolitica from '../DocRegulatorio/Informacion/VistaPolitica';
-import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
+import VistaDeslinde from '../../DocRegulatorio/Informacion/VistaDeslinde';
+import VistaPolitica from '../../DocRegulatorio/Informacion/VistaPolitica';
+import VistaTerminos from '../../DocRegulatorio/Informacion/VistaTerminos';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +15,7 @@ import { Button, Card, Col, Container, Form, InputGroup, Row } from 'react-boots
 import { motion } from 'framer-motion';
 export const Login = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated,role } = useAuth();
   const [errors, setErrors] = useState({});
   const [showDeslindeModal, setShowDeslindeModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
@@ -115,7 +115,6 @@ export const Login = () => {
           confirmButtonText: 'Continuar',
         }).then((result) => {
           if (result.isConfirmed) {
-            navigate('/Inicio', { replace: true });
             onResetForm();
           }
         });
@@ -144,12 +143,23 @@ export const Login = () => {
     }
   };
   
-
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/Inicio', { replace: true });
+      switch (role) {
+        case 1:
+          navigate('/Panel_Administrativo', { replace: true });
+          break;
+        case 2:
+          navigate('/Inicio', { replace: true });
+          break;
+        case 3:
+          navigate('/Inicio', { replace: true });
+          break;
+        default:
+          navigate('/Inicio', { replace: true }); 
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, role, navigate]);
 
   return (
     <Container className='mt-5 mb-5'>

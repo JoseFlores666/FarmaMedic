@@ -1,17 +1,32 @@
-import { Navbar2 } from "./components/Layout/Navbar";
-import { AppRouter } from "./router/AppRouter";
-import Footer from "./components/Layout/Footer/Footer";
+import { Footer } from "./components/Layout";
 import Chatbot from "./components/Chatbot/Chatbot";
-import Breadcrumbs from "./components/Breadcrumbs";
+import { Menu } from "./components/Layout/Menu/Menu";
+import { useAuth } from "./context/useAuth";
+import Notificactions from "./components/Notifictions/Notifications";
+import { useState, useEffect } from "react";
 
 function App() {
+  const { isAuthenticated } = useAuth();
+  const [notificationCount, setNotificationCount] = useState(() => {
+    const storedCount = localStorage.getItem("notificationCount");
+    return storedCount ? parseInt(storedCount, 10) : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("notificationCount", notificationCount);
+  }, [notificationCount]);
+
   return (
     <>
-      <Navbar2 />
-      <Breadcrumbs/>
-      <AppRouter />
+      <Menu
+        notificationCount={notificationCount}
+        setNotificationCount={setNotificationCount}
+      />
       <Footer />
-      <Chatbot/>
+      <Chatbot />
+      {isAuthenticated && (
+        <Notificactions setNotificationCount={setNotificationCount} />
+      )}
     </>
   )
 }

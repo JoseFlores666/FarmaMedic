@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const Empresa = () => {
   const navigate = useNavigate();
   return (
-    <Container className='mt-5 mb-5'>
+    <Container className=' mb-5'>
       <Row className="g-4">
         <Col md={4}>
           <Card
@@ -85,7 +85,7 @@ const Empresa = () => {
                 Descubre los servicios que ofrecemos a nuestros clientes y gestiona información sobre sus característica cómo puede ayudarlos en distintos aspectos
               </Card.Text>
               <Button onClick={() => navigate('/Inicio/Empresa/Gestion_De_Servicios')}
-                variant="secondary" className="w-75">Ediatr servicios</Button>
+                variant="secondary" className="w-75">Editar servicios</Button>
             </Card.Body>
           </Card>
         </Col>

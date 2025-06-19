@@ -87,7 +87,7 @@ const PerfilUsuario = () => {
 
 
   return (
-    <Container className="mt-5 mb-5 ">
+    <Container className="mb-5 ">
       <Card className="mb-4" style={{ width: "auto", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", borderRadius: "15px" }}>
         <Card.Body>
           <ThemeToggle />

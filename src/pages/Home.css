@@ -1,3 +1,32 @@
+  
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card-front,
+
+.flip-card-back {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+@keyframes rotateGradient {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
 
 .hero-title {
   font-size: 5rem;
@@ -26,6 +55,34 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
 }
+
+.service-box {
+  background-color: #534258;
+  padding: 20px;
+  border-radius: 12px;
+  height: 100%;
+  color: white;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.icon-circle {
+  background-color: #d3b79a;
+  width: 60px;
+  height: 60px;
+ margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #2c245b; /* Contraste dentro del círculo */
+}
+
 
 @media (max-width: 768px) {
 

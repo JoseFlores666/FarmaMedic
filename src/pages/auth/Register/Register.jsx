@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from '../../hook/useForm';
-import { checkPasswordCompromise, containsCommonPatterns } from '../../services/passwordService';
+import { useForm } from '../../../hook/useForm';
+import { checkPasswordCompromise, containsCommonPatterns } from '../../../services/passwordService';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import PasswordChecklist from "react-password-checklist";
 import ReCAPTCHA from 'react-google-recaptcha';
-import Input from '../../components/Input';
+import Input from '../../../components/Input';
 import Swal from 'sweetalert2';
-import VistaDeslinde from '../DocRegulatorio/Informacion/VistaDeslinde';
-import VistaPolitica from '../DocRegulatorio/Informacion/VistaPolitica';
-import VistaTerminos from '../DocRegulatorio/Informacion/VistaTerminos';
+import VistaDeslinde from '../../DocRegulatorio/Informacion/VistaDeslinde';
+import VistaPolitica from '../../DocRegulatorio/Informacion/VistaPolitica';
+import VistaTerminos from '../../DocRegulatorio/Informacion/VistaTerminos';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -189,7 +189,7 @@ export const Register = () => {
 
     return (
         <motion.div
-            className="container py-4 h-100"
+            className="container py-4 h-100 mt-4"
             initial={{ x: '100vw' }}
             animate={{ x: 0 }}
             transition={{ duration: 1 }}

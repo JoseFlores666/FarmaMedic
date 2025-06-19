@@ -23,7 +23,7 @@ const Auditoria = () => {
       setAuditLogs(logs);
     } catch (error) {
       console.error('Error al obtener los registros de auditoría:', error);
-      navigate('/error400');
+    throw error;
     }
   }, [navigate]); 
 
@@ -32,7 +32,7 @@ const Auditoria = () => {
   }, [fetchAuditLogs]);
 
   return (
-    <div className="container mt-5 mb-5">
+    <div className="container mb-5">
       <h2>Registro de Auditoría</h2>
       <div className="table-responsive">
         <table className="table table-striped">

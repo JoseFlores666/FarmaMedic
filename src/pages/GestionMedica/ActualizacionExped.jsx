@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaTrash } from 'react-icons/fa';
-
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
 const API_URL = 'https://back-farmam.onrender.com/api/';
 
 const getActuExpe = async (setActuExpe) => {
@@ -42,23 +42,11 @@ const deleteActuExpe = async (id, setActuExpe) => {
     });
 };
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => (
-    <div className="input-group">
-        <input
-            type="text"
-            className="form-control"
-            placeholder="Buscar Doctor"
-            value={filterText}
-            onChange={onFilter}
-        />
-        <button className="btn btn-danger" onClick={onClear}>X</button>
-    </div>
-);
-
 export const ActualizacionExped = () => {
     const [ActuExpe, setActuExpe] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+    const [selectedField, setSelectedField] = useState('doctor');
 
 
     useEffect(() => {
@@ -86,10 +74,28 @@ export const ActualizacionExped = () => {
             ignoreRowClick: true,
         },
     ];
+    const filteredItems = (ActuExpe || []).filter(item => {
+        const filter = filterText.toLowerCase();
+        let fieldValue = '';
 
-    const filteredItems = ActuExpe.filter(
-        item => (item.nomdoc || '').toLowerCase().includes(filterText.toLowerCase())
-    );
+        switch (selectedField) {
+            case 'paciente':
+                fieldValue = item.paciente?.toLowerCase() || '';
+                break;
+            case 'doctor':
+                fieldValue = item.doctor?.toLowerCase() || '';
+                break;
+
+            case 'fecha':
+                fieldValue = item.fecha || '';
+                break;
+            default:
+                return true;
+        }
+
+        return fieldValue.includes(filter);
+    });
+
 
     const subHeaderComponentMemo = useMemo(() => {
         const handleClear = () => {
@@ -99,30 +105,30 @@ export const ActualizacionExped = () => {
             }
         };
 
+        const handleFieldChange = (e) => {
+            setSelectedField(e.target.value);
+        };
+
         return (
             <FilterComponent
                 onFilter={e => setFilterText(e.target.value)}
                 onClear={handleClear}
                 filterText={filterText}
+                buttonText={''}
+                selectedField={selectedField}
+                onFieldChange={handleFieldChange}
+                fieldsToShow={['doctor', 'fecha']}
             />
         );
-    }, [filterText, resetPaginationToggle]);
+    }, [filterText, resetPaginationToggle, selectedField]);
 
     return (
-        <div className='mt-5'>
-            <DataTable
-                title="Gestión de Opiniones"
+        <div className=''>
+            <CustomDataTable
+                title="Actualizacion de Expedientes"
                 columns={userColumns}
                 data={filteredItems}
-                pagination
-                paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
-                paginationResetDefaultPage={resetPaginationToggle}
-                subHeader
                 subHeaderComponent={subHeaderComponentMemo}
-                persistTableHead
-                highlightOnHover
-                responsive
             />
         </div>
     );

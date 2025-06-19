@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaEdit, FaPlusCircle, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
-
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
 const API_URL = 'https://back-farmam.onrender.com/api';
 
 const fetchHorarios = async (setHorarios, doctores = []) => {
@@ -162,14 +162,6 @@ const horarioColumns = (setHorarios, handleEditHorario) => [
   },
 ];
 
-const FilterComponent = ({ filterText, onFilter, onClear, onShowModal }) => (
-  <div className="input-group">
-    <input type="text" className="form-control" placeholder="Buscar Doctor" value={filterText} onChange={onFilter} />
-    <button className="btn btn-danger" onClick={onClear}>X</button>
-    <button className="btn btn-success" onClick={onShowModal}>Añadir Horario</button>
-  </div>
-);
-
 export const HorarioCitas = () => {
   const [horarios, setHorarios] = useState([]);
   const [doctores, setDoctores] = useState([]);
@@ -192,6 +184,7 @@ export const HorarioCitas = () => {
       horaPM: `${horaPM}:00`
     };
   });
+  const [selectedField, setSelectedField] = useState('doctor');
 
   const handleShow = () => {
     setCoddoc('');
@@ -305,9 +298,25 @@ export const HorarioCitas = () => {
     setShowModal(true);
   };
 
-  const filteredItems = horarios.filter(item =>
-    item.nomdoc && item.nomdoc.toLowerCase().includes(filterText.toLowerCase())
-  );
+  const filteredItems = (horarios || []).filter(item => {
+    const filter = filterText.toLowerCase();
+    let fieldValue = '';
+
+    switch (selectedField) {
+
+      case 'doctor':
+        fieldValue = item.nomdoc?.toLowerCase() || '';
+        break;
+      case 'estado':
+        fieldValue = item.estado?.toLowerCase() || '';
+        break;
+      default:
+        return true;
+    }
+
+    return fieldValue.includes(filter);
+  });
+
 
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
@@ -316,22 +325,34 @@ export const HorarioCitas = () => {
         setFilterText('');
       }
     };
-    return <FilterComponent onFilter={e => setFilterText(e.target.value)} onClear={handleClear} onShowModal={handleShow} filterText={filterText} />;
-  }, [filterText, resetPaginationToggle]);
+
+    const handleFieldChange = (e) => {
+      setSelectedField(e.target.value);
+    };
+
+    return (
+      <FilterComponent
+        onFilter={e => setFilterText(e.target.value)}
+        onClear={handleClear}
+        onShowModal={handleShow}
+        filterText={filterText}
+        buttonText={'Añadir Horario'}
+        selectedField={selectedField}
+        onFieldChange={handleFieldChange}
+        fieldsToShow={['doctor','estado']}
+      />
+    );
+  }, [filterText, resetPaginationToggle, selectedField]);
+
 
   return (
-    <div className='mt-5'>
-      <DataTable
-        title="Gestión de Horario Médico"
+    <div className=''>
+        <CustomDataTable
+             title="Gestión de Horarios Citas"
         columns={horarioColumns(setHorarios, handleEditHorario)}
-        data={filteredItems}
-        pagination
-        subHeader
-        subHeaderComponent={subHeaderComponentMemo}
-        persistTableHead
-        highlightOnHover
-        responsive
-      />
+             data={filteredItems}
+             subHeaderComponent={subHeaderComponentMemo}
+           />
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>{editingHorario ? 'Editar Horario' : 'Agregar Nuevo Horario'}</Modal.Title>

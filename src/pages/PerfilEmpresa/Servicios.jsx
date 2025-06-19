@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const Servicios = () => {
   const [Servicios, setServicios] = useState([]);
-  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '',imagen:'' });
+  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: '' });
   const [editMode, setEditMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
@@ -33,7 +33,7 @@ const Servicios = () => {
       setnuevoEnlace(link);
       setEditMode(true);
     } else {
-      setnuevoEnlace({ nombre: "", descripcion: "",imagen:"" });
+      setnuevoEnlace({ nombre: "", descripcion: "", imagen: "" });
       setEditMode(false);
     }
     setShowModal(true);
@@ -77,7 +77,7 @@ const Servicios = () => {
   };
 
   const resetForm = () => {
-    setnuevoEnlace({ id: '', nombre: '', descripcion: '',imagen:"" });
+    setnuevoEnlace({ id: '', nombre: '', descripcion: '', imagen: "" });
     setEditMode(false);
   };
 
@@ -127,7 +127,7 @@ const Servicios = () => {
   }, []);
 
   return (
-    <Container className="mt-5 mb-5">
+    <Container className=" mb-5">
       <h2 className="text-center text-primary fw-bold ">Gestión de Servicios</h2>
 
       <div className="d-flex justify-content-center">
@@ -162,7 +162,17 @@ const Servicios = () => {
                 >
                   <td>{item.nombre}</td>
                   <td style={{ wordBreak: "break-word" }}>{item.descripcion}</td>
-                  <td style={{ wordBreak: "break-word" }}>{item.imagen}</td>
+                  <td style={{ wordBreak: "break-word" }}>
+                    {item.imagen ? (
+                      <img
+                        src={item.imagen}
+                        alt="Imagen"
+                        style={{ maxWidth: "100px", maxHeight: "100px", objectFit: "contain", borderRadius: "4px" }}
+                      />
+                    ) : (
+                      "Sin imagen"
+                    )}
+                  </td>
                   <td className="text-center">
                     <Row className="justify-content-center g-2">
                       <Col xs="auto">

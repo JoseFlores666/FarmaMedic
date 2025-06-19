@@ -127,7 +127,7 @@ const Enlaces = () => {
   }, []);
 
   return (
-    <Container className="mt-5 mb-5">
+    <Container className=" mb-5">
       <h2 className="text-center text-primary fw-bold ">Gestión de Enlaces de Redes Sociales</h2>
 
       <div className="d-flex justify-content-center">

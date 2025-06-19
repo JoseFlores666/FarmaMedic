@@ -1,6 +1,6 @@
 .search-container {
     position: relative;
-    width: 400px; /* Tamaño fijo */
+    width: 100%; /* Tamaño fijo */
     min-width: 200px;
     max-width: 400px;
 }
@@ -52,4 +52,16 @@
 
 .search-results li:hover {
     background-color: cornflowerblue;
+}
+
+@media (max-width: 576px) {
+    .search-box {
+        max-width: 200px;
+    }
+
+    .search-results {
+        max-width: 200px;
+
+    }
+
 }

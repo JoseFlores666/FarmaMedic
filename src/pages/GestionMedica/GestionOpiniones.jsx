@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
-
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
 const API_URL = 'https://back-farmam.onrender.com/api/';
 const authData = JSON.parse(localStorage.getItem("authData"));
 const userId = authData ? authData.id : null;
+
 const getOpinions = async (setOpinions) => {
     try {
         const response = await fetch(`${API_URL}getOpinions`);
@@ -45,26 +46,13 @@ const deleteOpinion = async (id, setOpinions) => {
     });
 };
 
-const FilterComponent = ({ filterText, onFilter, onClear, openModal }) => (
-    <div className="input-group">
-        <input
-            type="text"
-            className="form-control"
-            placeholder="Buscar opinión"
-            value={filterText}
-            onChange={onFilter}
-        />
-        <button className="btn btn-danger" onClick={onClear}>X</button>
-        <button className="btn btn-success" onClick={openModal}>Añadir Opinión</button>
-    </div>
-);
-
 export const GestionOpiniones = () => {
     const [opinions, setOpinions] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [opinionData, setOpinionData] = useState({ id: null, user_id: userId, rating: '', opinion: '' });
+    const [selectedField, setSelectedField] = useState('paciente');
 
     useEffect(() => {
         getOpinions(setOpinions);
@@ -103,7 +91,7 @@ export const GestionOpiniones = () => {
 
     const userColumns = [
         { name: '#', selector: row => row.id, sortable: true, width: "55px" },
-        { name: 'Cliente', selector: row => row.usuario_nombre, sortable: true },
+        { name: 'Cliente', selector: row => row.paciente, sortable: true },
         { name: 'Rating', selector: row => row.rating, sortable: true },
         { name: 'Opinión', selector: row => row.opinion, sortable: true },
         { name: 'Me gusta', selector: row => row.megusta, sortable: true },
@@ -133,9 +121,21 @@ export const GestionOpiniones = () => {
         },
     ];
 
-    const filteredItems = opinions.filter(
-        item => (item.usuario_nombre || '').toLowerCase().includes(filterText.toLowerCase())
-    );
+
+    const filteredItems = (opinions || []).filter(item => {
+        const filter = filterText.toLowerCase();
+        let fieldValue = '';
+
+        switch (selectedField) {
+            case 'paciente':
+                fieldValue = item.paciente?.toLowerCase() || '';
+                break;
+            default:
+                return true;
+        }
+
+        return fieldValue.includes(filter);
+    });
 
     const subHeaderComponentMemo = useMemo(() => {
         const handleClear = () => {
@@ -145,31 +145,32 @@ export const GestionOpiniones = () => {
             }
         };
 
+        const handleFieldChange = (e) => {
+            setSelectedField(e.target.value);
+        };
+
         return (
             <FilterComponent
                 onFilter={e => setFilterText(e.target.value)}
                 onClear={handleClear}
+                onShowModal={openModal}
                 filterText={filterText}
-                openModal={openModal}
+                buttonText={'Añadir Opinion'}
+                selectedField={selectedField}
+                onFieldChange={handleFieldChange}
+                fieldsToShow={['paciente',]}
             />
         );
-    }, [filterText, resetPaginationToggle]);
+    }, [filterText, resetPaginationToggle, selectedField]);
+
 
     return (
-        <div className='mt-5'>
-            <DataTable
-                title="Gestión de Opiniones"
+        <div className=''>
+            <CustomDataTable
+                title="Gestión de Recetas Medicas"
                 columns={userColumns}
                 data={filteredItems}
-                pagination
-                paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
-                paginationResetDefaultPage={resetPaginationToggle}
-                subHeader
                 subHeaderComponent={subHeaderComponentMemo}
-                persistTableHead
-                highlightOnHover
-                responsive
             />
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>

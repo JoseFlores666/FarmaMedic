@@ -66,21 +66,21 @@ const ContactoEmpresa = () => {
     }, []);
 
     return (
-        <Container className='mt-5 mb-5'>
+        <Container className='mb-5'>
             <h2 className="text-center mb-5">Gestion de contacto de la empresa</h2>
 
             <div className="mb-5">
-                <Input id="direccion" required value={direccion} onChange={(e) => setDireccion(e.target.value)}>
+                <Input name="direccion" id="direccion" required value={direccion} onChange={(e) => setDireccion(e.target.value)}>
                     Dirección
                 </Input>
             </div>
             <div className="mb-5">
-                <Input id="email" required value={email} onChange={(e) => setEmail(e.target.value)}>
+                <Input name="email" id="email" required value={email} onChange={(e) => setEmail(e.target.value)}>
                     Email
                 </Input>
             </div>
             <div className="mb-5">
-                <Input id="telefono" required value={telefono} onChange={(e) => setTelefono(e.target.value)}>
+                <Input name="telefono" id="telefono" required value={telefono} onChange={(e) => setTelefono(e.target.value)}>
                     Teléfono
                 </Input>
             </div>

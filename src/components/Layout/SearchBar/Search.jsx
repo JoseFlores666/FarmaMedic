@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import "./SearchBar.css"; // Importar estilos
+import "./SearchBar.css"; 
 
-const SearchBar = () => {
+export const SearchB = () => {
     const [doctores, setDoctores] = useState([]);
     const [servicios, setServicios] = useState([]);
     const [search, setSearch] = useState("");
     const navigate = useNavigate();
-    const searchRef = useRef(null); // Referencia para detectar clics fuera
+    const searchRef = useRef(null); 
 
     const URL = "https://back-farmam.onrender.com/api";
 
@@ -99,14 +99,12 @@ const SearchBar = () => {
                         </li>
                     ))}
                 </ul>
-
             )}
         </div>
     );
 };
 
-SearchBar.propTypes = {
+SearchB.propTypes = {
     onSelect: PropTypes.func,
 };
 
-export default SearchBar;

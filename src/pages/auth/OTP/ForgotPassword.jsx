@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm } from '../hook/useForm';
+import { useForm } from '../../../hook/useForm';
 import { useNavigate } from 'react-router-dom';
 import OtpInput from 'react-otp-input';
 import PasswordStrengthBar from 'react-password-strength-bar';
@@ -9,6 +9,7 @@ import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from 'framer-motion';
+
 export const ForgotPassword = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);

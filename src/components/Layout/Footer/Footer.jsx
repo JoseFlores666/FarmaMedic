@@ -15,9 +15,10 @@ import { Badge, Card, Col, Row } from 'react-bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-const Footer = () => {
+export const Footer = () => {
   const [enlaces, setEnlaces] = useState([]);
   const [contactInfo, setContactInfo] = useState({ direccion: '', email: '', telefono: '' });
+  const [horarios, setHorarios] = useState([]);
   const [showDeslindeModal, setShowDeslindeModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -27,7 +28,7 @@ const Footer = () => {
   const closeDeslindeModal2 = () => setShowModal2(false);
   const openDeslindeModal3 = () => setShowModal3(true);
   const closeDeslindeModal3 = () => setShowModal3(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const loadEnlaces = async () => {
     try {
@@ -35,7 +36,7 @@ const Footer = () => {
         credentials: 'include',
       });
       const data = await response.json();
-      setEnlaces(data); 
+      setEnlaces(data);
     } catch (error) {
       console.error('Error obteniendo enlaces:', error);
       throw error;
@@ -59,32 +60,32 @@ const Footer = () => {
       }
     } catch (error) {
       console.error('Error al obtener datos de contacto:', error);
-      MySwal.fire('Error', 'Error al obtener los datos de contacto', 'error');
+          throw error;
     }
   };
 
-  useEffect(() => {
-    loadEnlaces();
-    fetchContactInfo();
-
-    const intervalId = setInterval(() => {
-      loadEnlaces();
+  const fetchHorarios = async () => {
+    try {
+      const response = await fetch('https://back-farmam.onrender.com/api/getHorarioEmpresa');
+      const data = await response.json();
+      const formatted = data.map(item => ({
+        dia: item.dia,
+        horario: `${item.hora_inicio} - ${item.hora_fin}`,
+        disponible: item.activo === 1
+      }));
+      
+      setHorarios(formatted);
+    } catch (error) {
+      console.error('Error al obtener horarios:', error);
+      MySwal.fire('Error', 'No se pudieron cargar los horarios de atención', 'error');
+    }
+  };
+  
+    useEffect(() => {
       fetchContactInfo();
-    }, 20000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const horarios = [
-    { dia: "Lunes", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Martes", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Miércoles", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Jueves", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Viernes", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Sabado", horario: "9:00 AM - 6:00 PM", disponible: true },
-    { dia: "Domingo", horario: "N/A ", disponible: false },
-  ];
-
+      fetchHorarios()
+      loadEnlaces()
+    }, []);
   return (
     <footer className="text-center text-lg-start text-white" style={{ backgroundColor: '#2c245b' }}>
       <div className="p-5">
@@ -120,47 +121,37 @@ const Footer = () => {
         </div>
 
         <div className="row">
-          <div className="col-12 col-md-6 text-center">
-            <h5 className="p-2">Ubicación</h5>
-            <iframe
-              className="rounded w-100"
-              height="250"
-              id="gmap_canvas"
-              src="https://maps.google.com/maps?width=286&amp;height=217&amp;hl=en&amp;q=san%20felipe%20orizatlan%20+(far)&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-            ></iframe>
-          </div>
 
-          <Col xs={12} md={6} className="text-center">
-            <h5 className="p-2">Horarios de Atención</h5>
-            <Row className="d-flex justify-content-center align-items-center">
-              {horarios.map((horario, index) => (
-                <Col key={index} xs={4} sm={3} md={2} lg={2} className="p-1">
-                  <motion.div
-                    className="d-flex justify-content-center align-items-center"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Card className="p-2 d-flex justify-content-center align-items-center">
-                      {horario.disponible ? (
-                        <FaCalendarCheck className="text-success" size={20} />
-                      ) : (
-                        <FaCalendarTimes className="text-danger" size={20} />
-                      )}
-                      <small className="fw-bold text-center">{horario.dia}</small>
-                      <p className="extra-small text-center m-0">{horario.horario}</p>
-                      <Badge
-                        className="text-white px-2 py-1 rounded-pill"
-                        bg={horario.disponible ? "success" : "danger"}
-                      >
-                        {horario.disponible ? "Disponible" : "No Disponible"}
-                      </Badge>
-                    </Card>
-                  </motion.div>
-                </Col>
-              ))}
-            </Row>
-          </Col>
+
+          <h5 className="p-2 text-center">Horarios de Atención</h5>
+          <Row className="d-flex justify-content-center align-items-center">
+            {horarios.map((horario, index) => (
+              <Col key={index} xs={4} sm={3} md={2} lg={2} className="p-1">
+                <motion.div
+                  className="d-flex justify-content-center align-items-center"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Card className="p-2 d-flex justify-content-center align-items-center">
+                    {horario.disponible ? (
+                      <FaCalendarCheck className="text-success" size={20} />
+                    ) : (
+                      <FaCalendarTimes className="text-danger" size={20} />
+                    )}
+                    <small className="fw-bold text-center">{horario.dia}</small>
+                    <p className="extra-small text-center m-0">{horario.horario}</p>
+                    <Badge
+                      className="text-white px-2 py-1 rounded-pill"
+                      bg={horario.disponible ? "success" : "danger"}
+                    >
+                      {horario.disponible ? "Disponible" : "No Disponible"}
+                    </Badge>
+                  </Card>
+                </motion.div>
+              </Col>
+            ))}
+          </Row>
 
         </div>
 
@@ -282,5 +273,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export default Footer;

@@ -2,18 +2,37 @@ import { useEffect, useState } from 'react';
 import './Home.css';
 import { motion, AnimatePresence } from "framer-motion";
 import { Button, Card, Carousel, Col, Container, Row } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaAmbulance, FaCheckCircle, FaMedal, FaMobileAlt, FaSpa, FaStar, FaStethoscope } from 'react-icons/fa';
+import { Contactanos } from './Clients/Contactanos';
 
 export const Home = () => {
   const navigate = useNavigate();
   const [empresa, setEmpresa] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [doctores, setDoctores] = useState([]);
-  const [valores, setValores] = useState([]);
   const [opiniones, setOpiniones] = useState([]);
   const [index, setIndex] = useState(0);
+  const [error, setError] = useState(null);
 
+  const scrollToContacto = () => {
+    const contactoDiv = document.getElementById('contacto');
+    if (contactoDiv) {
+      const yOffset = -95;
+      const y = contactoDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+
+  };
+
+  const scrollToConocenos = () => {
+    const conocenosDiv = document.getElementById('conocenos');
+    if (conocenosDiv) {
+      const yOffset = -95;
+      const y = conocenosDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
   useEffect(() => {
     if (opiniones.length > 0) {
       const interval = setInterval(() => {
@@ -39,8 +58,8 @@ export const Home = () => {
       const data = await response.json();
       const empresaData = data[0];
       setEmpresa(empresaData);
-    } catch (error) {
-      console.error('Error al obtener datos de la empresa:', error);
+    } catch (err) {
+      setError(err);
     }
   };
 
@@ -50,8 +69,8 @@ export const Home = () => {
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setServicios(data);
-    } catch (error) {
-      console.error('Error al obtener servicios:', error);
+    } catch (err) {
+      setError(err);
     }
   };
 
@@ -61,19 +80,8 @@ export const Home = () => {
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setDoctores(data);
-    } catch (error) {
-      console.error('Error al obtener servicios:', error);
-    }
-  };
-
-  const getValores = async () => {
-    try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getValores`);
-      if (!response.ok) throw new Error('Error al obtener opiniones');
-      const data = await response.json();
-      setValores(data);
-    } catch (error) {
-      console.error('Error al obtener opiniones:', error);
+    } catch (err) {
+      setError(err);
     }
   };
 
@@ -83,18 +91,23 @@ export const Home = () => {
       if (!response.ok) throw new Error('Error al obtener opiniones');
       const data = await response.json();
       setOpiniones(data);
-    } catch (error) {
-      console.error('Error al obtener opiniones:', error);
+    } catch (err) {
+      setError(err);
     }
   };
-
+  function handleLeerMas() {
+    navigate('/Inicio/Ayuda/Conocenos');
+  }
   useEffect(() => {
     getOpinions();
     getEmpresa()
     getServicios()
-    getValores()
     getDoctores()
   }, []);
+
+  if (error) {
+    throw error;
+  }
 
   return (
     <div>
@@ -117,7 +130,7 @@ export const Home = () => {
                   variant="primary"
                   size="lg"
                   className="w-100 w-md-auto shadow-sm rounded-pill px-4 py-2"
-                  onClick={() => navigate('/Inicio/Ayuda/Conocenos')}
+                  onClick={scrollToConocenos}
                 >
                   Conócenos
                 </Button>
@@ -125,6 +138,7 @@ export const Home = () => {
                   variant="outline-secondary"
                   size="lg"
                   className="w-100 w-md-auto shadow-sm rounded-pill px-4 py-2"
+                  onClick={scrollToContacto}
                 >
                   Contactanos
                 </Button>
@@ -159,59 +173,30 @@ export const Home = () => {
         </Container>
       </motion.div>
 
-      <Container className="mt-5 mb-5">
-        <Row className="text-center mb-5">
-          <Col xs={12}>
-            <h2 className="display-4 fw-bold text-primary">¿Quiénes Somos?</h2>
-            <p className="fs-5 text-muted">
-              {empresa.nosotros}
+      <Container className="my-5" id='conocenos'>
+        <Row className="align-items-center">
+          <Col md={6} className="text-center">
+            <img
+              src="https://centrodelapiel.com.ar/wp-content/uploads/2019/08/Clinica-medica.jpg" // <-- Aquí debes poner la ruta correcta
+              alt="Quienes somos"
+              className="img-fluid rounded shadow"
+            />
+          </Col>
+          <Col md={6} className="text-center text-md-start mb-4 mb-md-0">
+            <h2 className="display-4 fw-bold text-primary mb-4">¿Quiénes Somos?</h2>
+            <p className="fs-5 text-muted mb-4">
+              {empresa.nosotros || "Somos una empresa dedicada a brindar los mejores servicios de salud."}
             </p>
-          </Col>
-        </Row>
-
-        <Row className="g-4">
-          <Col md={4}>
-            <Card className="shadow-lg border-0 rounded">
-              <Card.Body style={{ height: '300px' }}>
-                <Card.Title className="fw-semibold text-primary fs-4">Nuestra Misión</Card.Title>
-                <Card.Text className="text-muted fs-5">
-                  {empresa.mision}
-                </Card.Text>
-              </Card.Body>
-            </Card>
+            <Button
+              variant="primary"
+              size="lg"
+              className="rounded-pill"
+              onClick={handleLeerMas}
+            >
+              Leer más
+            </Button>
           </Col>
 
-          <Col md={4}>
-            <Card className="shadow-lg border-0 rounded">
-              <Card.Body style={{ height: '300px' }}>
-                <Card.Title className="fw-semibold text-primary fs-4">Nuestra Visión</Card.Title>
-                <Card.Text className="text-muted fs-5">
-                  {empresa.vision}
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="shadow-lg border-0 rounded">
-              <Card.Body>
-                <Card.Title className='fw-semibold text-primary fs-4'>Nuestros Valores</Card.Title>
-                <ul className="list-unstyled">
-                  {valores.length > 0 ? (
-                    valores.map((valor, index) => (
-                      <li key={valor.id || index} className="">
-                        <Card.Text className="text-muted fs-5">
-                          {valor.nombre}
-                        </Card.Text>
-                      </li>
-                    ))
-                  ) : (
-                    <p className="text-center text-muted">Cargando valores...</p>
-                  )}
-                </ul>
-              </Card.Body>
-            </Card>
-          </Col>
         </Row>
       </Container>
 
@@ -227,23 +212,33 @@ export const Home = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <Card className="shadow-lg border service-card" style={{ height: '350px' }}>
-                  <Card.Img
-                    variant="top"
-                    src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
-                    alt="service-icon"
-                    className="mx-auto"
-                    style={{
-                      width: "100%",
-                      height: "180px",
-                      objectFit: "cover",
-                    }}
-                  />
+                <Card className="shadow-lg border service-card h-100">
+                  <div style={{ height: '180px', overflow: 'hidden' }}>
+                    <Card.Img
+                      variant="top"
+                      src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
+                      alt="service-icon"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
                   <Card.Body className="d-flex flex-column justify-content-between">
-                    <Card.Title className="fw-semibold fs-5">{service.nombre}</Card.Title>
-                    <Card.Text className="text-muted">
-                      {service.descripcion || "Descripción no disponible"}
-                    </Card.Text>
+                    <div className='mb-1'>
+                      <Card.Title className="fw-semibold fs-5">{service.nombre}</Card.Title>
+                      <Card.Text className="text-muted">
+                        {service.descripcion
+                          ? service.descripcion.length > 70
+                            ? service.descripcion.substring(0, 70) + '...'
+                            : service.descripcion
+                          : "Descripción no disponible"}
+                      </Card.Text>
+                    </div>
+                    <Link to={`/servicios/${service.id}`}>
+                      <Button variant="outline-primary" size="sm">Leer Más</Button>
+                    </Link>
                   </Card.Body>
                 </Card>
               </motion.div>
@@ -271,7 +266,6 @@ export const Home = () => {
           }}
         ></motion.div>
 
-        {/* Círculo decorativo amarillo animado */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -347,7 +341,7 @@ export const Home = () => {
           <Col lg={6}>
             <h2>Las instalaciones clínicas son la columna vertebral de los sistemas de salud modernos</h2>
             <p>
-            Proporcionan recursos esenciales para el diagnóstico, tratamiento y manejo de diversas afecciones médicas. Estas instalaciones abarcan una amplia gama de entornos, desde hospitales y clínicas hasta laboratorios de diagnóstico y centros de rehabilitación. En este artículo, exploraremos el papel vital que desempeñan las instalaciones clínicas en la prestación de una atención médica de alta calidad y la mejora de los resultados de los pacientes.
+              Proporcionan recursos esenciales para el diagnóstico, tratamiento y manejo de diversas afecciones médicas. Estas instalaciones abarcan una amplia gama de entornos, desde hospitales y clínicas hasta laboratorios de diagnóstico y centros de rehabilitación. En este artículo, exploraremos el papel vital que desempeñan las instalaciones clínicas en la prestación de una atención médica de alta calidad y la mejora de los resultados de los pacientes.
             </p>
           </Col>
           <Col lg={6} className="position-relative d-flex justify-content-center">
@@ -378,6 +372,90 @@ export const Home = () => {
             </Carousel>
           </Col>
         </Row>
+      </Container>
+
+      <section className='mt-5 overflow-hidden'>
+        <Row>
+          <Col
+            md={4}
+            className="d-flex align-items-center justify-content-center"
+            style={{
+              backgroundColor: "#d3b79a",
+              backgroundImage: "url('https://cdn-icons-png.flaticon.com/512/1509/1509538.png')",
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+            }}
+          >
+          </Col>
+
+          <Col
+            md={8}
+            className="py-5 px-4 text-white"
+            style={{
+              backgroundColor: "#2c245b",
+            }}
+          >
+            <h2 className="fw-bold mb-3">¿Por qué somos los mejores?</h2>
+            <p className="mb-5">
+              Ofrecemos atención médica profesional, rápida y de calidad. Nuestro compromiso es con tu salud.
+            </p>
+            <Row className="text-center text-white">
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaMobileAlt size={36} />
+                  </div>
+                  <h6>Atención Médica Online</h6>
+                </div>
+              </Col>
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaSpa size={36} />
+                  </div>
+                  <h6>Experiencia de Bienestar</h6>
+                </div>
+              </Col>
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaStethoscope size={36} />
+                  </div>
+                  <h6>Consulta Médica Profesional</h6>
+                </div>
+              </Col>
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaAmbulance size={36} />
+                  </div>
+                  <h6>Servicios de Urgencias</h6>
+                </div>
+              </Col>
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaCheckCircle size={36} />
+                  </div>
+                  <h6>Empresas Acreditadas</h6>
+                </div>
+              </Col>
+              <Col md={4} className="mb-4">
+                <div className="service-box">
+                  <div className="icon-circle">
+                    <FaMedal size={36} />
+                  </div>
+                  <h6>Calidad y Acreditación</h6>
+                </div>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </section>
+
+      <Container className='mt-5' id='contacto'>
+        <Contactanos />
       </Container>
 
       <Container className="mt-5 mb-5">

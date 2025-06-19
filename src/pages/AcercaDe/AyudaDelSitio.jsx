@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaMapMarkedAlt, FaQuestionCircle, FaEnvelope, FaStar, FaGlobeAmericas } from "react-icons/fa";
+import { FaMapMarkedAlt, FaQuestionCircle, FaStar, FaGlobeAmericas } from "react-icons/fa";
 
 const AyudaDelSitio = () => {
     const navigate = useNavigate();
@@ -69,15 +69,6 @@ const AyudaDelSitio = () => {
                                 className="d-flex align-items-center gap-2 text-primary fw-semibold mt-2"
                                 whileHover={{ scale: 1.05 }}
                                 style={{ cursor: "pointer" }}
-                                onClick={() => navigate("/Inicio/Ayuda/Contacto")}
-                            >
-                                <FaEnvelope />
-                                Contáctanos
-                            </motion.li>
-                            <motion.li
-                                className="d-flex align-items-center gap-2 text-primary fw-semibold mt-2"
-                                whileHover={{ scale: 1.05 }}
-                                style={{ cursor: "pointer" }}
                                 onClick={() => navigate("/Inicio/Ayuda/Opiniones")}
                             >
                                 <FaStar />
@@ -96,7 +87,7 @@ const AyudaDelSitio = () => {
                                 className="d-flex align-items-center gap-2 text-primary fw-semibold mt-2"
                                 whileHover={{ scale: 1.05 }}
                                 style={{ cursor: "pointer" }}
-                                onClick={() => navigate("/Inicio/Ayuda/Preguntas")}
+                                onClick={() => navigate("/Inicio/Ayuda/Conocenos")}
                             >
                                 <FaGlobeAmericas />
                                 Conocenos

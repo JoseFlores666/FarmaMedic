@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
-
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
 const API_URL = 'https://back-farmam.onrender.com/api';
 const authData = JSON.parse(localStorage.getItem("authData"));
 const userId = authData ? authData.id : null;
@@ -54,7 +54,7 @@ const eliminarExpediente = async (id, setExpedientes) => {
 
 const expedienteColumns = (setExpedientes, handleEditExpediente) => [
   { name: '#', selector: row => row.id, sortable: true, width: "53px" },
-  { name: 'Paciente', selector: row => row.nombre, sortable: true, width: "150px" },
+  { name: 'Paciente', selector: row => row.paciente, sortable: true, width: "150px" },
   { name: 'Antecedentes', selector: row => row.antecedentes, sortable: true, wrap: true },
   { name: 'Alergias', selector: row => row.alergias, sortable: true, wrap: true },
   { name: 'Enfermedades', selector: row => row.enfermedades, sortable: true },
@@ -83,14 +83,6 @@ const expedienteColumns = (setExpedientes, handleEditExpediente) => [
   },
 ];
 
-const FilterComponent = ({ filterText, onFilter, onClear, onShowModal }) => (
-  <div className="input-group">
-    <input type="text" className="form-control" placeholder="Buscar paciente" value={filterText} onChange={onFilter} />
-    <button className="btn btn-danger" onClick={onClear}>X</button>
-    <button className="btn btn-success" onClick={onShowModal}>Añadir Expediente</button>
-  </div>
-);
-
 export const Expedientes = () => {
   const [expedientes, setExpedientes] = useState([]);
   const [pacientes, setPacientes] = useState([]);
@@ -113,6 +105,7 @@ export const Expedientes = () => {
   const [antecedentes, setAntecedentes] = useState('');
   const [alergias, setAlergias] = useState('');
   const [motivo, setMotivo] = useState('');
+  const [selectedField, setSelectedField] = useState('paciente');
 
   const handleShow = () => {
     setPaciente('');
@@ -224,32 +217,43 @@ export const Expedientes = () => {
 
 
   const filteredItems = expedientes.filter(item =>
-    item.nombre && item.nombre.toString().toLowerCase().includes(filterText.toLowerCase())
+    item.paciente && item.paciente.toString().toLowerCase().includes(filterText.toLowerCase())
   );
 
-  const subHeaderComponentMemo = useMemo(() => {
+ const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
       if (filterText) {
         setResetPaginationToggle(!resetPaginationToggle);
         setFilterText('');
       }
     };
-    return <FilterComponent onFilter={e => setFilterText(e.target.value)} onClear={handleClear} onShowModal={handleShow} filterText={filterText} />;
-  }, [filterText, resetPaginationToggle]);
+
+    const handleFieldChange = (e) => {
+      setSelectedField(e.target.value);
+    };
+
+    return (
+      <FilterComponent
+        onFilter={e => setFilterText(e.target.value)}
+        onClear={handleClear}
+        onShowModal={handleShow}
+        filterText={filterText}
+        buttonText={'Añadir Expediente Medico'}
+        selectedField={selectedField}
+        onFieldChange={handleFieldChange}
+        fieldsToShow={['paciente','fecha']}
+      />
+    );
+  }, [filterText, resetPaginationToggle, selectedField]);
 
   return (
-    <div className='mt-5'>
-      <DataTable
-        title="Gestión de Expedientes Medicos"
+    <div className=''>
+        <CustomDataTable
+          title="Gestión de Expedientes Medicos"
         columns={expedienteColumns(setExpedientes, handleEditExpediente)}
-        data={filteredItems}
-        pagination
-        subHeader
-        subHeaderComponent={subHeaderComponentMemo}
-        persistTableHead
-        highlightOnHover
-        responsive
-      />
+          data={filteredItems}
+          subHeaderComponent={subHeaderComponentMemo}
+        />
       <Modal show={showModal} onHide={handleClose} centered size='lg'>
         <Modal.Header closeButton>
           <Modal.Title>{editingExpediente ? 'Editar Expediente' : 'Agregar Nuevo Expediente'}</Modal.Title>

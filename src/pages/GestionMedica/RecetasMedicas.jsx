@@ -1,107 +1,130 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
-import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const API_URL = 'https://back-farmam.onrender.com/api';
 
-const fetchRecetas = async (setRecetas) => {
-  try {
-    const response = await fetch(`${API_URL}/getRecetas`);
-    const data = await response.json();
-    setRecetas(data);
-  } catch (error) {
-    console.error('Error al obtener Recetas:', error);
-  }
-};
-
-const fetchMedicamentos = async (setMedicamentos) => {
-  try {
-    const response = await fetch(`${API_URL}/getRecetas`);
-    const dataMedicamentos = await response.json();
-    setMedicamentos(dataMedicamentos);
-  } catch (error) {
-    console.error('Error al obtener Recetas:', error);
-  }
-};
-
-const fetchUsuarios = async (setPacientes) => {
-  try {
-    const response = await fetch(`${API_URL}/getUsuariosAll`);
-    const dataPacientes = await response.json();
-    setPacientes(dataPacientes);
-  } catch (error) {
-    console.error('Error al obtener Recetas:', error);
-  }
-};
-
-const fetchDoctores = async (setDoctores) => {
-  try {
-    const response = await fetch(`${API_URL}/getDoc`);
-    const dataDoctores = await response.json();
-    setDoctores(dataDoctores);
-  } catch (error) {
-    console.error('Error al obtener Citas:', error);
-  }
-};
-
-const eliminarReceta = async (id, setRecetas) => {
-  Swal.fire({
-    title: '¿Estás seguro?',
-    text: 'Esta acción no se puede deshacer',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Sí, eliminar',
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        await fetch(`${API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
-        setRecetas(prevRecetas => prevRecetas.filter(Receta => Receta.id !== id));
-        Swal.fire('Eliminado', 'Receta eliminado con éxito', 'success');
-      } catch (error) {
-        console.error('Error al eliminar el Receta:', error);
-        Swal.fire('Error', 'No se pudo eliminar el Receta', 'error');
-      }
+ const fetchRecetas = async (setRecetas) => {
+    try {
+        const response = await fetch(`${API_URL}/getRecetas`);
+        const data = await response.json();
+        setRecetas(data);
+        console.log(data)
+    } catch (error) {
+        console.error('Error al obtener Recetas:', error);
     }
-  });
 };
 
-const recetasColumns = (setRecetas, handleEditReceta) => [
-  { name: '#', selector: row => row.id, sortable: true, width: "53px" },
-  { name: 'Historial', selector: row => row.historial_id||'', sortable: true, width: "150px" },
+ const fetchMedicamentos = async (setMedicamentos) => {
+    try {
+        const response = await fetch(`${API_URL}/getRecetas`);
+        const data = await response.json();
+        setMedicamentos(data);
+    } catch (error) {
+        console.error('Error al obtener Medicamentos:', error);
+        throw error;
+
+    }
+};
+
+ const fetchUsuarios = async (setPacientes) => {
+    try {
+        const response = await fetch(`${API_URL}/getUsuariosAll`);
+        const data = await response.json();
+        setPacientes(data);
+    } catch (error) {
+        console.error('Error al obtener Pacientes:', error);
+        throw error;
+
+    }
+};
+
+ const fetchDoctores = async (setDoctores) => {
+    try {
+        const response = await fetch(`${API_URL}/getDoc`);
+        const data = await response.json();
+        setDoctores(data);
+    } catch (error) {
+        console.error('Error al obtener Doctores:', error);
+        throw error;
+
+    }
+};
+
+ const eliminarReceta = async (id, setRecetas) => {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await fetch(`${API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
+                setRecetas(prev => prev.filter(receta => receta.id !== id));
+                Swal.fire('Eliminado', 'Receta eliminada con éxito', 'success');
+            } catch (error) {
+                console.error('Error al eliminar Receta:', error);
+                Swal.fire('Error', 'No se pudo eliminar la receta', 'error');
+                throw error;
+
+            }
+        }
+    });
+};
+
+ const recetasColumns = (setRecetas, handleEditReceta) => [
   { name: 'Doctor', selector: row => row.doctor, sortable: true, wrap: true },
   { name: 'Paciente', selector: row => row.paciente, sortable: true, wrap: true },
   { name: 'Medicamento', selector: row => row.medicamento, sortable: true },
   { name: 'Dosis', selector: row => row.dosis, sortable: true },
   { name: 'Instrucciones', selector: row => row.instrucciones, sortable: true },
-  { name: 'Fecha de Emisión', selector: row => row.fecha_emision, sortable: true },
-  { name: 'Fecha de Vencimiento', selector: row => row.fecha_vencimiento, sortable: true },
+  {
+    name: 'Fecha de Emisión',
+    selector: row => {
+      const date = new Date(row.fecha_inicio);
+      return date.toLocaleDateString('es-ES');
+    },
+    sortable: true
+  },
+  {
+    name: 'Fecha de Vencimiento',
+    selector: row => {
+      const date = new Date(row.fecha_fin);
+      return date.toLocaleDateString('es-ES');
+    },
+    sortable: true
+  },
   {
     name: 'Acción',
     cell: row => (
       <div>
-        <FaTrash color='red' title='Eliminar' style={{ cursor: 'pointer', marginRight: 10 }}
-          onClick={() => eliminarReceta(row.id, setRecetas)} />
-        <FaEdit color='blue' title='Editar' style={{ cursor: 'pointer' }}
-          onClick={() => handleEditReceta(row)} />
+        <FaTrash
+          color='red'
+          title='Eliminar'
+          style={{ cursor: 'pointer', marginRight: 10 }}
+          onClick={() => eliminarReceta(row.id, setRecetas)}
+        />
+        <FaEdit
+          color='blue'
+          title='Editar'
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleEditReceta(row)}
+        />
       </div>
     ),
-    ignoreRowClick: true,
+    ignoreRowClick: true
   },
 ];
 
-const FilterComponent = ({ filterText, onFilter, onClear, onShowModal }) => (
-  <div className="input-group">
-    <input type="text" className="form-control" placeholder="Buscar paciente" value={filterText} onChange={onFilter} />
-    <button className="btn btn-danger" onClick={onClear}>X</button>
-    <button className="btn btn-success" onClick={onShowModal}>Añadir Receta</button>
-  </div>
-);
 
 export const Recetas = () => {
   const [Recetas, setRecetas] = useState([]);
@@ -121,6 +144,7 @@ export const Recetas = () => {
   const [instrucciones, setInstrucciones] = useState('');
   const [fechaEmision, setFechaEmision] = useState('');
   const [fechaVencimiento, setfechaVencimiento] = useState('');
+  const [selectedField, setSelectedField] = useState('paciente');
 
   const handleShow = () => {
     setPaciente('');
@@ -183,7 +207,7 @@ export const Recetas = () => {
       Swal.fire('Error', 'Todos los campos son obligatorios y debe agregar al menos un medicamento', 'error');
       return;
     }
-  
+
     const recetasData = {
       codpaci: paciente,
       coddoc: doctor,
@@ -191,25 +215,25 @@ export const Recetas = () => {
       fecha_vencimiento: fechaVencimiento,
       medicamentos
     };
-  
+
     const url = editingReceta
       ? `${API_URL}/updateReceta/${editingReceta.id}`
       : `${API_URL}/createReceta`;
-  
+
     const method = editingReceta ? 'PUT' : 'POST';
-  
+
     try {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(recetasData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al guardar la receta');
       }
-  
+
       await fetchRecetas(setRecetas);
       Swal.fire('Éxito', 'Receta guardada correctamente', 'success');
       handleClose();
@@ -218,11 +242,31 @@ export const Recetas = () => {
       Swal.fire('Error', error.message || 'No se pudo guardar la receta', 'error');
     }
   };
-  
 
-  const filteredItems = Recetas.filter(item =>
-    item.paciente && item.paciente.toString().toLowerCase().includes(filterText.toLowerCase())
-  );
+
+    const filteredItems = (Recetas || []).filter(item => {
+    const filter = filterText.toLowerCase();
+    let fieldValue = '';
+
+    switch (selectedField) {
+      case 'paciente':
+        fieldValue = item.paciente?.toLowerCase() || '';
+        break;
+      case 'doctor':
+        fieldValue = item.doctor?.toLowerCase() || '';
+        break;
+      case 'medicamento':
+        fieldValue = item.medicamento?.toLowerCase() || '';
+        break;
+      case 'fecha':
+        fieldValue = item.fecha_inicio || '';
+        break;
+      default:
+        return true;
+    }
+
+    return fieldValue.includes(filter);
+  });
 
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
@@ -231,21 +275,33 @@ export const Recetas = () => {
         setFilterText('');
       }
     };
-    return <FilterComponent onFilter={e => setFilterText(e.target.value)} onClear={handleClear} onShowModal={handleShow} filterText={filterText} />;
-  }, [filterText, resetPaginationToggle]);
+
+    const handleFieldChange = (e) => {
+      setSelectedField(e.target.value);
+    };
+
+    return (
+      <FilterComponent
+        onFilter={e => setFilterText(e.target.value)}
+        onClear={handleClear}
+        onShowModal={handleShow}
+        filterText={filterText}
+        buttonText={'Añadir Receta'}
+        selectedField={selectedField}
+        onFieldChange={handleFieldChange}
+        fieldsToShow={['doctor', 'paciente', 'medicamento', 'fecha']}
+      />
+    );
+  }, [filterText, resetPaginationToggle, selectedField]);
+
 
   return (
-    <div className='mt-5'>
-      <DataTable
+    <div>
+      <CustomDataTable
         title="Gestión de Recetas Medicas"
         columns={recetasColumns(setRecetas, handleEditReceta)}
         data={filteredItems}
-        pagination
-        subHeader
         subHeaderComponent={subHeaderComponentMemo}
-        persistTableHead
-        highlightOnHover
-        responsive
       />
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -346,7 +402,7 @@ export const Recetas = () => {
                   />
                 </Form.Group>
               </Col>
-              
+
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Fecha de Vencimiento</Form.Label>

@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Row, Col } from 'react-bootstrap';
+import CustomDataTable from '../../components/Tables/CustomDataTable';
+import FilterComponent from '../../components/FilterComponent';
 
 const fetchDoctores = async (setServices) => {
   try {
@@ -82,7 +83,9 @@ const initialDoctorState = {
   genero: '',
   correo: '',
   telefo: '',
-  especialidad: ''
+  especialidad: '',
+  foto_doc: '',
+  password: ''
 };
 
 const GestionDoctores = () => {
@@ -100,8 +103,12 @@ const GestionDoctores = () => {
     genero: '',
     correo: '',
     telefo: '',
-    especialidad: ''
+    especialidad: '',
+    foto_doc: '',
+    password: '',
+    vista_previa: null,
   });
+  const [selectedField, setSelectedField] = useState('doctor');
 
   useEffect(() => {
     const fetchDoctores = async () => {
@@ -113,9 +120,9 @@ const GestionDoctores = () => {
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!response.ok) throw new Error('Error al obtener los doctores');
-        
+
         const data = await response.json();
         setServices(data.length > 0 ? data : []);
       } catch (error) {
@@ -123,26 +130,48 @@ const GestionDoctores = () => {
         Swal.fire('Error', 'No se pudo obtener los doctores', 'error');
       }
     };
-  
+
     fetchDoctores();
-  
+
     const fetchEspecialidades = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getServicios');
+        const response = await fetch('https://back-farmam.onrender.com/api/getEspecialidades');
         const data = await response.json();
         setEspecialidades(data);
+
       } catch (error) {
         console.error("Error al obtener especialidades:", error);
       }
     };
-  
+
     fetchEspecialidades();
   }, []);
-  
 
-  const filteredItems = services.filter(
-    item => item.nomdoc.toLowerCase().includes(filterText.toLowerCase())
-  );
+
+  const filteredItems = (services || []).filter(item => {
+    const filter = filterText.toLowerCase();
+    let fieldValue = '';
+
+    switch (selectedField) {
+      case 'doctor':
+        fieldValue = item.nombreCompleto?.toLowerCase() || '';
+        break;
+      case 'especialidad':
+        fieldValue = item.especialidad?.toLowerCase() || '';
+        break;
+      case 'fecha':
+        fieldValue = item.fecha_create || '';
+        break;
+      case 'correo':
+        fieldValue = item.correo.toLowerCase() || '';
+        break;
+      default:
+        return true;
+    }
+
+    return fieldValue.includes(filter);
+  });
+
 
   const serviceColumns = [
     { name: '#', selector: row => row.coddoc, sortable: true, width: "53px" },
@@ -153,8 +182,21 @@ const GestionDoctores = () => {
     { name: 'Genero', selector: row => row.genero, sortable: true, wrap: true },
     { name: 'Correo', selector: row => row.correo, sortable: true, wrap: true },
     { name: 'Telefono', selector: row => row.telefo, sortable: true, wrap: true },
-    { name: 'Especialidad', selector: row => row.titulo, sortable: true, wrap: true },
-    { name: 'Fecha Creado', selector: row => row.fecha_create, sortable: true, wrap: true,format: row => new Date(row.fecha_create).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) },
+    { name: 'Especialidad', selector: row => row.especialidad, sortable: true, wrap: true },
+    { name: 'Contraseña', selector: row => row.password, sortable: true, wrap: true },
+    {
+      name: 'Foto perfil',
+      selector: row => (
+        <img
+          src={row.foto_doc}
+          alt="Foto perfil"
+          style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }}
+        />
+      ),
+      sortable: false,
+      wrap: true,
+    },
+    { name: 'Creado', selector: row => row.fecha_create, sortable: true, wrap: true, format: row => new Date(row.fecha_create).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) },
     {
       name: 'Acción',
       cell: row => (
@@ -223,7 +265,11 @@ const GestionDoctores = () => {
 
   const handleEditDoctor = (doctor) => {
     setCurrentDoctor(doctor);
-    const especialidad = especialidades.find(e => e.codespe === doctor.especialidad);
+    let especialidadCode = doctor.codespe || doctor.especialidad;
+    if (!especialidades.some(e => e.codespe === especialidadCode)) {
+      const match = especialidades.find(e => e.titulo === doctor.titulo);
+      especialidadCode = match ? match.codespe : '';
+    }
     setNewDoctor({
       nomdoc: doctor.nomdoc,
       apepaternodoc: doctor.apepaternodoc,
@@ -232,7 +278,10 @@ const GestionDoctores = () => {
       genero: doctor.genero,
       correo: doctor.correo,
       telefo: doctor.telefo,
-      especialidad: especialidad ? especialidad.codespe : '',
+      foto_doc: doctor.foto_doc,
+      password: doctor.password,
+      especialidad: especialidadCode,
+
     });
     setShowModal(true);
   };
@@ -241,7 +290,6 @@ const GestionDoctores = () => {
     setShowModal(false);
     setNewDoctor(initialDoctorState);
   }
-
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
       if (filterText) {
@@ -250,28 +298,45 @@ const GestionDoctores = () => {
       }
     };
 
-    return (
-      <div className="input-group">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Buscar nombre del doctor"
-          value={filterText}
-          onChange={e => setFilterText(e.target.value)}
-        />
-        <button className="btn btn-danger" onClick={handleClear}>X</button>
-        <button className="btn btn-success" onClick={handleAddDoctor}>Añadir doctor</button>
-      </div>
-    );
-  }, [filterText, resetPaginationToggle]);
+    const handleFieldChange = (e) => {
+      setSelectedField(e.target.value);
+    };
 
+    return (
+      <FilterComponent
+        onFilter={e => setFilterText(e.target.value)}
+        onClear={handleClear}
+        onShowModal={handleAddDoctor}
+        buttonText={'Añadir Doctor'}
+        filterText={filterText}
+        selectedField={selectedField}
+        onFieldChange={handleFieldChange}
+        fieldsToShow={['doctor', 'correo', 'especialidad', 'fecha']}
+      />
+    );
+  }, [filterText, resetPaginationToggle, selectedField]);
 
   const handleChange = (e) => {
-    setNewDoctor({
-      ...newDoctor,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value, files } = e.target;
+
+    if (name === 'perfil') {
+      const file = files[0];
+      if (file) {
+        // Vista previa y nombre del archivo
+        setNewDoctor((prev) => ({
+          ...prev,
+          foto_doc: file.name,
+          vista_previa: URL.createObjectURL(file),
+        }));
+      }
+    } else {
+      setNewDoctor((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
+
 
   const handleSubmit = async () => {
     if (currentDoctor) {
@@ -290,20 +355,12 @@ const GestionDoctores = () => {
   };
 
   return (
-    <div className='mt-5'>
-      <DataTable
+    <div className=''>
+      <CustomDataTable
         title="Gestión de Doctores"
         columns={serviceColumns}
         data={filteredItems}
-        pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={[10, 20, 50]}
-        paginationResetDefaultPage={resetPaginationToggle}
-        subHeader
         subHeaderComponent={subHeaderComponentMemo}
-        persistTableHead
-        highlightOnHover
-        responsive
       />
 
       <Modal show={showModal} onHide={handleClose} centered>
@@ -412,6 +469,33 @@ const GestionDoctores = () => {
                 </Form.Group>
 
               </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Contraseña</Form.Label>
+                  <Form.Control required type="password" name="password" value={newDoctor.correo} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Foto de Perfil</Form.Label>
+                  <Form.Control
+                    type="file"
+                    name="perfil"
+                    accept="image/*"
+                    onChange={handleChange}
+                  />
+                  {newDoctor.vista_previa || newDoctor.foto_doc ? (
+                    <img
+                      src={newDoctor.foto_doc || `/ruta/del/servidor/${newDoctor.foto_doc}`}
+                      alt="Previsualización"
+                      className="mt-2"
+                      style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }}
+                    />
+                  ) : null}
+                </Form.Group>
+              </Col>
+
+
             </Row>
           </Form>
         </Modal.Body>

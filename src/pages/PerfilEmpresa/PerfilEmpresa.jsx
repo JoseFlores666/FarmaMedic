@@ -95,7 +95,7 @@ const PerfilEmpresa = () => {
   };
 
   return (
-    <Container className="mt-5 mb-5">
+    <Container className=" mb-5">
       <h1 className="text-center mb-4">Gestión de Empresa</h1>
       <div className="card p-4 shadow-lg">
         <Row>

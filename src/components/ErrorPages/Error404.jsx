@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { AiOutlineFileSearch } from "react-icons/ai";
 
-const Error404 = () => {
+export const Error404 = () => {
     const navigate = useNavigate();
 
     return (
@@ -43,5 +43,3 @@ const styles = {
         color: "#666",
     },
 };
-
-export default Error404;

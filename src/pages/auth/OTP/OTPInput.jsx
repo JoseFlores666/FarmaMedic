@@ -4,7 +4,7 @@ import OtpInput from 'react-otp-input';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const OTPInput = () => {
+export const OTPInput = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false); 
@@ -108,5 +108,3 @@ const OTPInput = () => {
     </section>
   );
 };
-
-export default OTPInput;

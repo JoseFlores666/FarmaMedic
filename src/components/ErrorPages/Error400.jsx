@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { MdBlock } from "react-icons/md";
 
-const Error400 = () => {
+export const Error400 = () => {
     const navigate = useNavigate();
 
     return (
@@ -50,5 +50,3 @@ const styles = {
 
     },
 };
-
-export default Error400;
