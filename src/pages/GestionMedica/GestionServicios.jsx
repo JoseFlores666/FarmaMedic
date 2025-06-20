@@ -211,7 +211,7 @@ export const GestionServicios = () => {
   return (
     <div className=''>
       <CustomDataTable
-        title="Gestión de Recetas Medicas"
+        title="Gestión de Especialidades Medicas"
         columns={serviceColumns(setServices, handleEditService)}
         data={filteredItems}
         subHeaderComponent={subHeaderComponentMemo}

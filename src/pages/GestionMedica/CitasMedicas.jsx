@@ -564,7 +564,7 @@ export const CitasMedicas = () => {
   return (
     <div className=''>
       <CustomDataTable
-        title="Gestión de Recetas Medicas"
+        title="Gestión de Citas Medicas"
         columns={userColumns(setCitas, handleEditCita, abrirModal, handleReagendarCita, handleCancelarCita)}
         data={filteredItems}
         subHeaderComponent={subHeaderComponentMemo}

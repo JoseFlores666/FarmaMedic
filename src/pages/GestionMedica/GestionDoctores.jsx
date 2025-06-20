@@ -322,7 +322,6 @@ const GestionDoctores = () => {
     if (name === 'perfil') {
       const file = files[0];
       if (file) {
-        // Vista previa y nombre del archivo
         setNewDoctor((prev) => ({
           ...prev,
           foto_doc: file.name,

@@ -9,86 +9,74 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const API_URL = 'https://back-farmam.onrender.com/api';
 
- const fetchRecetas = async (setRecetas) => {
-    try {
-        const response = await fetch(`${API_URL}/getRecetas`);
-        const data = await response.json();
-        setRecetas(data);
-        console.log(data)
-    } catch (error) {
-        console.error('Error al obtener Recetas:', error);
-    }
+const fetchRecetas = async (setRecetas) => {
+  try {
+    const response = await fetch(`${API_URL}/getRecetas`);
+    const data = await response.json();
+    setRecetas(data);
+    console.log(data)
+  } catch (error) {
+    console.error('Error al obtener Recetas:', error);
+  }
 };
 
- const fetchMedicamentos = async (setMedicamentos) => {
-    try {
-        const response = await fetch(`${API_URL}/getRecetas`);
-        const data = await response.json();
-        setMedicamentos(data);
-    } catch (error) {
-        console.error('Error al obtener Medicamentos:', error);
+const fetchUsuarios = async (setPacientes) => {
+  try {
+    const response = await fetch(`${API_URL}/getUsuariosAll`);
+    const data = await response.json();
+    setPacientes(data);
+  } catch (error) {
+    console.error('Error al obtener Pacientes:', error);
+    throw error;
+
+  }
+};
+
+const fetchDoctores = async (setDoctores) => {
+  try {
+    const response = await fetch(`${API_URL}/getDoc`);
+    const data = await response.json();
+    setDoctores(data);
+  } catch (error) {
+    console.error('Error al obtener Doctores:', error);
+    throw error;
+
+  }
+};
+
+const eliminarReceta = async (id, setRecetas) => {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await fetch(`${API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
+        setRecetas(prev => prev.filter(receta => receta.id !== id));
+        Swal.fire('Eliminado', 'Receta eliminada con éxito', 'success');
+      } catch (error) {
+        console.error('Error al eliminar Receta:', error);
+        Swal.fire('Error', 'No se pudo eliminar la receta', 'error');
         throw error;
 
+      }
     }
+  });
 };
 
- const fetchUsuarios = async (setPacientes) => {
-    try {
-        const response = await fetch(`${API_URL}/getUsuariosAll`);
-        const data = await response.json();
-        setPacientes(data);
-    } catch (error) {
-        console.error('Error al obtener Pacientes:', error);
-        throw error;
-
-    }
-};
-
- const fetchDoctores = async (setDoctores) => {
-    try {
-        const response = await fetch(`${API_URL}/getDoc`);
-        const data = await response.json();
-        setDoctores(data);
-    } catch (error) {
-        console.error('Error al obtener Doctores:', error);
-        throw error;
-
-    }
-};
-
- const eliminarReceta = async (id, setRecetas) => {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Esta acción no se puede deshacer',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                await fetch(`${API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
-                setRecetas(prev => prev.filter(receta => receta.id !== id));
-                Swal.fire('Eliminado', 'Receta eliminada con éxito', 'success');
-            } catch (error) {
-                console.error('Error al eliminar Receta:', error);
-                Swal.fire('Error', 'No se pudo eliminar la receta', 'error');
-                throw error;
-
-            }
-        }
-    });
-};
-
- const recetasColumns = (setRecetas, handleEditReceta) => [
+const recetasColumns = (setRecetas, handleEditReceta) => [
   { name: 'Doctor', selector: row => row.doctor, sortable: true, wrap: true },
   { name: 'Paciente', selector: row => row.paciente, sortable: true, wrap: true },
   { name: 'Medicamento', selector: row => row.medicamento, sortable: true },
   { name: 'Dosis', selector: row => row.dosis, sortable: true },
-  { name: 'Instrucciones', selector: row => row.instrucciones, sortable: true },
+  { name: 'Frecuencia', selector: row => row.instrucciones, sortable: true },
   {
-    name: 'Fecha de Emisión',
+    name: 'Fecha de Inicio',
     selector: row => {
       const date = new Date(row.fecha_inicio);
       return date.toLocaleDateString('es-ES');
@@ -96,7 +84,7 @@ const API_URL = 'https://back-farmam.onrender.com/api';
     sortable: true
   },
   {
-    name: 'Fecha de Vencimiento',
+    name: 'Fecha de Final',
     selector: row => {
       const date = new Date(row.fecha_fin);
       return date.toLocaleDateString('es-ES');
@@ -127,10 +115,9 @@ const API_URL = 'https://back-farmam.onrender.com/api';
 
 
 export const Recetas = () => {
-  const [Recetas, setRecetas] = useState([]);
+  const [recetas, setRecetas] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [doctores, setDoctores] = useState([]);
-  const [medicamentos, setMedicamentos] = useState([]);
 
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
@@ -145,6 +132,11 @@ export const Recetas = () => {
   const [fechaEmision, setFechaEmision] = useState('');
   const [fechaVencimiento, setfechaVencimiento] = useState('');
   const [selectedField, setSelectedField] = useState('paciente');
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0]; // Obtiene solo "YYYY-MM-DD"
+};
 
   const handleShow = () => {
     setPaciente('');
@@ -176,8 +168,8 @@ export const Recetas = () => {
     setMedicamento(Receta.medicamento);
     setDosis(Receta.dosis);
     setInstrucciones(Receta.instrucciones);
-    setFechaEmision(Receta.fechaEmision);
-    setfechaVencimiento(Receta.fechaVencimiento);
+  setFechaEmision(formatDate(Receta.fecha_inicio));
+  setfechaVencimiento(formatDate(Receta.fecha_fin));
     setEditingReceta(Receta);
     setShowModal(true);
   };
@@ -186,34 +178,19 @@ export const Recetas = () => {
     fetchRecetas(setRecetas);
     fetchUsuarios(setPacientes)
     fetchDoctores(setDoctores)
-    fetchMedicamentos(setMedicamentos)
   }, []);
 
-  const agregarMedicamento = () => {
-    if (medicamento && dosis && instrucciones) {
-      setMedicamentos([...medicamentos, { medicamento, dosis, instrucciones }]);
-      setMedicamento('');
-      setDosis('');
-      setInstrucciones('');
-    }
-  };
-
-  const eliminarMedicamento = (index) => {
-    setMedicamentos(medicamentos.filter((_, i) => i !== index));
-  };
-
   const handleSaveReceta = async () => {
-    if (!paciente || !doctor || !fechaEmision || !fechaVencimiento || medicamentos.length === 0) {
-      Swal.fire('Error', 'Todos los campos son obligatorios y debe agregar al menos un medicamento', 'error');
-      return;
-    }
-
     const recetasData = {
-      codpaci: paciente,
-      coddoc: doctor,
-      fecha_emision: fechaEmision,
-      fecha_vencimiento: fechaVencimiento,
-      medicamentos
+      historial_id: 3,
+      coddoc: Number(doctor),    // importante: convertir a número si el backend espera int
+      codpaci: Number(paciente),
+      medicamento: medicamento,
+      fecha_inicio: fechaEmision,
+      fecha_fin: fechaVencimiento,
+      dosis: dosis,
+      instrucciones: instrucciones,
+      estado: 'Activo',
     };
 
     const url = editingReceta
@@ -234,7 +211,7 @@ export const Recetas = () => {
         throw new Error(errorData.message || 'Error al guardar la receta');
       }
 
-      await fetchRecetas(setRecetas);
+      fetchRecetas(setRecetas);
       Swal.fire('Éxito', 'Receta guardada correctamente', 'success');
       handleClose();
     } catch (error) {
@@ -244,7 +221,7 @@ export const Recetas = () => {
   };
 
 
-    const filteredItems = (Recetas || []).filter(item => {
+  const filteredItems = (recetas || []).filter(item => {
     const filter = filterText.toLowerCase();
     let fieldValue = '';
 
@@ -307,6 +284,7 @@ export const Recetas = () => {
         <Modal.Header closeButton>
           <Modal.Title>{editingReceta ? 'Editar Receta' : 'Agregar Nueva Receta'}</Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
           <Form>
             <Row>
@@ -317,26 +295,12 @@ export const Recetas = () => {
                     <option value="">Seleccione un paciente</option>
                     {pacientes.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.nombre}
+                        {`${p.nombre} ${p.apellidoPaterno} ${p.apellidoMaterno}`}
                       </option>
                     ))}
                   </Form.Select>
                 </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Doctor</Form.Label>
-                  <Form.Select value={doctor} onChange={(e) => setDoctor(e.target.value)}>
-                    <option value="">Seleccione un doctor</option>
-                    {doctores.map((d) => (
-                      <option key={d.coddoc} value={d.coddoc}>
-                        {d.nomdoc}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={4}>
+
                 <Form.Group className="mb-3">
                   <Form.Label>Medicamento</Form.Label>
                   <Form.Control
@@ -346,9 +310,41 @@ export const Recetas = () => {
                     onChange={(e) => setMedicamento(e.target.value)}
                   />
                 </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Frecuencia (Horas)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Ingrese la frecuencia"
+                    value={instrucciones}
+                    onChange={(e) => setInstrucciones(e.target.value)}
+                    min={0}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Fecha de Vencimiento</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={fechaVencimiento}
+                    onChange={(e) => setfechaVencimiento(e.target.value)}
+                  />
+                </Form.Group>
               </Col>
 
-              <Col md={4}>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Doctor</Form.Label>
+                  <Form.Select value={doctor} onChange={(e) => setDoctor(e.target.value)}>
+                    <option value="">Seleccione un doctor</option>
+                    {doctores.map((d) => (
+                      <option key={d.coddoc} value={d.coddoc}>
+                        {`${d.nomdoc} ${d.apepaternodoc} ${d.apematernodoc}`}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+
                 <Form.Group className="mb-3">
                   <Form.Label>Dosis</Form.Label>
                   <Form.Control
@@ -358,72 +354,27 @@ export const Recetas = () => {
                     onChange={(e) => setDosis(e.target.value)}
                   />
                 </Form.Group>
-              </Col>
 
-              <Col md={4}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Instrucciones</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    placeholder="Ingrese las instrucciones"
-                    value={instrucciones}
-                    rows={3}
-                    onChange={(e) => setInstrucciones(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
-
-              <Col md={12}>
-                <Button variant="success" onClick={agregarMedicamento}>Agregar Medicamento</Button>
-              </Col>
-
-              <Col md={12} className="mt-3">
-                <h5>Medicamentos Agregados:</h5>
-                <ul>
-                  {medicamentos.map((med, index) => (
-                    <li key={index}>
-                      {med.medicamento} - {med.dosis} - {med.instrucciones}
-                      <Button variant="danger" size="sm" onClick={() => eliminarMedicamento(index)}>X</Button>
-                    </li>
-                  ))}
-                </ul>
-              </Col>
-
-
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Fecha de emision</Form.Label>
+                  <Form.Label>Fecha de Emisión</Form.Label>
                   <Form.Control
                     type="date"
-                    name='temperatura'
-                    placeholder="Ingrese la fecha de emision"
                     value={fechaEmision}
                     onChange={(e) => setFechaEmision(e.target.value)}
                   />
                 </Form.Group>
               </Col>
-
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Fecha de Vencimiento</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name='fechaVencimiento'
-                    placeholder="Ingrese la fecha de vencimiento"
-                    value={fechaVencimiento}
-                    onChange={(e) => setfechaVencimiento(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
-
             </Row>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
-          <Button variant="primary" onClick={handleSaveReceta}>{editingReceta ? 'Editar Receta' : 'Guardar Receta'}</Button>
+          <Button variant="primary" onClick={handleSaveReceta}>
+            {editingReceta ? 'Guardar Cambios' : 'Guardar Receta'}
+          </Button>
         </Modal.Footer>
       </Modal>
+
     </div>
   );
 };
