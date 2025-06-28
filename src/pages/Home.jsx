@@ -53,7 +53,7 @@ export const Home = () => {
 
   const getEmpresa = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getEmpresa');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getEmpresa`);
       if (!response.ok) throw new Error('Error al obtener datos de la empresa');
       const data = await response.json();
       const empresaData = data[0];
@@ -65,7 +65,7 @@ export const Home = () => {
 
   const getServicios = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getServicios`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getServicios`);
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setServicios(data);
@@ -76,7 +76,7 @@ export const Home = () => {
 
   const getDoctores = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getDoc`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
       if (!response.ok) throw new Error('Error al obtener servicios');
       const data = await response.json();
       setDoctores(data);
@@ -87,7 +87,7 @@ export const Home = () => {
 
   const getOpinions = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getOpinions`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getOpinions`);
       if (!response.ok) throw new Error('Error al obtener opiniones');
       const data = await response.json();
       setOpiniones(data);

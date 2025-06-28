@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import Swal from 'sweetalert2';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaDollarSign, FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
-import { Button, Form, Row, Col } from 'react-bootstrap';
+import { Button, Form, Row, Col, ModalHeader, ModalTitle, ModalBody, ModalFooter } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
 
 const fetchDoctores = async (setServices) => {
   try {
-    const response = await fetch('https://back-farmam.onrender.com/api/getDoc', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -30,7 +30,7 @@ const fetchDoctores = async (setServices) => {
 
 const createDoctor = async (doctorData) => {
   try {
-    const response = await fetch('https://back-farmam.onrender.com/api/createDoc', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/createDoc`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -54,7 +54,7 @@ const createDoctor = async (doctorData) => {
 
 const updateDoctor = async (id, doctorData) => {
   try {
-    const response = await fetch(`https://back-farmam.onrender.com/api/updateDoc/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/updateDoc/${id}`, {
       method: 'PUT',
       credentials: 'include',
       headers: {
@@ -93,6 +93,7 @@ const GestionDoctores = () => {
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [modalCostos, setModalCostos] = useState(false);
   const [especialidades, setEspecialidades] = useState([]);
   const [currentDoctor, setCurrentDoctor] = useState(null);
   const [newDoctor, setNewDoctor] = useState({
@@ -107,13 +108,15 @@ const GestionDoctores = () => {
     foto_doc: '',
     password: '',
     vista_previa: null,
+    precio_base: '',
+    descuento: ''
   });
   const [selectedField, setSelectedField] = useState('doctor');
 
   useEffect(() => {
     const fetchDoctores = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getDoc', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -135,7 +138,7 @@ const GestionDoctores = () => {
 
     const fetchEspecialidades = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/getEspecialidades');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getEspecialidades`);
         const data = await response.json();
         setEspecialidades(data);
 
@@ -213,6 +216,12 @@ const GestionDoctores = () => {
             style={{ cursor: 'pointer', marginRight: 10 }}
             onClick={() => handleEditDoctor(row)}
           />
+          <FaDollarSign
+            color='blue'
+            title='Editar'
+            style={{ cursor: 'pointer', marginRight: 10 }}
+            onClick={() => handleNewCostos(row)}
+          />
         </div>
       ),
       ignoreRowClick: true,
@@ -237,7 +246,7 @@ const GestionDoctores = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`https://back-farmam.onrender.com/api/deleteDoc/${id}`, {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteDoc/${id}`, {
             method: "DELETE",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -281,13 +290,24 @@ const GestionDoctores = () => {
       foto_doc: doctor.foto_doc,
       password: doctor.password,
       especialidad: especialidadCode,
-
+      precio_base: doctor.precio_base,
+      descuento: doctor.descuento,
     });
     setShowModal(true);
   };
 
+  const handleNewCostos = (doctor) => {
+    setCurrentDoctor(doctor);
+    setNewDoctor({
+      precio_base: doctor.precio_base,
+      descuento: doctor.descuento,
+    });
+    setModalCostos(true);
+  };
+
   const handleClose = () => {
     setShowModal(false);
+    setModalCostos(false);
     setNewDoctor(initialDoctorState);
   }
   const subHeaderComponentMemo = useMemo(() => {
@@ -351,6 +371,56 @@ const GestionDoctores = () => {
       }
     }
     handleClose();
+  };
+
+  const guardarCostosDoctor = async (doctor_id, precio_base, descuento) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/upsertCostosDoctor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          doctor_id,
+          precio_base: parseFloat(precio_base),
+          descuento: parseFloat(descuento),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("Error al guardar costos:", data.message);
+        return false;
+      }
+
+      console.log("Costos guardados correctamente");
+      return true;
+    } catch (error) {
+      console.error("Error en guardarCostosDoctor:", error);
+      return false;
+    }
+  };
+
+  const handleSubmitCostos = async () => {
+    const base = parseFloat(newDoctor.precio_base);
+    const desc = parseFloat(newDoctor.descuento);
+
+    if (isNaN(base) || isNaN(desc)) {
+      return Swal.fire('Error', 'Debe ingresar valores numéricos válidos para costo y descuento', 'error');
+    }
+    if (currentDoctor) {
+      const guardado = await guardarCostosDoctor(
+        currentDoctor.coddoc,
+        base,
+        desc
+      );
+
+      if (guardado) {
+        await fetchDoctores(setServices);
+        Swal.fire('Éxito', 'Costos actualizados correctamente', 'success');
+        handleClose();
+      } else {
+        Swal.fire('Error', 'No se pudieron guardar los costos', 'error');
+      }
+    }
   };
 
   return (
@@ -471,7 +541,7 @@ const GestionDoctores = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Contraseña</Form.Label>
-                  <Form.Control required type="password" name="password" value={newDoctor.correo} onChange={handleChange} />
+                  <Form.Control required type="password" name="password" value={newDoctor.password} onChange={handleChange} />
                 </Form.Group>
               </Col>
               <Col md={6}>
@@ -504,6 +574,54 @@ const GestionDoctores = () => {
             {currentDoctor ? 'Actualizar' : 'Crear'}
           </Button>
         </Modal.Footer>
+      </Modal>
+      <Modal show={modalCostos} onHide={handleClose} centered>
+        <ModalHeader closeButton>
+          <ModalTitle>
+            Editar Precios de la Consulta
+          </ModalTitle>
+        </ModalHeader>
+        <ModalBody>
+          <Form>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Costo</Form.Label>
+                  <Form.Control
+                    required
+                    type="number"
+                    name="precio_base"
+                    value={newDoctor.precio_base}
+                    step="0.01"
+                    onChange={handleChange}
+                    min={0}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Descuento</Form.Label>
+                  <Form.Control
+                    required
+                    type="number"
+                    name="descuento"
+                    value={newDoctor.descuento}
+                    onChange={handleChange}
+                    step="0.01"
+                    min={0}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
+          <Button variant="primary" onClick={handleSubmitCostos}>
+            {currentDoctor ? 'Actualizar' : 'Crear'}
+          </Button>
+
+        </ModalFooter>
       </Modal>
     </div>
   );

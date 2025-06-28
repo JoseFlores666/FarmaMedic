@@ -6,11 +6,11 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-const API_URL = 'https://back-farmam.onrender.com/api';
+
 
 const fetchHorarios = async (setHorarios, doctores = []) => {
   try {
-    const response = await fetch(`${API_URL}/getHorario`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getHorario`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -52,7 +52,7 @@ const fetchHorarios = async (setHorarios, doctores = []) => {
 
 const fetchDoctores = async (setDoctores) => {
   try {
-    const response = await fetch(`${API_URL}/getDoc`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`, {
       method: 'GET',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ const eliminarHorario = async (horario, setHorarios) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`${API_URL}/deleteHorario/${horario.id}`,
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteHorario/${horario.id}`,
           { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, });
 
         if (!response.ok) throw new Error('Error al eliminar el horario');
@@ -115,7 +115,7 @@ const generarCitas = async (horario) => {
     cancelButtonText: 'Cancelar'
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const response = await fetch(`${API_URL}/generarCitas`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/generarCitas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -264,14 +264,14 @@ export const HorarioCitas = () => {
           return Swal.fire('Error', 'Solo se pueden modificar horarios inactivos', 'error');
         }
 
-        response = await fetch(`${API_URL}/updateHorario/${editingHorario.id}`, {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/updateHorario/${editingHorario.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(horarioData),
         });
 
       } else {
-        response = await fetch(`${API_URL}/createHorario`, {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/createHorario`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(horarioData),

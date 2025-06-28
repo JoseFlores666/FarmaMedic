@@ -82,10 +82,10 @@ export const Login = () => {
     if (Object.keys(newErrors).length > 0) return;
   
     try {
-      let url = 'https://back-farmam.onrender.com/api/login'; 
+      let url = `${import.meta.env.VITE_API_URL}/login`; 
   
       if (isDoctor) { 
-        url = 'https://back-farmam.onrender.com/api/loginDoc';
+        url = `${import.meta.env.VITE_API_URL}/loginDoc`;
       }
   
       const response = await fetch(url, {

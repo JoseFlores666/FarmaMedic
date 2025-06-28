@@ -38,7 +38,7 @@ export const Sidebar = () => {
 
   const fetchLogoActivo = useCallback(async () => {
     try {
-      const response = await fetch("https://back-farmam.onrender.com/api/getLogoActivo");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 
@@ -100,6 +100,10 @@ export const Sidebar = () => {
                 <ListGroup.Item as={NavLink} to="/Expedientes" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaFolderOpen className="me-2" />
                   Expedientes
+                </ListGroup.Item>
+                    <ListGroup.Item as={NavLink} to="/Asignar_Servicios" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                  <FaFolderOpen className="me-2" />
+                  Asignar Servicios
                 </ListGroup.Item>
                 <ListGroup.Item as={NavLink} to="/Horarios_Citas" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaClock className="me-2" />
@@ -226,7 +230,7 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
 
   const fetchLogoActivo = useCallback(async () => {
     try {
-      const response = await fetch("https://back-farmam.onrender.com/api/getLogoActivo");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 

@@ -7,7 +7,7 @@ const Conocenos = () => {
 
   const getEmpresa = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getEmpresa');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getEmpresa`);
       if (!response.ok) throw new Error('Error al obtener datos de la empresa');
       const data = await response.json();
       setEmpresa(data[0]);
@@ -18,7 +18,7 @@ const Conocenos = () => {
 
   const getValores = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getValores');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getValores`);
       if (!response.ok) throw new Error('Error al obtener valores');
       const data = await response.json();
       setValores(data);

@@ -30,7 +30,7 @@ const Politicas = () => {
 
   const fetchPoliticas = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getPoliticas`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getPoliticas`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener políticas');
@@ -56,7 +56,7 @@ const Politicas = () => {
 
   const createPolitica = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/add_politica`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/add_politica`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ const Politicas = () => {
 
   const updatePolitica = async (id) => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/edit_politica/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/edit_politica/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const Politicas = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://back-farmam.onrender.com/api/delete_politica/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/delete_politica/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

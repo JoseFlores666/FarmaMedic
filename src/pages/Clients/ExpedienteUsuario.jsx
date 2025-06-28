@@ -4,14 +4,13 @@ import { useState, useEffect } from "react";
 import { FaEnvelope, FaTransgender, FaWeight, FaRuler, FaHeartbeat, FaTint, FaPrescriptionBottleAlt, FaCalendarDay, FaUserMinus, FaTemperatureHigh, FaLungs, FaCarBattery } from 'react-icons/fa';
 
 const ExpedienteUsuario = () => {
-    const API_URL = "https://back-farmam.onrender.com/api";
     const authData = JSON.parse(localStorage.getItem("authData"));
     const userId = authData ? authData.id : null;
     const [expediente, setExpediente] = useState(null);
 
     const getExpediente = async () => {
         try {
-            const response = await fetch(`${API_URL}/getExpedienteById/${userId}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getExpedienteById/${userId}`);
             if (!response.ok) throw new Error("Error al obtener expediente");
             const data = await response.json();
             setExpediente(data);

@@ -21,7 +21,7 @@ const VincularWearOS = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('https://back-farmam.onrender.com/api/generar-token', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/generar-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ codpaci: userId }),

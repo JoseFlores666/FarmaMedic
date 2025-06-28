@@ -24,10 +24,9 @@ const PerfilEmpresa = () => {
     setEditField(null);
   };
 
-  const apiUrl = 'https://back-farmam.onrender.com/api/';
   const getEmpresa = async () => {
     try {
-      const response = await fetch(`${apiUrl}getEmpresa`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getEmpresa`);
       if (!response.ok) throw new Error('Error al obtener los datos de la empresa');
       const data = await response.json();
 
@@ -63,7 +62,7 @@ const PerfilEmpresa = () => {
       id_usuario:userId
     };
 
-    const response = await fetch(`https://back-farmam.onrender.com/api/updateEmpresa/${1}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/updateEmpresa/${1}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedEmpresa),

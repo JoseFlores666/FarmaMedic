@@ -10,6 +10,7 @@ const Chatbot = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
+    //No puede leer la api si no esya en .env por eso la defino aqui mismo
     const genAI = new GoogleGenerativeAI("AIzaSyClq1Clj5gDLsMfkOxohkTkxCfItTXpqJg");
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -19,9 +20,9 @@ const Chatbot = () => {
 
     const fetchEmpresaInfo = async () => {
         try {
-            const response = await fetch("https://back-farmam.onrender.com/api/getEmpresa");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getEmpresaChat`);
             if (!response.ok) throw new Error("Error en la respuesta del servidor");
-            
+
             const data = await response.json();
 
             return Array.isArray(data) ? data[0] : data;
@@ -41,20 +42,38 @@ const Chatbot = () => {
             const empresaInfo = await fetchEmpresaInfo();
 
             if (empresaInfo) {
-                if (lowerCaseInput.includes("nombre")||lowerCaseInput.includes("como se llama")) {
-                    botResponse = `El nombre de la empresa es: ${empresaInfo.nombre}.`;
-                } else if (lowerCaseInput.includes("quienes son") || lowerCaseInput.includes("acerca de") || lowerCaseInput.includes("farmamedic")) {
-                    botResponse = `${empresaInfo.nosotros}.`;
-                } else if (lowerCaseInput.includes("mision")) {
-                    botResponse = `${empresaInfo.mision}.`;
-                } else if (lowerCaseInput.includes("vision")) {
-                    botResponse = `Visión: ${empresaInfo.vision}.`;
-                } else if (lowerCaseInput.includes("eslogan")||lowerCaseInput.includes("frase")){ 
-                    botResponse = `Eslogan: ${empresaInfo.eslogan}.`;
-                } else if (lowerCaseInput.includes("valores")) {
-                    botResponse = `Nuestros valores son: ${empresaInfo.valores}.`;
-                } else if (lowerCaseInput.includes("servicios")) {
-                    botResponse = `Ofrecemos los siguientes servicios: ${empresaInfo.servicios}.`;
+                const lower = lowerCaseInput;
+
+                if (lower.includes("nombre") || lower.includes("como se llama")) {
+                    botResponse = `El nombre de la empresa es: ${empresaInfo.empresa.nombre}.`;
+
+                } else if (lower.includes("quienes son") || lower.includes("acerca de") || lower.includes("farmamedic")) {
+                    botResponse = `${empresaInfo.empresa.nosotros}.`;
+
+                } else if (lower.includes("mision")) {
+                    botResponse = `${empresaInfo.empresa.mision}.`;
+
+                } else if (lower.includes("vision")) {
+                    botResponse = `Visión: ${empresaInfo.empresa.vision}.`;
+
+                } else if (lower.includes("eslogan") || lower.includes("frase")) {
+                    botResponse = `Eslogan: ${empresaInfo.empresa.eslogan}.`;
+
+                } else if (lower.includes("valores")) {
+                    botResponse = "Nuestros valores son:\n" + empresaInfo.valores
+                        .map(v => `- ${v.nombre}: ${v.descripcion}`)
+                        .join("\n");
+
+                } else if (lower.includes("servicios")) {
+                    botResponse = "Ofrecemos los siguientes servicios:\n" + empresaInfo.servicios
+                        .map(s => `- ${s.nombre}: ${s.descripcion} (Costo: $${s.costo}, Descuento: ${s.descuento}%)`)
+                        .join("\n");
+
+                } else if (lower.includes("horario")) {
+                    botResponse = "Nuestro horario de atención es:\n" + empresaInfo.horario_empresa
+                        .map(h => `- ${h.dia}: ${h.hora_inicio} a ${h.hora_fin} (${h.activo ? "activo" : "inactivo"})`)
+                        .join("\n");
+
                 } else {
                     const result = await model.generateContent(userInput);
                     botResponse = result.response.text();
@@ -62,6 +81,7 @@ const Chatbot = () => {
             } else {
                 botResponse = "Lo siento, no pude obtener información sobre la empresa en este momento.";
             }
+
 
             setChatHistory(prevChat => [
                 ...prevChat,
@@ -93,7 +113,7 @@ const Chatbot = () => {
                         transition={{ duration: 0.3 }}
                         whileHover={{ scale: 1.2, opacity: 0.9 }}
                     >
-                        <img 
+                        <img
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/1200px-Google_Bard_logo.svg.png"
                             alt="Gemini Logo"
                             width="45"
@@ -124,14 +144,20 @@ const Chatbot = () => {
                             </div>
                             <div className="card-footer">
                                 <div className="input-group">
-                                    <input 
+                                    <input
                                         type="text"
                                         className="form-control"
                                         placeholder="Escribe tu mensaje..."
                                         value={userInput}
                                         onChange={handleUserInput}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                sendMessage(); 
+                                            }
+                                        }}
                                     />
-                                    <button 
+                                    <button
                                         className="btn btn-primary"
                                         onClick={sendMessage}
                                         disabled={isLoading}

@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 const Opiniones = () => {
-    const API_URL = "https://back-farmam.onrender.com/api/";
     const navigate = useNavigate();
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
@@ -18,7 +17,7 @@ const Opiniones = () => {
 
     const handleReaction = async (reactionType, opinionId) => {
         try {
-            const response = await fetch(`https://back-farmam.onrender.com/api/updateReaction/${opinionId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/updateReaction/${opinionId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ reaction: reactionType }),
@@ -38,7 +37,7 @@ const Opiniones = () => {
 
     const getOpinions = async () => {
         try {
-            const response = await fetch(`${API_URL}/getOpinions`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getOpinions`);
             if (!response.ok) throw new Error("Error al obtener opiniones");
             const data = await response.json();
             setOpinions(data);
@@ -71,7 +70,7 @@ const Opiniones = () => {
             return;
         }
         try {
-            const response = await fetch("https://back-farmam.onrender.com/api/createOpinion", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/createOpinion`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: userId, rating, opinion })

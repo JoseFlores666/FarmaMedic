@@ -32,7 +32,7 @@ export const Footer = () => {
 
   const loadEnlaces = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getEnlaces', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getEnlaces`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -46,7 +46,7 @@ export const Footer = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getContactInfo');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getContactInfo`);
       if (!response.ok) {
         throw new Error('No se pudo obtener la información de contacto');
       }
@@ -66,7 +66,7 @@ export const Footer = () => {
 
   const fetchHorarios = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getHorarioEmpresa');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getHorarioEmpresa`);
       const data = await response.json();
       const formatted = data.map(item => ({
         dia: item.dia,

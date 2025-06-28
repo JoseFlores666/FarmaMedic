@@ -21,7 +21,7 @@ export const Navbar2 = () => {
 
   const fetchLogoActivo = useCallback(async () => {
     try {
-      const response = await fetch("https://back-farmam.onrender.com/api/getLogoActivo");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 

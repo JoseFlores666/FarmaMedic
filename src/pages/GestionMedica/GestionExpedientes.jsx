@@ -6,12 +6,12 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-const API_URL = 'https://back-farmam.onrender.com/api';
+
 const authData = JSON.parse(localStorage.getItem("authData"));
 const userId = authData ? authData.id : null;
 const fetchExpedientes = async (setExpedientes) => {
   try {
-    const response = await fetch(`${API_URL}/getExpediente`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getExpediente`);
     const data = await response.json();
     setExpedientes(data);
   } catch (error) {
@@ -21,7 +21,7 @@ const fetchExpedientes = async (setExpedientes) => {
 
 const fetchUsuarios = async (setPacientes) => {
   try {
-    const response = await fetch(`${API_URL}/getUsuariosAll`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getUsuariosAll`);
     const dataPacientes = await response.json();
     setPacientes(dataPacientes);
   } catch (error) {
@@ -41,7 +41,7 @@ const eliminarExpediente = async (id, setExpedientes) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await fetch(`${API_URL}/deleteExpediente/${id}`, { method: 'DELETE' });
+        await fetch(`${import.meta.env.VITE_API_URL}/deleteExpediente/${id}`, { method: 'DELETE' });
         setExpedientes(prevExpedientes => prevExpedientes.filter(expediente => expediente.id !== id));
         Swal.fire('Eliminado', 'Expediente eliminado con éxito', 'success');
       } catch (error) {
@@ -192,8 +192,8 @@ export const Expedientes = () => {
     };
 
     const url = editingExpediente
-      ? `${API_URL}/updateExpediente/${editingExpediente.id}`
-      : `${API_URL}/createExpediente`;
+      ? `${import.meta.env.VITE_API_URL}/updateExpediente/${editingExpediente.id}`
+      : `${import.meta.env.VITE_API_URL}/createExpediente`;
 
     const method = editingExpediente ? 'PUT' : 'POST';
 

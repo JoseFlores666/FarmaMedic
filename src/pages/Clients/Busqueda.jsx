@@ -8,13 +8,11 @@ const Busqueda = () => {
     const [showDoctores, setShowDoctores] = useState(true);
     const [showServicios, setShowServicios] = useState(true);
 
-    const URL = "https://back-farmam.onrender.com/api";
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const responseDoc = await fetch(`${URL}/getDoc`);
-                const responseServ = await fetch(`${URL}/getServicios`);
+                const responseDoc = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
+                const responseServ = await fetch(`${import.meta.env.VITE_API_URL}/getServicios`);
 
                 if (!responseDoc.ok || !responseServ.ok) {
                     throw new Error("Error al obtener los datos");

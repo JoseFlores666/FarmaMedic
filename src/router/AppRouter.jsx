@@ -39,6 +39,7 @@ import Conocenos from '../pages/Clients/Conocenos';
 import HorarioEmpresa from '../pages/Clients/HorarioEmpresa';
 import VincularWearOS from '../pages/WearOs/vincularWearOs';
 import { ErrorBoundary } from 'react-error-boundary';
+import { AsignarServicios } from '../pages/GestionMedica/AsigancionServ';
 export const AppRouter = () => {
 	return (
 		<ErrorBoundary FallbackComponent={Error500}>
@@ -87,6 +88,7 @@ export const AppRouter = () => {
 				<Route path='/Horarios_Citas' element={<PrivateRoute><HorarioCitas /></PrivateRoute>} />
 				<Route path='/Recetas' element={<PrivateRoute><Recetas /></PrivateRoute>} />
 				<Route path='/Act_Expediente' element={<PrivateRoute><ActualizacionExped /></PrivateRoute>} />
+				<Route path='/Asignar_Servicios' element={<PrivateRoute><AsignarServicios /></PrivateRoute>} />
 
 				{/* {Parte de la gestion clientes} */}
 				<Route path='/CRUDOpiniones' element={<PrivateRoute><GestionOpiniones /></PrivateRoute>} />

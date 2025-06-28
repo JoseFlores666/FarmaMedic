@@ -1,16 +1,15 @@
-import { Container, Card, Row, Col, Button, Modal } from "react-bootstrap";
+import { Container, Card, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Swal from "sweetalert2";
-
+import Select from 'react-select';
 import '../Clients/verdoctores.css'
 import { FaCheckCircle } from "react-icons/fa";
 
 const VerDoctores = () => {
-    const API_URL = "https://back-farmam.onrender.com/api";
     const navigate = useNavigate();
     const [Doctores, setDoctores] = useState([]);
     const [citas, setCitas] = useState([]);
@@ -21,21 +20,23 @@ const VerDoctores = () => {
     const [selectedHorario, setSelectedHorario] = useState(null);
     const [motivoCita, setMotivoCita] = useState("");
     const [availableDates, setAvailableDates] = useState([]);
+    const [serviciosAsignados, setServiciosAsignados] = useState([]);
+    const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
 
     const getCitas = async (doctorId) => {
-        const response = await fetch(`${API_URL}/getCitasById/${doctorId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getCitasById/${doctorId}`);
         if (!response.ok) throw new Error("Error al obtener citas");
         const data = await response.json();
         setCitas(data);
         console.log(data)
         const formattedDates = data.map(cita => new Date(cita.fecha).toISOString().split("T")[0]);
 
-        setAvailableDates([...new Set(formattedDates)]); 
+        setAvailableDates([...new Set(formattedDates)]);
     };
 
     const getDoctores = async () => {
         try {
-            const response = await fetch(`${API_URL}/getDoc`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
             if (!response.ok) throw new Error("Error al obtener doctores");
             const data = await response.json();
             setDoctores(data);
@@ -44,9 +45,21 @@ const VerDoctores = () => {
         }
     };
 
+    const getServiciosAsignados = async (coddoc) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getServiciosDelDoctor/${coddoc}`);
+            const data = await response.json();
+
+            setServiciosAsignados(data);
+        } catch (err) {
+            console.error("Error al obtener servicios", err);
+        }
+    };
+
     useEffect(() => {
         getDoctores();
-        getCitas()
+        getCitas();
+        getServiciosAsignados();
     }, []);
 
     const handleCancelarSeleccion = () => {
@@ -56,6 +69,7 @@ const VerDoctores = () => {
 
     const handleSelectDoctor = (doctor) => {
         setSelectedDoctor(doctor);
+        getServiciosAsignados(doctor.coddoc);
         setShowModal(true);
         getCitas(doctor.coddoc);
     };
@@ -122,7 +136,7 @@ const VerDoctores = () => {
         }
 
         try {
-            const response = await fetch(`${API_URL}/reservarCita`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/reservarCita`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -225,7 +239,7 @@ const VerDoctores = () => {
                 ))}
             </Row>
 
-            <Modal show={showModal} centered onHide={handleCloseModal} size='lg'>
+            <Modal show={showModal} centered onHide={handleCloseModal} size='xl'>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         Selecciona una fecha {selectedDoctor && ` -  ${selectedDoctor.especialidad}: ${selectedDoctor.nomdoc} ${selectedDoctor.apepaternodoc} ${selectedDoctor.apematernodoc}`}
@@ -234,7 +248,7 @@ const VerDoctores = () => {
                 <Modal.Body>
                     <Row>
                         <Col md={6} className="text-center">
-                            <Card className="shadow-sm p-3">
+                            <Card className="shadow-sm p-3 align-items-center">
                                 <h5 className="text-primary">Selecciona una fecha</h5>
                                 <Calendar
                                     onChange={handleDateSelect}
@@ -245,12 +259,12 @@ const VerDoctores = () => {
                         </Col>
 
                         <Col md={6}>
-                      
+
                             <Card className="shadow-sm p-3">
-                            <h5 className="text-success">
-    <FaCheckCircle className="me-2" /> Horarios Disponibles
-</h5>
-                          
+                                <h5 className="text-success">
+                                    <FaCheckCircle className="me-2" /> Horarios Disponibles
+                                </h5>
+
                                 {selectedHorario ? (
                                     <div className="text-center">
                                         <Button
@@ -291,6 +305,28 @@ const VerDoctores = () => {
 
                                 {selectedHorario && (
                                     <div className="mt-3">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Servicios disponibles del doctor (máx. 2)</Form.Label>
+                                            <Select
+                                                options={serviciosAsignados.map(serv => ({
+                                                    label: serv.nombre,
+                                                    value: serv.id
+                                                }))}
+                                                isMulti
+                                                closeMenuOnSelect={false}
+                                                placeholder="Seleccione servicios"
+                                                value={serviciosSeleccionados}
+                                                onChange={(selectedOptions) => {
+                                                    if (selectedOptions.length <= 2) {
+                                                        setServiciosSeleccionados(selectedOptions);
+                                                    }
+                                                }}
+                                            />
+                                            {serviciosSeleccionados.length >= 2 && (
+                                                <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+                                            )}
+                                        </Form.Group>
+
                                         <label className="fw-semibold">Motivo de la cita:</label>
                                         <textarea
                                             className="form-control border-primary"
@@ -302,6 +338,7 @@ const VerDoctores = () => {
                                         />
                                     </div>
                                 )}
+
                             </Card>
                         </Col>
                     </Row>

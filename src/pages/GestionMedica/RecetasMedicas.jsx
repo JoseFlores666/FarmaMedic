@@ -7,11 +7,9 @@ import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
-const API_URL = 'https://back-farmam.onrender.com/api';
-
 const fetchRecetas = async (setRecetas) => {
   try {
-    const response = await fetch(`${API_URL}/getRecetas`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getRecetas`);
     const data = await response.json();
     setRecetas(data);
     console.log(data)
@@ -22,7 +20,7 @@ const fetchRecetas = async (setRecetas) => {
 
 const fetchUsuarios = async (setPacientes) => {
   try {
-    const response = await fetch(`${API_URL}/getUsuariosAll`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getUsuariosAll`);
     const data = await response.json();
     setPacientes(data);
   } catch (error) {
@@ -34,7 +32,7 @@ const fetchUsuarios = async (setPacientes) => {
 
 const fetchDoctores = async (setDoctores) => {
   try {
-    const response = await fetch(`${API_URL}/getDoc`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
     const data = await response.json();
     setDoctores(data);
   } catch (error) {
@@ -56,7 +54,7 @@ const eliminarReceta = async (id, setRecetas) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await fetch(`${API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
+        await fetch(`${import.meta.env.VITE_API_URL}/deleteReceta/${id}`, { method: 'DELETE' });
         setRecetas(prev => prev.filter(receta => receta.id !== id));
         Swal.fire('Eliminado', 'Receta eliminada con éxito', 'success');
       } catch (error) {
@@ -183,7 +181,7 @@ const formatDate = (dateString) => {
   const handleSaveReceta = async () => {
     const recetasData = {
       historial_id: 3,
-      coddoc: Number(doctor),    // importante: convertir a número si el backend espera int
+      coddoc: Number(doctor), 
       codpaci: Number(paciente),
       medicamento: medicamento,
       fecha_inicio: fechaEmision,
@@ -194,8 +192,8 @@ const formatDate = (dateString) => {
     };
 
     const url = editingReceta
-      ? `${API_URL}/updateReceta/${editingReceta.id}`
-      : `${API_URL}/createReceta`;
+      ? `${import.meta.env.VITE_API_URL}}/updateReceta/${editingReceta.id}`
+      : `${import.meta.env.VITE_API_URL}}/createReceta`;
 
     const method = editingReceta ? 'PUT' : 'POST';
 

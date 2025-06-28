@@ -163,7 +163,7 @@ export const Register = () => {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) return;
-        const response = await fetch('https://back-farmam.onrender.com/api/register', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

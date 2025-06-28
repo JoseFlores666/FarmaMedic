@@ -7,11 +7,11 @@ import { Button, Form } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
 
-const API_URL = 'https://back-farmam.onrender.com/api';
+
 
 const fetchServices = async (setServices) => {
   try {
-    const response = await fetch(`${API_URL}/getEspecialidades`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getEspecialidades`, {
       method: 'GET',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -39,7 +39,7 @@ const eliminarServicio = async (id, setServices) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await fetch(`${API_URL}/deleteEspec/${id}`, { method: 'DELETE' });
+        await fetch(`${import.meta.env.VITE_API_URL}/deleteEspec/${id}`, { method: 'DELETE' });
         setServices(prevServices => prevServices.filter(service => service.codespe !== id));
         Swal.fire('Eliminado', 'Servicio eliminado con éxito', 'success');
       } catch (error) {
@@ -121,7 +121,7 @@ export const GestionServicios = () => {
       let response;
       if (editingService) {
         console.log('Editando servicio:', editingService);
-        response = await fetch(`${API_URL}/updateEspec/${editingService.codespe}`, {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/updateEspec/${editingService.codespe}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -131,7 +131,7 @@ export const GestionServicios = () => {
           }),
         });
       } else {
-        response = await fetch(`${API_URL}/createEspec`, {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/createEspec`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

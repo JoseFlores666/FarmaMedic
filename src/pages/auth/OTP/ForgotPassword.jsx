@@ -37,7 +37,7 @@ export const ForgotPassword = () => {
 
     const fetchLogoActivo = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getLogoActivo');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
             if (!response.ok) throw new Error("Error fetching active logo");
             const data = await response.json();
 
@@ -55,7 +55,7 @@ export const ForgotPassword = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/recuperar-password', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/recuperar-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export const ForgotPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/verificarToken', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/verificarToken`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/cambiar-password', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cambiar-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

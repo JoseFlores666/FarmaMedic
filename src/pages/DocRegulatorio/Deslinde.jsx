@@ -30,7 +30,7 @@ const Deslinde = () => {
 
   const fetchDeslindes = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getDeslindesLegales`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getDeslindesLegales`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener deslinde legal');
@@ -56,7 +56,7 @@ const Deslinde = () => {
 
   const createDeslinde = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/createDeslindeLegal`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/createDeslindeLegal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Deslinde = () => {
 
   const updateDeslinde = async (id) => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/updateDeslindeLegal/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/updateDeslindeLegal/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const Deslinde = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://back-farmam.onrender.com/api/deleteDeslindeLegal/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteDeslindeLegal/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

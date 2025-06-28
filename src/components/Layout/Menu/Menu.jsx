@@ -11,7 +11,7 @@ export const Menu = ({ notificationCount, setNotificationCount }) => {
  useEffect(() => {
   const fetchNotificaciones = async () => {
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getNotiById/${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getNotiById/${userId}`);
       if (!response.ok) throw new Error("Error al obtener notificaciones");
       const data = await response.json();
       setNotificationCount(data.length);

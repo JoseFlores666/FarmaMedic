@@ -9,7 +9,7 @@ const GestionUsuarios = () => {
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('https://back-farmam.onrender.com/api/getUsuariosAll', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/getUsuariosAll`, {
                     credentials: 'include',
                 });
 
@@ -60,7 +60,7 @@ const GestionUsuarios = () => {
 
     const handleBloquear = async (id) => {
         try {
-            const response = await fetch(`https://back-farmam.onrender.com/api/bloquearUsuario/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/bloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });
@@ -79,7 +79,7 @@ const GestionUsuarios = () => {
 
     const handleDesbloquear = async (id) => {
         try {
-            const response = await fetch(`https://back-farmam.onrender.com/api/desbloquearUsuario/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/desbloquearUsuario/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
             });

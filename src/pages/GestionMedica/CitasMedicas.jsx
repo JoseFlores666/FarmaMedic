@@ -8,11 +8,9 @@ import Select from 'react-select';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
 
-const API_URL = 'https://back-farmam.onrender.com/api';
-
 const fetchCitas = async (setCitas) => {
   try {
-    const response = await fetch(`${API_URL}/getCitas`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getCitas`);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Error al obtener citas');
@@ -27,7 +25,7 @@ const fetchCitas = async (setCitas) => {
 
 const fetchUsuarios = async (setPacientes) => {
   try {
-    const response = await fetch(`${API_URL}/getUsuariosAll`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getUsuariosAll`);
     const dataPacientes = await response.json();
     setPacientes(dataPacientes);
   } catch (error) {
@@ -37,7 +35,7 @@ const fetchUsuarios = async (setPacientes) => {
 
 const fetchListaEspera = async (codcita, setListaEspera) => {
   try {
-    const response = await fetch(`${API_URL}/getListaEspera/${codcita}`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getListaEspera/${codcita}`);
     const data = await response.json();
     setListaEspera(data);
   } catch (error) {
@@ -45,14 +43,34 @@ const fetchListaEspera = async (codcita, setListaEspera) => {
   }
 };
 
-
 const fetchDoctores = async (setDoctores) => {
   try {
-    const response = await fetch(`${API_URL}/getDoc`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
     const dataDoctores = await response.json();
     setDoctores(dataDoctores);
   } catch (error) {
     console.error('Error al obtener Citas:', error);
+  }
+};
+
+const fetchServicios = async (setServiciosAll) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getServicios`);
+    const dataServicios = await response.json();
+    setServiciosAll(dataServicios);
+  } catch (error) {
+    console.error('Error al obtener Citas:', error);
+  }
+};
+
+const getServiciosAsignados = async (coddoc, setServiciosDoc) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getServiciosDelDoctor/${coddoc}`);
+    const data = await response.json();
+
+    setServiciosDoc(data);
+  } catch (err) {
+    console.error("Error al obtener servicios", err);
   }
 };
 
@@ -102,6 +120,8 @@ export const CitasMedicas = () => {
   const [citas, setCitas] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [doctores, setDoctores] = useState([]);
+  const [serviciosAll, setServiciosAll] = useState([]);
+  const [serviciosDoc, setServiciosDoc] = useState([]);
   const [listaEspera, setListaEspera] = useState([]);
 
   const [fecha, setFecha] = useState('');
@@ -140,6 +160,7 @@ export const CitasMedicas = () => {
   }));
 
   const [selectedField, setSelectedField] = useState('paciente');
+  const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
 
   const handleShow = () => {
     setPaciente('');
@@ -168,10 +189,11 @@ export const CitasMedicas = () => {
     setFecha('')
     setEditingCita('');
     setListaEspera([]);
+    setServiciosSeleccionados([]);
+    setServiciosAll([])
+    setPacienteSeleccionado('')
     setEditingCita(null);
   }
-
-
 
   const handleEditCita = (Cita) => {
     setPacienteSeleccionado(Cita.codpaci);
@@ -228,18 +250,29 @@ export const CitasMedicas = () => {
     fetchCitas(setCitas);
     fetchUsuarios(setPacientes)
     fetchDoctores(setDoctores)
-  }, []);
+    fetchServicios(setServiciosAll)
+  if (doctor) {
+    getServiciosAsignados(doctor, setServiciosDoc);
+  } else {
+    setServiciosDoc([]);
+  }  }, [doctor]);
 
   const handleSaveCita = async () => {
     if (!pacienteSeleccionado || !doctor || !motivoCita) {
       Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
       return;
     }
-
+    const serviciosIds = serviciosSeleccionados.map(s => s.value);
+    if (serviciosIds.length > 2) {
+      alert("Solo puedes seleccionar hasta 2 servicios.");
+      return;
+    }
     let CitaData = {
       codpaci: pacienteSeleccionado,
       coddoc: doctor,
       motivo_cita: motivoCita,
+      servicios: serviciosIds
+
     };
 
     if (!editingCita) {
@@ -255,8 +288,8 @@ export const CitasMedicas = () => {
     }
 
     const url = editingCita
-      ? `${API_URL}/editarDatosCita/${editingCita.id}`
-      : `${API_URL}/createCita`;
+      ? `${import.meta.env.VITE_API_URL}/editarDatosCita/${editingCita.id}`
+      : `${import.meta.env.VITE_API_URL}/createCita`;
 
     const method = editingCita ? 'PUT' : 'POST';
 
@@ -280,7 +313,7 @@ export const CitasMedicas = () => {
 
   const cancelarYReemplazarCita = async (codcita) => {
     try {
-      const res = await fetch(`${API_URL}/reemplazarCita/${codcita}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reemplazarCita/${codcita}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -322,7 +355,7 @@ export const CitasMedicas = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/cancelarYEliminarCita`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/cancelarYEliminarCita`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -359,7 +392,7 @@ export const CitasMedicas = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${API_URL}/deleteListaEspera/${id}`, {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteListaEspera/${id}`, {
             method: "DELETE",
           });
 
@@ -384,7 +417,7 @@ export const CitasMedicas = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/reagendarCita/${editingCita.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/reagendarCita/${editingCita.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -424,7 +457,7 @@ export const CitasMedicas = () => {
 
     try {
       if (role !== 'admin') {
-        const checkResponse = await fetch(`${API_URL}/checkCitaPendiente?codpaci=${pacienteId}`);
+        const checkResponse = await fetch(`${import.meta.env.VITE_API_URL}/checkCitaPendiente?codpaci=${pacienteId}`);
         const checkData = await checkResponse.json();
 
         if (checkData.tieneCitaPendiente) {
@@ -444,7 +477,7 @@ export const CitasMedicas = () => {
         }
       }
 
-      const response = await fetch(`${API_URL}/reservarCita`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/reservarCita`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -485,7 +518,7 @@ export const CitasMedicas = () => {
 
   const agregarListaEspera = async (pacienteId) => {
     try {
-      const response = await fetch(`${API_URL}/agregarListaEspera`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/agregarListaEspera`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -577,7 +610,7 @@ export const CitasMedicas = () => {
           <Form onSubmit={(e) => e.preventDefault()}>
             <Row className="mb-3">
               <Col md={6}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Paciente</Form.Label>
                   <Select
                     options={opcionesPacientes}
@@ -596,12 +629,40 @@ export const CitasMedicas = () => {
                     placeholder="Seleccione un doctor"
                     isClearable
                     value={opcionesDoctores.find(op => op.value === doctor) || null}
-                    onChange={(selected) => setDoctor(selected ? selected.value : null)}
+                    onChange={(selected) => {
+                      const doctorId = selected ? selected.value : null;
+                      setDoctor(doctorId);
+                      if (doctorId) {
+                        getServiciosAsignados(doctorId, setServiciosDoc);
+                      } else {
+                        setServiciosDoc([]);
+                      }
+                    }}
                   />
                 </Form.Group>
-
               </Col>
             </Row>
+                <Form.Group className="mb-3">
+                  <Form.Label>Servicios (máx. 2)</Form.Label>
+                  <Select
+                    options={serviciosDoc.map(serv => ({
+                      label: serv.nombre,
+                      value: serv.id
+                    }))}
+                    isMulti
+                    closeMenuOnSelect={false}
+                    placeholder="Seleccione servicios"
+                    value={serviciosSeleccionados}
+                    onChange={(selectedOptions) => {
+                      if (selectedOptions.length <= 2) {
+                        setServiciosSeleccionados(selectedOptions);
+                      }
+                    }}
+                  />
+                  {serviciosSeleccionados.length >= 2 && (
+                    <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+                  )}
+                </Form.Group>
             {!editingCita && (
               <Row>
                 <Col md={6}>
@@ -725,7 +786,27 @@ export const CitasMedicas = () => {
                   </Col>
 
                 </Row>
-
+   <Form.Group className="mb-3">
+                  <Form.Label>Servicios (máx. 2)</Form.Label>
+                  <Select
+                    options={serviciosDoc.map(serv => ({
+                      label: serv.nombre,
+                      value: serv.id
+                    }))}
+                    isMulti
+                    closeMenuOnSelect={false}
+                    placeholder="Seleccione servicios"
+                    value={serviciosSeleccionados}
+                    onChange={(selectedOptions) => {
+                      if (selectedOptions.length <= 2) {
+                        setServiciosSeleccionados(selectedOptions);
+                      }
+                    }}
+                  />
+                  {serviciosSeleccionados.length >= 2 && (
+                    <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+                  )}
+                </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Motivo de la Cita</Form.Label>
                   <Form.Control

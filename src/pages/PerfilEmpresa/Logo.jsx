@@ -18,7 +18,7 @@ const Logo = () => {
 
     const fetchLogos = async () => {
         try {
-            const response = await fetch('https://back-farmam.onrender.com/api/getAllLogos');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getAllLogos`);
             if (!response.ok) throw new Error("Error fetching logos");
             const data = await response.json();
             setLogos(data);
@@ -77,7 +77,7 @@ const Logo = () => {
             const file = await response.json();
             setImage(file.secure_url);
 
-            await fetch('https://back-farmam.onrender.com/api/uploadLogo', {
+            await fetch(`${import.meta.env.VITE_API_URL}/uploadLogo`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -113,7 +113,7 @@ const Logo = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch(`https://back-farmam.onrender.com/api/deleteLogo/${id}`, {
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteLogo/${id}`, {
                         method: 'DELETE',
                         credentials: 'include',
                         body: JSON.stringify({ id_usuario: userId }),
@@ -144,7 +144,7 @@ const Logo = () => {
             return;
         }
         try {
-            await fetch(`https://back-farmam.onrender.com/api/updateLogo/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/updateLogo/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ isActive: true, url, id_usuario: userId }),

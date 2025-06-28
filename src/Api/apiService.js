@@ -1,7 +1,7 @@
-const API_URL = 'https://back-farmam.onrender.com/api';
+
 
 export const loginUser = async (username, password) => {
-    const response = await fetch(`${API_URL}/login`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

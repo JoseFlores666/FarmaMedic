@@ -16,7 +16,7 @@ export default function HorarioEmpresaCrud() {
   const [editId, setEditId] = useState(null);
 
   const fetchHorarios = async () => {
-    const res = await fetch("https://back-farmam.onrender.com/api/getHorarioEmpresa");
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/getHorarioEmpresa`);
     const data = await res.json();
 
     const dataOrdenada = data.sort(
@@ -55,8 +55,8 @@ export default function HorarioEmpresaCrud() {
 
     const method = editId ? "PUT" : "POST";
     const url = editId
-      ? `https://back-farmam.onrender.com/api/updateHorarioEmpresa/${editId}`
-      : "https://back-farmam.onrender.com/api/crearHorarioEmpresa";
+      ? `${import.meta.env.VITE_API_URL}/updateHorarioEmpresa/${editId}`
+      : `${import.meta.env.VITE_API_URL}/crearHorarioEmpresa`;
 
     const payload = {
       ...form,
@@ -102,7 +102,7 @@ export default function HorarioEmpresaCrud() {
     });
 
     if (result.isConfirmed) {
-      const res = await fetch(`https://back-farmam.onrender.com/api/deleteHorarioEmpresa/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/deleteHorarioEmpresa/${id}`, {
         method: "DELETE",
       });
 

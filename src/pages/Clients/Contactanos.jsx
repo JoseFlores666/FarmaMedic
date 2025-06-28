@@ -16,7 +16,7 @@ export const Contactanos = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('https://back-farmam.onrender.com/api/enviarMensaje', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/enviarMensaje`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

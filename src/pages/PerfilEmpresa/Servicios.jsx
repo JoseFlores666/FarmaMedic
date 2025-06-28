@@ -6,14 +6,14 @@ import { motion } from "framer-motion";
 
 const Servicios = () => {
   const [Servicios, setServicios] = useState([]);
-  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: '' });
+  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: '', costo: '', descuento: '' });
   const [editMode, setEditMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
 
   const fetchServicios = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getServicios', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getServicios`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -33,7 +33,7 @@ const Servicios = () => {
       setnuevoEnlace(link);
       setEditMode(true);
     } else {
-      setnuevoEnlace({ nombre: "", descripcion: "", imagen: "" });
+      setnuevoEnlace({ nombre: "", descripcion: "", imagen: "", costo: "", descuento: "" });
       setEditMode(false);
     }
     setShowModal(true);
@@ -54,7 +54,7 @@ const Servicios = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://back-farmam.onrender.com/api/deleteServicios/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteServicios/${id}`, {
           method: 'DELETE',
           credentials: 'include',
           body: JSON.stringify({ id_usuario: userId }),
@@ -77,7 +77,7 @@ const Servicios = () => {
   };
 
   const resetForm = () => {
-    setnuevoEnlace({ id: '', nombre: '', descripcion: '', imagen: "" });
+    setnuevoEnlace({ id: '', nombre: '', descripcion: '', imagen: "", costo: "", descuento: "" });
     setEditMode(false);
   };
 
@@ -91,7 +91,7 @@ const Servicios = () => {
       return;
     }
     const method = editMode ? 'PUT' : 'POST';
-    const descripcion = editMode ? `https://back-farmam.onrender.com/api/updateServicios/${nuevoEnlace.id}` : 'https://back-farmam.onrender.com/api/crearServicios';
+    const descripcion = editMode ? `${import.meta.env.VITE_API_URL}/updateServicios/${nuevoEnlace.id}` : `${import.meta.env.VITE_API_URL}/crearServicios`;
 
     try {
       const response = await fetch(descripcion, {
@@ -148,6 +148,8 @@ const Servicios = () => {
               <th style={{ minWidth: "150px" }}>Servicio</th>
               <th style={{ minWidth: "250px", wordBreak: "break-word" }}>Descripcion</th>
               <th style={{ minWidth: "250px", wordBreak: "break-word" }}>Imagen</th>
+              <th style={{ minWidth: "100px" }}>Costo</th>
+              <th style={{ minWidth: "100px" }}>Descuento</th>
               <th style={{ minWidth: "200px" }}>Acciones</th>
             </tr>
           </thead>
@@ -173,6 +175,10 @@ const Servicios = () => {
                       "Sin imagen"
                     )}
                   </td>
+                  <td style={{ wordBreak: "break-word" }}>{item.costo}</td>
+
+                  <td style={{ wordBreak: "break-word" }}>{item.descuento}</td>
+
                   <td className="text-center">
                     <Row className="justify-content-center g-2">
                       <Col xs="auto">
@@ -180,7 +186,7 @@ const Servicios = () => {
                           <Button
                             variant="warning"
                             size="sm"
-                            className="d-flex align-items-center px-3 py-2 shadow-sm"
+                            className="d-flex align-items-center shadow-sm"
                             style={{ whiteSpace: "nowrap" }}
                             onClick={() => handleShow(item)}
                           >
@@ -193,7 +199,7 @@ const Servicios = () => {
                           <Button
                             variant="danger"
                             size="sm"
-                            className="d-flex align-items-center px-3 py-2 shadow-sm"
+                            className="d-flex align-items-center  shadow-sm"
                             style={{ whiteSpace: "nowrap" }}
                             onClick={() => handleDelete(item.id)}
                           >
@@ -251,6 +257,32 @@ const Servicios = () => {
                 onChange={handleChange}
                 placeholder="Ingrese la url de la imagen"
                 required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Costo Normal:</Form.Label>
+              <Form.Control
+                type="number"
+                name="costo"
+                value={nuevoEnlace.costo}
+                onChange={handleChange}
+                placeholder="Ingrese el costo"
+                min={0}
+                required
+                step="0.01"
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Descuento:</Form.Label>
+              <Form.Control
+                type="number"
+                name="descuento"
+                value={nuevoEnlace.descuento}
+                onChange={handleChange}
+                placeholder="Ingrese el descuento"
+                required
+                min={0}
+                step="0.01"
               />
             </Form.Group>
             <Modal.Footer>

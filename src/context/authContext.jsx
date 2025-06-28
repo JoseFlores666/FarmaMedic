@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch('https://back-farmam.onrender.com/api/logout', {
+    await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('https://back-farmam.onrender.com/api/session', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/session`, {
           credentials: 'include',
         });
 

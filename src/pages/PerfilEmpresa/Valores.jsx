@@ -13,7 +13,7 @@ const Valores = () => {
 
   const fetchValores = async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getValores', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getValores`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -54,7 +54,7 @@ const Valores = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const response = await fetch(`https://back-farmam.onrender.com/api/deleteValor/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteValor/${id}`, {
           method: 'DELETE',
           credentials: 'include',
           body: JSON.stringify({ id_usuario: userId }),
@@ -91,7 +91,7 @@ const Valores = () => {
       return;
     }
     const method = editMode ? 'PUT' : 'POST';
-    const descripcion = editMode ? `https://back-farmam.onrender.com/api/updateValores/${nuevoEnlace.id}` : 'https://back-farmam.onrender.com/api/createValor';
+    const descripcion = editMode ? `${import.meta.env.VITE_API_URL}/updateValores/${nuevoEnlace.id}` : `${import.meta.env.VITE_API_URL}/createValor`;
 
     try {
       const response = await fetch(descripcion, {

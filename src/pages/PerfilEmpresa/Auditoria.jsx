@@ -7,7 +7,7 @@ const Auditoria = () => {
 
   const fetchAuditLogs = useCallback(async () => {
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/getAuditLogs');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getAuditLogs`);
       
       if (response.status === 404) {
         const errorMessage = await response.text();

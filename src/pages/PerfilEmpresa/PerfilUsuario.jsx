@@ -23,7 +23,7 @@ const PerfilUsuario = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const response = await fetch(`https://back-farmam.onrender.com/api/getPerfilbyid/${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getPerfilbyid/${userId}`);
       const data = await response.json();
       setUser(data);
     };
@@ -65,7 +65,7 @@ const PerfilUsuario = () => {
     }
 
     try {
-      const response = await fetch(`https://back-farmam.onrender.com/api/updateperfilbyid/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/updateperfilbyid/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

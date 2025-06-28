@@ -24,7 +24,7 @@ export const OTPInput = () => {
     setError('');
 
     try {
-      const response = await fetch('https://back-farmam.onrender.com/api/verifyOtp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/verifyOtp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

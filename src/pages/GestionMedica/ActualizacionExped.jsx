@@ -4,11 +4,10 @@ import Swal from 'sweetalert2';
 import { FaTrash } from 'react-icons/fa';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-const API_URL = 'https://back-farmam.onrender.com/api/';
 
 const getActuExpe = async (setActuExpe) => {
     try {
-        const response = await fetch(`${API_URL}getActuExpe`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getActuExpe`);
         if (!response.ok) throw new Error('Error al obtener opiniones');
         const data = await response.json();
         setActuExpe(data);
@@ -30,7 +29,7 @@ const deleteActuExpe = async (id, setActuExpe) => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`${API_URL}deleteOpinion/${id}`, { method: 'DELETE' });
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteOpinion/${id}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error('Error al eliminar la opinión');
                 Swal.fire('Eliminado', 'La opinión ha sido eliminada', 'success');
                 getActuExpe(setActuExpe);
@@ -47,7 +46,6 @@ export const ActualizacionExped = () => {
     const [filterText, setFilterText] = useState('');
     const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
     const [selectedField, setSelectedField] = useState('doctor');
-
 
     useEffect(() => {
         getActuExpe(setActuExpe);

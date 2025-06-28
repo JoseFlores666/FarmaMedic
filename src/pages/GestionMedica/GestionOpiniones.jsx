@@ -6,13 +6,13 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-const API_URL = 'https://back-farmam.onrender.com/api/';
+
 const authData = JSON.parse(localStorage.getItem("authData"));
 const userId = authData ? authData.id : null;
 
 const getOpinions = async (setOpinions) => {
     try {
-        const response = await fetch(`${API_URL}getOpinions`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getOpinions`);
         if (!response.ok) throw new Error('Error al obtener opiniones');
         const data = await response.json();
         setOpinions(data);
@@ -34,7 +34,7 @@ const deleteOpinion = async (id, setOpinions) => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`${API_URL}deleteOpinion/${id}`, { method: 'DELETE' });
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteOpinion/${id}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error('Error al eliminar la opinión');
                 Swal.fire('Eliminado', 'La opinión ha sido eliminada', 'success');
                 getOpinions(setOpinions);
@@ -70,7 +70,7 @@ export const GestionOpiniones = () => {
     const saveOpinion = async () => {
         try {
             const method = opinionData.id ? 'PUT' : 'POST';
-            const url = opinionData.id ? `${API_URL}updateOpinion/${opinionData.id}` : `${API_URL}createOpinion`;
+            const url = opinionData.id ? `${import.meta.env.VITE_API_URL}/updateOpinion/${opinionData.id}` : `${import.meta.env.VITE_API_URL}/createOpinion`;
 
             const response = await fetch(url, {
                 method,
