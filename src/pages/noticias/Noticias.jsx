@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const Noticias = () => {
     const [noticias, setNoticias] = useState([]);
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const cargarNoticias = async () => {
@@ -113,7 +113,7 @@ const navigate = useNavigate();
                                     <div className="position-absolute top-0 start-0 w-100 h-100 p-0">
                                         <OverlayContent
                                             titulo={noticias[1].titulo}
-                                        descripcion={noticias[1].descripcion}
+                                            descripcion={noticias[1].descripcion}
                                         />
                                     </div>
                                 </MDBCard>
@@ -136,7 +136,7 @@ const navigate = useNavigate();
                                     <div className="position-absolute top-0 start-0 w-100 h-100 p-0">
                                         <OverlayContent
                                             titulo={noticias[2].titulo}
-                                        descripcion={noticias[2].descripcion}
+                                            descripcion={noticias[2].descripcion}
                                         />
                                     </div>
                                 </MDBCard>
@@ -162,7 +162,7 @@ const navigate = useNavigate();
                             <div className="position-absolute top-0 start-0 w-100 h-100 p-0">
                                 <OverlayContent
                                     titulo={noticias[3].titulo}
-                                        descripcion={noticias[3].descripcion}
+                                    descripcion={noticias[3].descripcion}
                                 />
                             </div>
                         </MDBCard>
@@ -170,11 +170,11 @@ const navigate = useNavigate();
                 </MDBCol>
             </MDBRow>
 
-       <div className="text-center mt-4">
-    <Button onClick={() => navigate('/Inicio/Noticias')} variant="outline-primary" size="lg">
-        Mostrar todas las noticias
-    </Button>
-</div>
+            <div className="text-center mt-4">
+                <Button onClick={() => navigate('/Inicio/Noticias')} variant="outline-primary" size="lg">
+                    Mostrar todas las noticias
+                </Button>
+            </div>
 
         </div>
     );

@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaAmbulance, FaCheckCircle, FaMedal, FaMobileAlt, FaSpa, FaStethoscope } from 'react-icons/fa';
 import { Contactanos } from './Clients/Contactanos';
 import Opiniones from './AcercaDe/Opiniones';
-import { Noticias } from './noticias/noticias';
+import { Noticias } from './noticias/Noticias';
 
 export const Home = () => {
   const navigate = useNavigate();
