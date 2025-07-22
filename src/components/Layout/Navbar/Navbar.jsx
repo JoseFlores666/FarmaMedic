@@ -12,6 +12,7 @@ import { SearchB } from '../SearchBar/Search';
 import { AppRouter } from '../../../router/AppRouter';
 import Breadcrumbs from '../../Breadcrumbs';
 import "../../Layout/Navbar/style.css"
+import ThemeToggle from '../../../util/theme-toggler';
 
 export const Navbar2 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -216,7 +217,10 @@ export const Navbar2 = () => {
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
+          <ThemeToggle></ThemeToggle>
+
         </Container>
+
       </Navbar>
       <div style={{
         width: '100%', backgroundColor: '#0b0342',

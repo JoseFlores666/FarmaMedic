@@ -170,7 +170,7 @@ const Deslinde = () => {
   });
 
   return (
-    <div className="container mt-5">
+    <div className="container">
       <h1 className="text-center mb-4">Gestión de Deslinde Legal</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <label htmlFor="">Título</label>

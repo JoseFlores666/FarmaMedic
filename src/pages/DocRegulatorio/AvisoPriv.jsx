@@ -3,10 +3,12 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'react-bootstrap';
 
 const MySwal = withReactContent(Swal);
-const Terminos = () => {
-    const [terminos, setTerminos] = useState([]);
+
+const AvisoPriv = () => {
+    const [deslindes, setDeslindes] = useState([]);
     const [titulo, setTitulo] = useState('');
     const [contenido, setContenido] = useState('');
     const [fechaVigencia, setFechaVigencia] = useState('');
@@ -14,48 +16,59 @@ const Terminos = () => {
     const [currentId, setCurrentId] = useState('');
     const [expandir, setExpandir] = useState([]);
     const [filtroEstado, setFiltroEstado] = useState('Todos');
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenModal = () => {
+        resetForm();
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        resetForm();
+        setShowModal(false);
+    };
 
     const manejoExpansion = (id) => {
         if (expandir.includes(id)) {
-            setExpandir(expandir.filter((terminoId) => terminoId !== id));
+            setExpandir(expandir.filter((deslindeId) => deslindeId !== id));
         } else {
             setExpandir([...expandir, id]);
         }
     };
 
     useEffect(() => {
-        fetchTerminos();
+        fetchDeslindes();
     }, []);
 
-    const fetchTerminos = async () => {
+    const fetchDeslindes = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/getTerminosCondiciones`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getDeslindesLegales`);
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al obtener términos y condiciones');
+                throw new Error(errorData.message || 'Error al obtener deslinde legal');
             }
             const data = await response.json();
-            setTerminos(data);
+            setDeslindes(data);
         } catch (error) {
-            console.error('Error al obtener términos y condiciones:', error);
-            MySwal.fire('Error', error.message || 'No se pudo obtener la lista de términos y condiciones', 'error');
+            console.error('Error al obtener deslinde legal:', error);
+            MySwal.fire('Error', error.message || 'No se pudo obtener la lista de deslindes legales', 'error');
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (editMode) {
-            await updateTermino(currentId);
+            await updateDeslinde(currentId);
         } else {
-            await createTermino();
+            await createDeslinde();
         }
         resetForm();
-        fetchTerminos();
+        fetchDeslindes();
     };
 
-    const createTermino = async () => {
+    const createDeslinde = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/createTerminosCondiciones`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/createDeslindeLegal`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,20 +76,21 @@ const Terminos = () => {
                 credentials: 'include',
                 body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al crear término y condición');
+                throw new Error(errorData.message || 'Error al crear deslinde legal');
             }
-            MySwal.fire('Éxito', 'Término y condición agregado correctamente', 'success');
+            MySwal.fire('Éxito', 'Deslinde legal agregado correctamente', 'success');
         } catch (error) {
-            console.error('Error al crear término y condición:', error);
-            MySwal.fire('Error', error.message || 'No se pudo crear el término y condición', 'error');
+            console.error('Error al crear deslinde legal:', error);
+            MySwal.fire('Error', error.message || 'No se pudo crear el deslinde legal', 'error');
         }
     };
 
-    const updateTermino = async (id) => {
+    const updateDeslinde = async (id) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/updateTerminosCondiciones/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/updateDeslindeLegal/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,18 +98,19 @@ const Terminos = () => {
                 credentials: 'include',
                 body: JSON.stringify({ titulo, contenido, fecha_vigencia: fechaVigencia }),
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al actualizar término y condición');
+                throw new Error(errorData.message || 'Error al actualizar deslinde legal');
             }
-            MySwal.fire('Éxito', 'Término y condición actualizado correctamente', 'success');
+            MySwal.fire('Éxito', 'Deslinde legal actualizado correctamente', 'success');
         } catch (error) {
-            console.error('Error al actualizar término y condición:', error);
-            MySwal.fire('Error', error.message || 'No se pudo actualizar el término y condición', 'error');
+            console.error('Error al actualizar deslinde legal:', error);
+            MySwal.fire('Error', error.message || 'No se pudo actualizar el deslinde legal', 'error');
         }
     };
 
-    const deleteTermino = async (id) => {
+    const deleteDeslinde = async (id) => {
         const confirm = await MySwal.fire({
             title: '¿Estás seguro?',
             text: 'Esta acción no se puede deshacer.',
@@ -106,29 +121,32 @@ const Terminos = () => {
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
         });
+
         if (confirm.isConfirmed) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteTerminosCondiciones/${id}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteDeslindeLegal/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'include',
                 });
+
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al eliminar término y condición');
+                    throw new Error(errorData.message || 'Error al eliminar deslinde legal');
                 }
+
                 MySwal.fire('Eliminado', 'Eliminado correctamente', 'success');
-                fetchTerminos();
+                fetchDeslindes();
             } catch (error) {
-                console.error('Error al eliminar término y condición:', error);
-                MySwal.fire('Error', error.message || 'No se pudo eliminar el término y condición', 'error');
+                console.error('Error al eliminar deslinde legal:', error);
+                MySwal.fire('Error', error.message || 'No se pudo eliminar el deslinde legal', 'error');
             }
         }
     };
 
-    const editTermino = (id, titulo, contenido, fecha_vigencia, vigencia) => {
+    const editDeslinde = (id, titulo, contenido, fecha_vigencia, vigencia) => {
         if (vigencia === 'Vigente') {
             const formattedDate = new Date(fecha_vigencia).toISOString().split('T')[0];
             setCurrentId(id);
@@ -136,8 +154,10 @@ const Terminos = () => {
             setContenido(contenido);
             setFechaVigencia(formattedDate);
             setEditMode(true);
+            setShowModal(true);
+
         } else {
-            MySwal.fire('Error', 'Solo se puede editar un término y condición vigente', 'error');
+            MySwal.fire('Error', 'Solo se puede editar un deslinde legal vigente', 'error');
         }
     };
 
@@ -147,6 +167,7 @@ const Terminos = () => {
         setFechaVigencia('');
         setEditMode(false);
         setCurrentId('');
+        setShowModal(false);
     };
 
     const formatDate = (dateString) => {
@@ -158,63 +179,76 @@ const Terminos = () => {
         return `${day}/${month}/${year}`;
     };
 
-    const terminosFiltrados = terminos.filter((item) => {
+    const deslindesFiltrados = deslindes.filter(item => {
         if (filtroEstado === 'Todos') return true;
         return item.vigencia === filtroEstado;
     });
-    return (
-        <div className="container">
-            <h1 className="text-center mb-4">Gestión de Términos y Condiciones</h1>
-            <form onSubmit={handleSubmit} className="mb-4">
-                <label htmlFor="">Título</label>
-                <div className="input-group mb-3">
-                    <input
-                        type="text"
-                        value={titulo}
-                        onChange={(e) => setTitulo(e.target.value)}
-                        placeholder="Ingrese título"
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <label htmlFor="">Contenido</label>
-                <div className="input-group mb-3">
-                    <textarea
-                        value={contenido}
-                        onChange={(e) => setContenido(e.target.value)}
-                        placeholder="Ingrese contenido"
-                        required
-                        className="form-control"
-                        rows="4"
-                    />
-                </div>
-                <div className="">
-                    <label htmlFor="fechaVigencia">Fecha de Vigencia</label>
-                    <input
-                        id="fechaVigencia"
-                        type="date"
-                        value={fechaVigencia}
-                        onChange={(e) => setFechaVigencia(e.target.value)}
-                        required
-                        className="form-control"
-                    />
-                </div>
 
-                <div className="d-flex justify-content-center gap-2 mt-3">
-                    <button type="submit" className="btn btn-primary">
-                        {editMode ? 'Actualizar' : 'Crear'}
-                    </button>
-                    {editMode && (
-                        <button type="button" onClick={resetForm} className="btn btn-secondary">
-                            Cancelar
-                        </button>
-                    )}
-                </div>
-            </form>
+    return (
+        <div >
+            <h1 className="text-center mb-4">Gestión de Aviso de Privacidad</h1>
+            <div className="d-flex justify-content-end mb-3">
+                <Button variant="success" onClick={handleOpenModal}>
+                    Crear Aviso de Privacidad
+                </Button>
+            </div>
+            <Modal show={showModal || editMode} onHide={handleCloseModal} size="lg" centered backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>{editMode ? 'Editar Aviso de Privacidad' : 'Crear Aviso de Privacidad'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <form onSubmit={handleSubmit}>
+                        <label>Título</label>
+                        <div className="input-group mb-3">
+                            <input
+                                type="text"
+                                value={titulo}
+                                onChange={(e) => setTitulo(e.target.value)}
+                                placeholder="Ingrese título"
+                                required
+                                className="form-control"
+                            />
+                        </div>
+
+                        <label>Contenido</label>
+                        <div className="input-group mb-3">
+                            <textarea
+                                value={contenido}
+                                onChange={(e) => setContenido(e.target.value)}
+                                placeholder="Ingrese contenido"
+                                required
+                                className="form-control"
+                                rows="4"
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label>Fecha de Vigencia</label>
+                            <input
+                                type="date"
+                                value={fechaVigencia}
+                                onChange={(e) => setFechaVigencia(e.target.value)}
+                                required
+                                className="form-control"
+                            />
+                        </div>
+
+                        <div className="d-flex justify-content-end gap-2 mt-3">
+                            <Button type="submit" variant="primary">
+                                {editMode ? 'Actualizar' : 'Crear'}
+                            </Button>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                Cancelar
+                            </Button>
+                        </div>
+                    </form>
+                </Modal.Body>
+            </Modal>
+
 
             <div className="container mb-5">
                 <div className="mb-3">
-                    <label htmlFor="filtroEstado">Filtrar por estado:</label>
+                    <label htmlFor="filtroEstado">Filtrar por Estado</label>
                     <select
                         id="filtroEstado"
                         value={filtroEstado}
@@ -226,18 +260,17 @@ const Terminos = () => {
                         <option value="No Vigente">No Vigente</option>
                     </select>
                 </div>
-                {terminosFiltrados.map((item) => (
+                {deslindesFiltrados.map((item) => (
                     <div className="card mb-5" style={{ borderRadius: '1rem', border: '1px solid' }} key={item.id}>
                         <div className="card-header d-flex align-items-center"
                             onClick={() => manejoExpansion(item.id)}
                             style={{ borderRadius: '1rem', borderBottom: '1px solid', cursor: 'pointer', position: 'relative' }}>
-
                             <strong>{item.titulo}</strong>
 
                             <div style={{ marginLeft: 'auto', position: 'absolute', right: '5px' }}>
                                 {item.vigencia === 'Vigente' && (
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); editTermino(item.id, item.titulo, item.contenido, item.fecha_vigencia, item.vigencia); }}
+                                        onClick={(e) => { e.stopPropagation(); editDeslinde(item.id, item.titulo, item.contenido, item.fecha_vigencia, item.vigencia); }}
                                         className="btn btn-warning btn-sm me-1"
                                         title="Editar"
                                     >
@@ -246,7 +279,7 @@ const Terminos = () => {
                                 )}
                                 {item.estado !== 'eliminado' && (
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); deleteTermino(item.id); }}
+                                        onClick={(e) => { e.stopPropagation(); deleteDeslinde(item.id); }}
                                         className="btn btn-danger btn-sm"
                                         title="Eliminar"
                                     >
@@ -297,4 +330,4 @@ const Terminos = () => {
     );
 };
 
-export default Terminos;
+export default AvisoPriv;

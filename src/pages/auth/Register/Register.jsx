@@ -10,10 +10,12 @@ import Swal from 'sweetalert2';
 import VistaDeslinde from '../../DocRegulatorio/Informacion/VistaDeslinde';
 import VistaPolitica from '../../DocRegulatorio/Informacion/VistaPolitica';
 import VistaTerminos from '../../DocRegulatorio/Informacion/VistaTerminos';
+import VistaAviso from '../../DocRegulatorio/Informacion/VistaAviso';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from 'framer-motion';
+import { Col, Row } from 'react-bootstrap';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -23,10 +25,12 @@ export const Register = () => {
     const [showModal3, setShowModal3] = useState(false);
     const [terminosChecked, setTerminosChecked] = useState(false);
     const [privacidadChecked, setPrivacidadChecked] = useState(false);
+    const [avisoChecked, setAvisoChecked] = useState(false);
     const [deslindeChecked, setDeslindeChecked] = useState(false);
     const [captchaValue, setCaptchaValue] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const [showAvisoModal, setShowAvisoModal] = useState(false); // Aviso de Privacidad
 
     const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
@@ -45,6 +49,7 @@ export const Register = () => {
         if (checkboxName === "terminos") setTerminosChecked(isChecked);
         if (checkboxName === "privacidad") setPrivacidadChecked(isChecked);
         if (checkboxName === "deslinde") setDeslindeChecked(isChecked);
+        if (checkboxName === "aviso") setAvisoChecked(isChecked);
     };
 
     const openDeslindeModal = () => setShowDeslindeModal(true);
@@ -53,6 +58,8 @@ export const Register = () => {
     const closeDeslindeModal2 = () => setShowModal2(false);
     const openDeslindeModal3 = () => setShowModal3(true);
     const closeDeslindeModal3 = () => setShowModal3(false);
+const openAvisoModal     = () => setShowAvisoModal(true);     // Aviso
+const closeAvisoModal     = () => setShowAvisoModal(false);
 
     const validateCorreo = (correo) => /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(correo);
     const validatePassword = (password) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{8,50}$/.test(password);
@@ -484,24 +491,24 @@ export const Register = () => {
                                     {errors.captcha && <div className="text-danger mt-2">{errors.captcha}</div>}
                                 </div>
 
-                                <div className="row mb-3">
-                                    <div className="col-md-6 d-flex align-items-center">
+                                <Row className="mb-3">
+                                    <Col md={6} className="d-flex align-items-center mb-2">
                                         <input
                                             type="checkbox"
                                             id="terminos"
                                             className="me-2"
                                             checked={terminosChecked}
                                             onChange={(e) => handleCheckboxChange("terminos", e.target.checked)}
-
                                         />
-                                        <label htmlFor="terminos" className="small text-muted">
+                                        <label htmlFor="terminos" className="small text-muted mb-0">
                                             <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal3(); }}>
-                                                Acepto los Términos y Condiciones</a>
+                                                Acepto los Términos y Condiciones
+                                            </a>
                                         </label>
                                         <VistaTerminos showModal={showModal3} onClose={closeDeslindeModal3} />
-                                    </div>
+                                    </Col>
 
-                                    <div className="col-md-6 d-flex align-items-center">
+                                    <Col md={6} className="d-flex align-items-center mb-2">
                                         <input
                                             type="checkbox"
                                             id="privacidad"
@@ -509,31 +516,52 @@ export const Register = () => {
                                             checked={privacidadChecked}
                                             onChange={(e) => handleCheckboxChange("privacidad", e.target.checked)}
                                         />
-                                        <label htmlFor="privacidad" className="small text-muted">
+                                        <label htmlFor="privacidad" className="small text-muted mb-0">
                                             <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal2(); }}>
-                                                Acepto la Política de privacidad</a>
+                                                Acepto la Política de Privacidad
+                                            </a>
                                         </label>
                                         <VistaPolitica showModal={showModal2} onClose={closeDeslindeModal2} />
-                                    </div>
-                                    <div>
-                                        <div className="text-center align-items-center">
-                                            <input
-                                                type="checkbox"
-                                                id="deslinde"
-                                                className="me-2"
-                                                checked={deslindeChecked}
-                                                onChange={(e) => handleCheckboxChange("deslinde", e.target.checked)}
-                                            />
-                                            <label htmlFor="deslinde" className="small text-muted m-3">
-                                                <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
-                                                    Acepto el deslinde legal
-                                                </a>
-                                            </label>
-                                        </div>
+                                    </Col>
+
+                                    <Col md={6} className="d-flex align-items-center mb-2">
+                                        <input
+                                            type="checkbox"
+                                            id="deslinde"
+                                            className="me-2"
+                                            checked={deslindeChecked}
+                                            onChange={(e) => handleCheckboxChange("deslinde", e.target.checked)}
+                                        />
+                                        <label htmlFor="deslinde" className="small text-muted mb-0">
+                                            <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openDeslindeModal(); }}>
+                                                Acepto el Deslinde Legal
+                                            </a>
+                                        </label>
                                         <VistaDeslinde showModal={showDeslindeModal} onClose={closeDeslindeModal} />
-                                    </div>
-                                    {errors.terminos && <div className="text-danger mt-2">{errors.terminos}</div>}
-                                </div>
+                                    </Col>
+
+                                    <Col md={6} className="d-flex align-items-center mb-2">
+                                        <input
+                                            type="checkbox"
+                                            id="aviso"
+                                            className="me-2"
+                                            checked={avisoChecked}
+                                            onChange={(e) => handleCheckboxChange("aviso", e.target.checked)}
+                                        />
+                                        <label htmlFor="aviso" className="small text-muted mb-0">
+                                            <a className="text-muted" style={{ cursor: 'pointer' }} onClick={(e) => { e.preventDefault(); openAvisoModal(); }}>
+                                                Acepto los Avisos de Privacidad
+                                            </a>
+                                        </label>
+                                        <VistaAviso showModal={showAvisoModal} onClose={closeAvisoModal} />
+                                    </Col>
+
+                                    {errors.terminos && (
+                                        <Col md={12}>
+                                            <div className="text-danger mt-2">{errors.terminos}</div>
+                                        </Col>
+                                    )}
+                                </Row>
 
                                 <div className="mb-3">
                                     <button

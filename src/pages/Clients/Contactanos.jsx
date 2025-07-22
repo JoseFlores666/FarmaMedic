@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
+import { FaMapMarkedAlt, FaRegPaperPlane } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 export const Contactanos = () => {
     const [formData, setFormData] = useState({
@@ -8,6 +10,43 @@ export const Contactanos = () => {
         titulo: '',
         mensaje: ''
     });
+
+    const [horarios, setHorarios] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const diaActual = diasSemana[new Date().getDay()];
+
+    const convertirHora = (hora24) => {
+        const [hora, minutos] = hora24.split(':');
+        let h = parseInt(hora, 10);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${minutos} ${ampm}`;
+    };
+
+    const fetchHorarios = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/getHorarioEmpresa`);
+            const data = await response.json();
+            const formatted = data.map(item => ({
+                dia: item.dia,
+                horario: item.activo === 1 ? `${convertirHora(item.hora_inicio)} - ${convertirHora(item.hora_fin)}` : '',
+                disponible: item.activo === 1
+            }));
+            setHorarios(formatted);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error al obtener horarios:', error);
+            Swal.fire('Error', 'No se pudieron cargar los horarios de atención', 'error');
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchHorarios();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,40 +63,55 @@ export const Contactanos = () => {
 
             const data = await res.json();
             if (res.ok) {
-                alert('Mensaje enviado correctamente');
+                Swal.fire('Mensaje enviado correctamente', '', 'success');
                 setFormData({ nombre: '', correo: '', titulo: '', mensaje: '' });
             } else {
-                alert('Error al enviar mensaje: ' + data.message);
+                Swal.fire('Error al enviar mensaje', data.message, 'error');
             }
         } catch (err) {
             console.error(err);
-            alert('Error al enviar mensaje');
+            Swal.fire('Error al enviar mensaje', '', 'error');
         }
     };
 
     return (
-            <Row className="align-items-center">
-                <Col md={7}>
-                    <div className="contact-left">
+
+        <div >
+            <div className="text-center">
+                <h5 className="text-muted mb-2">Contacto</h5>
+                <h2 className="fw-bold mb-2">Envíanos un Mensaje</h2>
+            </div>
+            <div className="contact-right text-white p-4 rounded" style={{ backgroundColor: "#2c245b" }}>
+
+                <Row className="align-items-start">
+                    <Col md={7} className="">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <div className="d-flex align-items-center">
+                                <FaMapMarkedAlt size={25       } className="me-2" />
+                                <span className="fw-bold fs-4">Ubicación</span>
+                            </div>
+
+                            <Button variant="light" onClick={() => setShowModal(true)}>
+                                Ver Horarios de Atención
+                            </Button>
+                        </div>
+
+
                         <iframe
                             src="https://maps.google.com/maps?width=286&amp;height=217&amp;hl=en&amp;q=san%20felipe%20orizatlan%20+(far)&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
                             width="100%"
-                            height="535"
+                            height="407"
                             loading="lazy"
                             title="Location Map"
-                            style={{ border: 0 }}
+                            style={{ border: 0, borderRadius: '8px' }}
                             allowFullScreen
                         ></iframe>
-                    </div>
-                </Col>
 
-                <Col md={5}>
-                    <div className="contact-right text-white p-4 rounded" style={{ backgroundColor: "#2c245b" }}>
-                        <div className="contact-head text-center">
-                            <h4>Contáctanos</h4>
-                        </div>
+                    </Col>
+
+                    <Col md={5}>
                         <Form onSubmit={handleSubmit}>
-                            <Form.Group className="mb-2">
+                            <Form.Group className="mb-3">
                                 <Form.Label>Nombre:</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -65,10 +119,11 @@ export const Contactanos = () => {
                                     value={formData.nombre}
                                     onChange={handleChange}
                                     placeholder="Ingresa tu nombre completo"
+                                    required
                                 />
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
+                            <Form.Group className="mb-3">
                                 <Form.Label>Correo electrónico:</Form.Label>
                                 <Form.Control
                                     type="email"
@@ -76,10 +131,11 @@ export const Contactanos = () => {
                                     value={formData.correo}
                                     onChange={handleChange}
                                     placeholder="ejemplo@correo.com"
+                                    required
                                 />
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
+                            <Form.Group className="mb-3">
                                 <Form.Label>Título:</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -87,6 +143,7 @@ export const Contactanos = () => {
                                     value={formData.titulo}
                                     onChange={handleChange}
                                     placeholder="Escribe un título para tu mensaje"
+                                    required
                                 />
                             </Form.Group>
 
@@ -94,21 +151,72 @@ export const Contactanos = () => {
                                 <Form.Label>Mensaje:</Form.Label>
                                 <Form.Control
                                     as="textarea"
-                                    rows={5}
+                                    rows={4}
                                     name="mensaje"
                                     value={formData.mensaje}
                                     onChange={handleChange}
                                     placeholder="Escribe tu mensaje aquí"
                                     style={{ resize: 'none' }}
+                                    required
                                 />
                             </Form.Group>
 
-                            <Button type="submit" variant="light" className="btn-submit">
-                                <i className="fas fa-arrow-right"></i> Enviar Mensaje
+                            <Button type="submit" variant="primary" className="w-100">
+                                <FaRegPaperPlane className="me-2" />
+
+                                Enviar Mensaje
                             </Button>
                         </Form>
-                    </div>
-                </Col>
-            </Row>
+                    </Col>
+                </Row>
+
+                <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Horarios de Atención</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {loading ? (
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Spinner animation="border" variant="primary" />
+                            </div>
+                        ) : (
+                            <Table bordered responsive className="text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Día</th>
+                                        <th>Horario</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {horarios.map((horario, index) => (
+                                        <tr
+                                            key={index}
+                                            className={horario.dia === diaActual ? 'table-primary fw-bold' : ''}
+                                        >
+                                            <td>{horario.dia}</td>
+                                            <td>{horario.disponible ? horario.horario : 'Sin horario'}</td>
+                                            <td>
+                                                {horario.disponible ? (
+                                                    <Badge bg="success">Abierto</Badge>
+                                                ) : (
+                                                    <Badge bg="danger">Cerrado</Badge>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            Cerrar
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </div>
+        </div>
+
     );
 };

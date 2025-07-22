@@ -6,7 +6,15 @@ import { motion } from "framer-motion";
 
 const Servicios = () => {
   const [Servicios, setServicios] = useState([]);
-  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: '', costo: '', descuento: '' });
+  const [nuevoEnlace, setnuevoEnlace] = useState({
+    id: null,
+    nombre: '',
+    descripcion: '',
+    imagen: '',     // URL o path actual para mostrar
+    imagenFile: null, // Archivo seleccionado
+    costo: '',
+    descuento: ''
+  });
   const [editMode, setEditMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
@@ -23,17 +31,33 @@ const Servicios = () => {
     }
   };
 
+  // Cambios en inputs texto y número
   const handleChange = (e) => {
     const { name, value } = e.target;
     setnuevoEnlace({ ...nuevoEnlace, [name]: value });
   };
 
+  // Manejar selección de archivo
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setnuevoEnlace(prev => ({
+        ...prev,
+        imagenFile: file,
+        imagen: ''  // Limpiar URL si hay archivo nuevo
+      }));
+    }
+  };
+
   const handleShow = (link = null) => {
     if (link) {
-      setnuevoEnlace(link);
+      setnuevoEnlace({
+        ...link,
+        imagenFile: null, // Limpiar archivo al editar para cargar nuevo si se desea
+      });
       setEditMode(true);
     } else {
-      setnuevoEnlace({ nombre: "", descripcion: "", imagen: "", costo: "", descuento: "" });
+      setnuevoEnlace({ id: null, nombre: "", descripcion: "", imagen: "", imagenFile: null, costo: "", descuento: "" });
       setEditMode(false);
     }
     setShowModal(true);
@@ -57,15 +81,12 @@ const Servicios = () => {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/deleteServicios/${id}`, {
           method: 'DELETE',
           credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_usuario: userId }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
         });
 
-        if (!response.ok) {
-          throw new Error('Error al eliminar el Servicio');
-        }
+        if (!response.ok) throw new Error('Error al eliminar el Servicio');
+
         setServicios((prev) => prev.filter((link) => link.id !== id));
 
         Swal.fire('Eliminado', 'Servicio eliminado correctamente', 'success');
@@ -77,7 +98,7 @@ const Servicios = () => {
   };
 
   const resetForm = () => {
-    setnuevoEnlace({ id: '', nombre: '', descripcion: '', imagen: "", costo: "", descuento: "" });
+    setnuevoEnlace({ id: null, nombre: '', descripcion: '', imagen: '', imagenFile: null, costo: '', descuento: '' });
     setEditMode(false);
   };
 
@@ -85,40 +106,61 @@ const Servicios = () => {
     e.preventDefault();
     const authData = JSON.parse(localStorage.getItem("authData"));
     const userId = authData ? authData.id : null;
-    const isEdit = editMode;
-    if (isEdit && !nuevoEnlace.id) {
-      Swal.fire('Error', 'No se puede editar el enlace porque no tiene un ID válido.', 'error');
+
+    if (editMode && !nuevoEnlace.id) {
+      Swal.fire('Error', 'No se puede editar el servicio porque no tiene un ID válido.', 'error');
       return;
     }
-    const method = editMode ? 'PUT' : 'POST';
-    const descripcion = editMode ? `${import.meta.env.VITE_API_URL}/updateServicios/${nuevoEnlace.id}` : `${import.meta.env.VITE_API_URL}/crearServicios`;
 
     try {
-      const response = await fetch(descripcion, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ ...nuevoEnlace, id_usuario: userId }),
-      });
+      let response;
 
-      if (!response.ok) {
-        throw new Error('Error al guardar el enlace');
-      }
+      // Si hay archivo seleccionado, usar FormData
+      if (nuevoEnlace.imagenFile) {
+        const formData = new FormData();
+        formData.append('imagen', nuevoEnlace.imagenFile);
+        formData.append('nombre', nuevoEnlace.nombre);
+        formData.append('descripcion', nuevoEnlace.descripcion);
+        formData.append('costo', nuevoEnlace.costo);
+        formData.append('descuento', nuevoEnlace.descuento);
+        formData.append('id_usuario', userId);
 
-      if (isEdit) {
-        setServicios((prev) => prev.map((link) => (link.id === nuevoEnlace.id ? nuevoEnlace : link)));
+        const url = editMode
+          ? `${import.meta.env.VITE_API_URL}/updateServicios/${nuevoEnlace.id}`
+          : `${import.meta.env.VITE_API_URL}/crearServicios`;
+
+        response = await fetch(url, {
+          method: editMode ? 'PUT' : 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+
       } else {
-        setServicios((prev) => [...prev, nuevoEnlace]);
+        // Sin archivo nuevo, enviar JSON (útil para editar sin cambiar imagen)
+        const url = editMode
+          ? `${import.meta.env.VITE_API_URL}/updateServicios/${nuevoEnlace.id}`
+          : `${import.meta.env.VITE_API_URL}/crearServicios`;
+
+        response = await fetch(url, {
+          method: editMode ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...nuevoEnlace, id_usuario: userId }),
+          credentials: 'include',
+        });
       }
-      fetchServicios();
-      Swal.fire('Éxito', editMode ? 'Enlace actualizado correctamente' : 'Enlace agregado correctamente', 'success');
+
+      if (!response.ok) throw new Error('Error al guardar el servicio');
+
+      // Refrescar lista
+      await fetchServicios();
+
+      Swal.fire('Éxito', editMode ? 'Servicio actualizado correctamente' : 'Servicio agregado correctamente', 'success');
+
       resetForm();
       handleClose();
     } catch (error) {
-      console.error('Error al guardar enlace:', error);
-      Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
+      console.error('Error al guardar servicio:', error);
+      Swal.fire('Error', 'Ocurrió un error al guardar el servicio', 'error');
     }
   };
 
@@ -127,17 +169,17 @@ const Servicios = () => {
   }, []);
 
   return (
-    <Container className=" mb-5">
-      <h2 className="text-center text-primary fw-bold ">Gestión de Servicios</h2>
+    <Container className="mb-5">
+      <h2 className="text-center text-primary fw-bold">Gestión de Servicios</h2>
 
-      <div className="d-flex justify-content-center">
+      <div className="d-flex justify-content-center mb-3">
         <Button variant="success" onClick={() => handleShow()} className="d-flex align-items-center">
           <FaPlus className="me-2" /> Agregar Nuevo Servicio
         </Button>
       </div>
 
       <motion.div
-        className="table-responsive mt-4"
+        className="table-responsive"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -176,9 +218,7 @@ const Servicios = () => {
                     )}
                   </td>
                   <td style={{ wordBreak: "break-word" }}>{item.costo}</td>
-
                   <td style={{ wordBreak: "break-word" }}>{item.descuento}</td>
-
                   <td className="text-center">
                     <Row className="justify-content-center g-2">
                       <Col xs="auto">
@@ -199,7 +239,7 @@ const Servicios = () => {
                           <Button
                             variant="danger"
                             size="sm"
-                            className="d-flex align-items-center  shadow-sm"
+                            className="d-flex align-items-center shadow-sm"
                             style={{ whiteSpace: "nowrap" }}
                             onClick={() => handleDelete(item.id)}
                           >
@@ -213,7 +253,7 @@ const Servicios = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="text-center text-muted">No hay Servicios disponibles</td>
+                <td colSpan="6" className="text-center text-muted">No hay Servicios disponibles</td>
               </tr>
             )}
           </tbody>
@@ -251,13 +291,24 @@ const Servicios = () => {
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Imagen:</Form.Label>
               <Form.Control
-                type="text"
+                type="file"
                 name="imagen"
-                value={nuevoEnlace.imagen}
-                onChange={handleChange}
-                placeholder="Ingrese la url de la imagen"
-                required
+                accept="image/*"
+                onChange={handleFileChange}
+                required={!editMode}
               />
+              {/* Mostrar el nombre archivo seleccionado */}
+              {nuevoEnlace.imagenFile && <small className="text-muted">{nuevoEnlace.imagenFile.name}</small>}
+              {/* Imagen previa en modo edición si no hay archivo nuevo */}
+              {editMode && nuevoEnlace.imagen && !nuevoEnlace.imagenFile && (
+                <div className="mt-2">
+                  <img
+                    src={nuevoEnlace.imagen}
+                    alt="Imagen actual"
+                    style={{ maxWidth: "150px", maxHeight: "150px", objectFit: "contain" }}
+                  />
+                </div>
+              )}
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Costo Normal:</Form.Label>
@@ -280,9 +331,9 @@ const Servicios = () => {
                 value={nuevoEnlace.descuento}
                 onChange={handleChange}
                 placeholder="Ingrese el descuento"
-                required
                 min={0}
                 step="0.01"
+                required
               />
             </Form.Group>
             <Modal.Footer>
@@ -296,7 +347,6 @@ const Servicios = () => {
           </Form>
         </Modal.Body>
       </Modal>
-
     </Container>
   );
 };

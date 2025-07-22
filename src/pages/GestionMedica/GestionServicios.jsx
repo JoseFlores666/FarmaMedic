@@ -6,8 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-
-
+import axios from 'axios';
 
 const fetchServices = async (setServices) => {
   try {
@@ -111,49 +110,57 @@ export const GestionServicios = () => {
     fetchServices(setServices);
   }, []);
 
-  useEffect(() => { fetchServices(setServices); }, []);
-  const handleSaveService = async () => {
-    if (!consultorio || !detalles || !imagen) {
-      Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
-      return;
+const handleSaveService = async () => {
+  if (!consultorio || !detalles || (!imagen && !editingService)) {
+    Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
+    return;
+  }
+  try {
+    const data = new FormData();
+    data.append('titulo', consultorio);
+    data.append('detalles', detalles);
+
+    // Solo agrega imagen si es un archivo nuevo (File)
+    if (imagen instanceof File) {
+      data.append('imagen', imagen);
     }
-    try {
-      let response;
-      if (editingService) {
-        console.log('Editando servicio:', editingService);
-        response = await fetch(`${import.meta.env.VITE_API_URL}/updateEspec/${editingService.codespe}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            titulo: consultorio,
-            detalles: detalles,
-            imagen,
-          }),
-        });
-      } else {
-        response = await fetch(`${import.meta.env.VITE_API_URL}/createEspec`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            titulo: consultorio,
-            detalles: detalles,
-            imagen,
-          }),
-        });
-      }
 
-      if (!response.ok) throw new Error('Error al guardar el servicio');
+    const url = editingService
+      ? `${import.meta.env.VITE_API_URL}/updateEspec/${editingService.codespe}`
+      : `${import.meta.env.VITE_API_URL}/createEspec`;
 
-      const newService = await response.json();
-      setServices(prevServices => [...prevServices, newService]);
+    const method = editingService ? 'put' : 'post';
+
+    const response = await axios({
+      method,
+      url,
+      data,
+      withCredentials: true, // si usas cookies o sesión
+      headers: {
+        // 'Content-Type': 'multipart/form-data' // Opcional, axios lo detecta solo
+      },
+    });
+
+    const newService = response.data;
+
+    if (editingService) {
+      setServices(prev =>
+        prev.map(s => (s.codespe === editingService.codespe ? { ...s, ...newService } : s))
+      );
+      Swal.fire('Éxito', 'Servicio actualizado correctamente', 'success');
+    } else {
+      setServices(prev => [...prev, newService]);
       Swal.fire('Éxito', 'Servicio agregado correctamente', 'success');
-      fetchServices(setServices)
-      handleClose();
-    } catch (error) {
-      console.error('Error al guardar el servicio:', error);
-      Swal.fire('Error', 'No se pudo guardar el servicio', 'error');
     }
-  };
+
+    fetchServices(setServices);
+    handleClose();
+  } catch (error) {
+    console.error('Error al guardar el servicio:', error);
+    Swal.fire('Error', 'No se pudo guardar el servicio', 'error');
+  }
+};
+
 
   const handleEditService = (service) => {
     setEditingService(service);
@@ -243,15 +250,16 @@ export const GestionServicios = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Imagen (URL)</Form.Label>
+              <Form.Label>Imagen</Form.Label>
               <Form.Control
-                type="text"
-                name='imagen'
-                placeholder="Ingrese la URL de la imagen"
-                value={imagen || ''}
-                onChange={(e) => setImagen(e.target.value)}
+                type="file"
+                name="imagen"
+                accept="image/*"
+                onChange={(e) => setImagen(e.target.files[0])}
               />
             </Form.Group>
+
+
           </Form>
         </Modal.Body>
         <Modal.Footer>

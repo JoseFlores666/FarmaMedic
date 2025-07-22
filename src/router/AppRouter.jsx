@@ -12,7 +12,6 @@ import Enlaces from '../pages/PerfilEmpresa/Enlaces';
 import Logo from '../pages/PerfilEmpresa/Logo';
 import Auditoria from '../pages/PerfilEmpresa/Auditoria';
 import GestionUsuarios from '../pages/MonitorDeIncidencias/GestionUsuarios';
-
 import GestionDoctores from '../pages/GestionMedica/GestionDoctores';
 import CitasMedicas from '../pages/GestionMedica/CitasMedicas';
 import GestionServicios from '../pages/GestionMedica/GestionServicios';
@@ -23,7 +22,6 @@ import Opiniones from '../pages/AcercaDe/Opiniones';
 import GestionOpiniones from '../pages/GestionMedica/GestionOpiniones';
 import Expedientes from '../pages/GestionMedica/GestionExpedientes';
 import Recetas from '../pages/GestionMedica/RecetasMedicas';
-import ActualizacionExped from '../pages/GestionMedica/ActualizacionExped';
 import Empresa from '../pages/PerfilEmpresa/Empresa';
 import Valores from '../pages/PerfilEmpresa/Valores';
 import Servicios from '../pages/PerfilEmpresa/Servicios';
@@ -40,6 +38,11 @@ import HorarioEmpresa from '../pages/Clients/HorarioEmpresa';
 import VincularWearOS from '../pages/WearOs/vincularWearOs';
 import { ErrorBoundary } from 'react-error-boundary';
 import { AsignarServicios } from '../pages/GestionMedica/AsigancionServ';
+import AvisoPriv from '../pages/DocRegulatorio/AvisoPriv';
+import { NoticiasAdmin } from '../pages/noticias/NoticiasAdmin';
+import NoticiasPost from '../pages/noticias/NoticiasAll';
+import Resultados from '../pages/Predicciones/Resultados';
+
 export const AppRouter = () => {
 	return (
 		<ErrorBoundary FallbackComponent={Error500}>
@@ -75,9 +78,10 @@ export const AppRouter = () => {
 
 
 				{/* {Documentos Regulatorios} */}
-				<Route path='/CRUDDeslinde' element={<PrivateRoute><Deslinde /></PrivateRoute>} />
-				<Route path='/CRUDPoliticas' element={<PrivateRoute><Politicas /></PrivateRoute>} />
-				<Route path='/CRUDTerminos' element={<PrivateRoute><Terminos /></PrivateRoute>} />
+				<Route path='/Home/Deslinde_Legal' element={<PrivateRoute><Deslinde /></PrivateRoute>} />
+				<Route path='/Home/Politicas_De_Privacidad' element={<PrivateRoute><Politicas /></PrivateRoute>} />
+				<Route path='/Home/Terminos_Y_Condiciones' element={<PrivateRoute><Terminos /></PrivateRoute>} />
+				<Route path='/Home/Aviso_De_Privacidad' element={<PrivateRoute><AvisoPriv /></PrivateRoute>} />
 
 				{/* {Parte de la gestion medica} */}
 				<Route path='/Citas' element={<PrivateRoute><CitasMedicas /></PrivateRoute>} />
@@ -87,10 +91,10 @@ export const AppRouter = () => {
 				<Route path='/Expedientes' element={<PrivateRoute><Expedientes /></PrivateRoute>} />
 				<Route path='/Horarios_Citas' element={<PrivateRoute><HorarioCitas /></PrivateRoute>} />
 				<Route path='/Recetas' element={<PrivateRoute><Recetas /></PrivateRoute>} />
-				<Route path='/Act_Expediente' element={<PrivateRoute><ActualizacionExped /></PrivateRoute>} />
 				<Route path='/Asignar_Servicios' element={<PrivateRoute><AsignarServicios /></PrivateRoute>} />
 
 				{/* {Parte de la gestion clientes} */}
+				<Route path='/CRUDOpiniones' element={<PrivateRoute><GestionOpiniones /></PrivateRoute>} />
 				<Route path='/CRUDOpiniones' element={<PrivateRoute><GestionOpiniones /></PrivateRoute>} />
 
 				{/*Acerca del sitio */}
@@ -102,10 +106,14 @@ export const AppRouter = () => {
 
 				{/* rutas de Administrador */}
 				<Route path='/Panel_Administrativo' element={<PanelAdmin />} />
+				<Route path='/Inicio/NoticiasForm' element={<NoticiasAdmin />} />
+				<Route path='/Inicio/Noticias' element={<NoticiasPost />} />
 
 				{/* rutas de Administrador */}
 				<Route path='/Wear_OS' element={<VincularWearOS />} />
 
+				{/* Proyecto Doc */}
+				<Route path='/Predicciones' element={<Resultados />} />
 
 				{/* {Paginas de Error} */}
 				<Route path='*' element={<Error404 />} />

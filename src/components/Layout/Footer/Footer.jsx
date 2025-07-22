@@ -2,23 +2,19 @@ import { useEffect, useState } from 'react';
 import {
   FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaYoutube, FaGithub,
   FaPinterest, FaTiktok, FaSnapchat, FaWhatsapp, FaReddit, FaTumblr,
-  FaVimeo, FaSpotify, FaCalendarCheck, FaCalendarTimes
+  FaVimeo, FaSpotify
 } from 'react-icons/fa';
-import withReactContent from 'sweetalert2-react-content';
-import Swal from 'sweetalert2';
+
 import VistaDeslinde from '../../../pages/DocRegulatorio/Informacion/VistaDeslinde';
 import VistaPolitica from '../../../pages/DocRegulatorio/Informacion/VistaPolitica';
 import VistaTerminos from '../../../pages/DocRegulatorio/Informacion/VistaTerminos';
 import { motion } from 'framer-motion';
 import { useNavigate } from "react-router-dom";
-import { Badge, Card, Col, Row } from 'react-bootstrap';
 
-const MySwal = withReactContent(Swal);
 
 export const Footer = () => {
   const [enlaces, setEnlaces] = useState([]);
   const [contactInfo, setContactInfo] = useState({ direccion: '', email: '', telefono: '' });
-  const [horarios, setHorarios] = useState([]);
   const [showDeslindeModal, setShowDeslindeModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -64,26 +60,10 @@ export const Footer = () => {
     }
   };
 
-  const fetchHorarios = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/getHorarioEmpresa`);
-      const data = await response.json();
-      const formatted = data.map(item => ({
-        dia: item.dia,
-        horario: `${item.hora_inicio} - ${item.hora_fin}`,
-        disponible: item.activo === 1
-      }));
-      
-      setHorarios(formatted);
-    } catch (error) {
-      console.error('Error al obtener horarios:', error);
-      MySwal.fire('Error', 'No se pudieron cargar los horarios de atención', 'error');
-    }
-  };
+ 
   
     useEffect(() => {
       fetchContactInfo();
-      fetchHorarios()
       loadEnlaces()
     }, []);
   return (
@@ -118,41 +98,6 @@ export const Footer = () => {
               <li>Minnesota</li>
             </ul>
           </div>
-        </div>
-
-        <div className="row">
-
-
-          <h5 className="p-2 text-center">Horarios de Atención</h5>
-          <Row className="d-flex justify-content-center align-items-center">
-            {horarios.map((horario, index) => (
-              <Col key={index} xs={4} sm={3} md={2} lg={2} className="p-1">
-                <motion.div
-                  className="d-flex justify-content-center align-items-center"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Card className="p-2 d-flex justify-content-center align-items-center">
-                    {horario.disponible ? (
-                      <FaCalendarCheck className="text-success" size={20} />
-                    ) : (
-                      <FaCalendarTimes className="text-danger" size={20} />
-                    )}
-                    <small className="fw-bold text-center">{horario.dia}</small>
-                    <p className="extra-small text-center m-0">{horario.horario}</p>
-                    <Badge
-                      className="text-white px-2 py-1 rounded-pill"
-                      bg={horario.disponible ? "success" : "danger"}
-                    >
-                      {horario.disponible ? "Disponible" : "No Disponible"}
-                    </Badge>
-                  </Card>
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
-
         </div>
 
         <div className="row mt-4 pt text-center d-flex justify-content-center align-items-center" style={{ borderTop: '1px solid grey' }}>

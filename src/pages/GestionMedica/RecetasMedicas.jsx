@@ -5,14 +5,15 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import CustomDataTable from '../../components/Tables/CustomDataTable';
 import FilterComponent from '../../components/FilterComponent';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaEye, FaTrash } from 'react-icons/fa';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import RecetaPDF from './RecetaPDF';
 
 const fetchRecetas = async (setRecetas) => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/getRecetas`);
     const data = await response.json();
     setRecetas(data);
-    console.log(data)
   } catch (error) {
     console.error('Error al obtener Recetas:', error);
   }
@@ -42,6 +43,17 @@ const fetchDoctores = async (setDoctores) => {
   }
 };
 
+const fetchMedicamentosByReceta = async (recetaId) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getMedicamentosByReceta/${recetaId}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener medicamentos:', error);
+    throw new Error('No se pudieron cargar los medicamentos');
+  }
+};
+
 const eliminarReceta = async (id, setRecetas) => {
   Swal.fire({
     title: '¿Estás seguro?',
@@ -67,12 +79,9 @@ const eliminarReceta = async (id, setRecetas) => {
   });
 };
 
-const recetasColumns = (setRecetas, handleEditReceta) => [
+const recetasColumns = (setRecetas, handleEditReceta, handleMedicamentos) => [
   { name: 'Doctor', selector: row => row.doctor, sortable: true, wrap: true },
   { name: 'Paciente', selector: row => row.paciente, sortable: true, wrap: true },
-  { name: 'Medicamento', selector: row => row.medicamento, sortable: true },
-  { name: 'Dosis', selector: row => row.dosis, sortable: true },
-  { name: 'Frecuencia', selector: row => row.instrucciones, sortable: true },
   {
     name: 'Fecha de Inicio',
     selector: row => {
@@ -102,15 +111,20 @@ const recetasColumns = (setRecetas, handleEditReceta) => [
         <FaEdit
           color='blue'
           title='Editar'
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', marginRight: 10 }}
           onClick={() => handleEditReceta(row)}
+        />
+        <FaEye
+          color='black'
+          title='Ver Receta'
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleMedicamentos(row)}
         />
       </div>
     ),
     ignoreRowClick: true
   },
 ];
-
 
 export const Recetas = () => {
   const [recetas, setRecetas] = useState([]);
@@ -120,30 +134,30 @@ export const Recetas = () => {
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showMedic, setShowMedic] = useState(false);
   const [editingReceta, setEditingReceta] = useState(null);
 
   const [paciente, setPaciente] = useState('');
   const [doctor, setDoctor] = useState('');
-  const [medicamento, setMedicamento] = useState('');
-  const [dosis, setDosis] = useState('');
-  const [instrucciones, setInstrucciones] = useState('');
+  const [medicamentos, setMedicamentos] = useState([
+    { medicamento: '', dosis: '', instrucciones: '' }
+  ]);
+
   const [fechaEmision, setFechaEmision] = useState('');
   const [fechaVencimiento, setfechaVencimiento] = useState('');
   const [selectedField, setSelectedField] = useState('paciente');
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toISOString().split('T')[0]; // Obtiene solo "YYYY-MM-DD"
-};
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
 
   const handleShow = () => {
     setPaciente('');
     setDoctor('');
-    setMedicamento('');
-    setDosis('');
-    setInstrucciones('');
     setFechaEmision('');
     setfechaVencimiento('');
+    setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
     setEditingReceta(null);
     setShowModal(true);
   };
@@ -151,26 +165,55 @@ const formatDate = (dateString) => {
   const handleClose = () => {
     setPaciente('');
     setDoctor('');
-    setMedicamento('');
-    setDosis('');
-    setInstrucciones('');
     setFechaEmision('');
     setfechaVencimiento('');
+    setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
     setEditingReceta(null);
     setShowModal(false);
+    setShowMedic(false);
   };
 
-  const handleEditReceta = (Receta) => {
-    setPaciente(Receta.codpaci);
-    setDoctor(Receta.coddoc);
-    setMedicamento(Receta.medicamento);
-    setDosis(Receta.dosis);
-    setInstrucciones(Receta.instrucciones);
-  setFechaEmision(formatDate(Receta.fecha_inicio));
-  setfechaVencimiento(formatDate(Receta.fecha_fin));
-    setEditingReceta(Receta);
+
+  const handleEditReceta = async (receta) => {
+    setPaciente(receta.codpaci);
+    setDoctor(receta.coddoc);
+    setFechaEmision(formatDate(receta.fecha_inicio));
+    setfechaVencimiento(formatDate(receta.fecha_fin));
+    setEditingReceta(receta);
+
+    const medicamentosData = await fetchMedicamentosByReceta(receta.id);
+
+    if (Array.isArray(medicamentosData) && medicamentosData.length > 0) {
+      setMedicamentos(medicamentosData);
+    } else {
+      setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
+    }
     setShowModal(true);
   };
+
+
+  const handleMedicamentos = async (receta) => {
+    try {
+      setEditingReceta(receta);
+      setPaciente(receta.codpaci);
+      setDoctor(receta.coddoc);
+      setFechaEmision(formatDate(receta.fecha_inicio));
+      setfechaVencimiento(formatDate(receta.fecha_fin));
+
+      const data = await fetchMedicamentosByReceta(receta.id);
+      if (Array.isArray(data) && data.length > 0) {
+        setMedicamentos(data);
+      } else {
+        setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
+      }
+
+      setShowMedic(true);
+    } catch (error) {
+      console.error('Error al cargar medicamentos para vista:', error);
+      Swal.fire('Error', 'No se pudieron cargar los medicamentos', 'error');
+    }
+  };
+
 
   useEffect(() => {
     fetchRecetas(setRecetas);
@@ -178,22 +221,32 @@ const formatDate = (dateString) => {
     fetchDoctores(setDoctores)
   }, []);
 
+  const handleAddMedicamento = () => {
+    setMedicamentos([...medicamentos, { medicamento: '', dosis: '', instrucciones: '' }]);
+  };
+
+  const handleMedicamentoChange = (index, field, value) => {
+    const nuevosMedicamentos = [...medicamentos];
+    nuevosMedicamentos[index][field] = value;
+    setMedicamentos(nuevosMedicamentos);
+  };
+
   const handleSaveReceta = async () => {
-    const recetasData = {
-      historial_id: 3,
-      coddoc: Number(doctor), 
+    const recetasData = medicamentos.map((med) => ({
+      historial_id: editingReceta ? editingReceta.historial_id : null, 
+      coddoc: Number(doctor),
       codpaci: Number(paciente),
-      medicamento: medicamento,
+      medicamento: med.medicamento,
+      dosis: med.dosis,
+      instrucciones: med.instrucciones,
       fecha_inicio: fechaEmision,
       fecha_fin: fechaVencimiento,
-      dosis: dosis,
-      instrucciones: instrucciones,
       estado: 'Activo',
-    };
+    }));
 
     const url = editingReceta
-      ? `${import.meta.env.VITE_API_URL}}/updateReceta/${editingReceta.id}`
-      : `${import.meta.env.VITE_API_URL}}/createReceta`;
+      ? `${import.meta.env.VITE_API_URL}/updateReceta/${editingReceta.id}`
+      : `${import.meta.env.VITE_API_URL}/createReceta`;
 
     const method = editingReceta ? 'PUT' : 'POST';
 
@@ -201,7 +254,7 @@ const formatDate = (dateString) => {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(recetasData),
+        body: JSON.stringify({ recetas: recetasData }),
       });
 
       if (!response.ok) {
@@ -213,11 +266,10 @@ const formatDate = (dateString) => {
       Swal.fire('Éxito', 'Receta guardada correctamente', 'success');
       handleClose();
     } catch (error) {
-      console.error('Error al guardar la receta:', error);
-      Swal.fire('Error', error.message || 'No se pudo guardar la receta', 'error');
+      console.error('Error al guardar receta:', error);
+      Swal.fire('Error', error.message, 'error');
     }
   };
-
 
   const filteredItems = (recetas || []).filter(item => {
     const filter = filterText.toLowerCase();
@@ -269,12 +321,11 @@ const formatDate = (dateString) => {
     );
   }, [filterText, resetPaginationToggle, selectedField]);
 
-
   return (
     <div>
       <CustomDataTable
-        title="Gestión de Recetas Medicas"
-        columns={recetasColumns(setRecetas, handleEditReceta)}
+        title="Gestión de Recetas y Medicamentos"
+        columns={recetasColumns(setRecetas, handleEditReceta, handleMedicamentos)}
         data={filteredItems}
         subHeaderComponent={subHeaderComponentMemo}
       />
@@ -286,82 +337,117 @@ const formatDate = (dateString) => {
         <Modal.Body>
           <Form>
             <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Paciente</Form.Label>
-                  <Form.Select value={paciente} onChange={(e) => setPaciente(e.target.value)}>
-                    <option value="">Seleccione un paciente</option>
-                    {pacientes.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {`${p.nombre} ${p.apellidoPaterno} ${p.apellidoMaterno}`}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Paciente</Form.Label>
+                    <Form.Select value={paciente} onChange={(e) => setPaciente(e.target.value)}>
+                      <option value="">Seleccione un paciente</option>
+                      {pacientes.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {`${p.nombre} ${p.apellidoPaterno} ${p.apellidoMaterno}`}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Medicamento</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ingrese el medicamento"
-                    value={medicamento}
-                    onChange={(e) => setMedicamento(e.target.value)}
-                  />
-                </Form.Group>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Doctor</Form.Label>
+                    <Form.Select value={doctor} onChange={(e) => setDoctor(e.target.value)}>
+                      <option value="">Seleccione un doctor</option>
+                      {doctores.map((d) => (
+                        <option key={d.coddoc} value={d.coddoc}>
+                          {`${d.nomdoc} ${d.apepaternodoc} ${d.apematernodoc}`}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Frecuencia (Horas)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Ingrese la frecuencia"
-                    value={instrucciones}
-                    onChange={(e) => setInstrucciones(e.target.value)}
-                    min={0}
-                  />
-                </Form.Group>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Fecha de Emisión</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={fechaEmision}
+                      onChange={(e) => setFechaEmision(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Fecha de Vencimiento</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={fechaVencimiento}
-                    onChange={(e) => setfechaVencimiento(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Fecha de Vencimiento</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={fechaVencimiento}
+                      onChange={(e) => setfechaVencimiento(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Doctor</Form.Label>
-                  <Form.Select value={doctor} onChange={(e) => setDoctor(e.target.value)}>
-                    <option value="">Seleccione un doctor</option>
-                    {doctores.map((d) => (
-                      <option key={d.coddoc} value={d.coddoc}>
-                        {`${d.nomdoc} ${d.apepaternodoc} ${d.apematernodoc}`}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
+              {medicamentos.map((med, index) => (
+                <Row key={index}>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Medicamento</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Ingrese el medicamento"
+                        value={med.medicamento}
+                        onChange={(e) => handleMedicamentoChange(index, 'medicamento', e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Dosis</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Ingrese la dosis"
+                        value={med.dosis}
+                        onChange={(e) => handleMedicamentoChange(index, 'dosis', e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Frecuencia(Horas)</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Ingrese la frecuencia"
+                        value={med.instrucciones}
+                        onChange={(e) => handleMedicamentoChange(index, 'instrucciones', e.target.value)}
+                        min={0}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={1} className="d-flex align-items-center">
+                    {index > 0 && (
+                      <Button
+                        variant="danger"
+                        onClick={() => {
+                          const nuevos = medicamentos.filter((_, i) => i !== index);
+                          setMedicamentos(nuevos);
+                        }}
+                      >
+                        &times;
+                      </Button>
+                    )}
+                  </Col>
+                </Row>
+              ))}
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Dosis</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ingrese la dosis"
-                    value={dosis}
-                    onChange={(e) => setDosis(e.target.value)}
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Fecha de Emisión</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={fechaEmision}
-                    onChange={(e) => setFechaEmision(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
+              <div className="d-flex justify-content-end mb-3">
+                <Button variant="success" onClick={handleAddMedicamento}>
+                  + Agregar otro medicamento
+                </Button>
+              </div>
             </Row>
           </Form>
         </Modal.Body>
@@ -370,6 +456,108 @@ const formatDate = (dateString) => {
           <Button variant="primary" onClick={handleSaveReceta}>
             {editingReceta ? 'Guardar Cambios' : 'Guardar Receta'}
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+
+      <Modal show={showMedic} onHide={handleClose} centered size='xl'>
+        <Modal.Header closeButton>
+          <Modal.Title>Generar Receta Médica</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form>
+            <Row>
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Paciente</Form.Label>
+                  <Form.Select value={paciente} disabled>
+                    {pacientes.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {`${p.nombre} ${p.apellidoPaterno} ${p.apellidoMaterno}`}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Doctor</Form.Label>
+                  <Form.Select value={doctor} disabled>
+                    {doctores.map((d) => (
+                      <option key={d.coddoc} value={d.coddoc}>
+                        {`${d.nomdoc} ${d.apepaternodoc} ${d.apematernodoc}`}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Fecha de Emisión</Form.Label>
+                  <Form.Control type="date" value={fechaEmision} disabled />
+                </Form.Group>
+              </Col>
+
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Fecha de Vencimiento</Form.Label>
+                  <Form.Control type="date" value={fechaVencimiento} disabled />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {medicamentos.map((med, index) => (
+              <Row key={index}>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Medicamento</Form.Label>
+                    <Form.Control type="text" value={med.medicamento} disabled />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Dosis</Form.Label>
+                    <Form.Control type="text" value={med.dosis} disabled />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Frecuencia (Horas)</Form.Label>
+                    <Form.Control type="number" value={med.instrucciones} disabled />
+                  </Form.Group>
+                </Col>
+              </Row>
+            ))}
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
+          <PDFDownloadLink
+            document={
+              <RecetaPDF
+      paciente={editingReceta?.paciente || ''}
+      doctor={editingReceta?.doctor || ''}
+                fecha_inicio={fechaEmision}
+                fecha_fin={fechaVencimiento}
+                medicamentos={medicamentos}
+              />
+            }
+            fileName={`receta-${paciente}-${new Date().toISOString().split('T')[0]}.pdf`}
+          >
+            {({ loading }) =>
+              loading ? (
+                <Button variant="secondary" disabled>Generando...</Button>
+              ) : (
+                <Button variant="primary">Descargar PDF</Button>
+              )
+            }
+          </PDFDownloadLink>
         </Modal.Footer>
       </Modal>
 

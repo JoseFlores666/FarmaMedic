@@ -27,16 +27,18 @@ const fetchDoctores = async (setServices) => {
     Swal.fire('Error', 'No se pudo obtener los doctores', 'error');
   }
 };
-
 const createDoctor = async (doctorData) => {
   try {
+    const formData = new FormData();
+
+    for (const key in doctorData) {
+      formData.append(key, doctorData[key]);
+    }
+
     const response = await fetch(`${import.meta.env.VITE_API_URL}/createDoc`, {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(doctorData),
+      body: formData, // No agregues headers, fetch los maneja automáticamente con FormData
     });
 
     if (!response.ok) {
@@ -54,19 +56,24 @@ const createDoctor = async (doctorData) => {
 
 const updateDoctor = async (id, doctorData) => {
   try {
+    const formData = new FormData();
+
+    for (const key in doctorData) {
+      formData.append(key, doctorData[key]);
+    }
+
     const response = await fetch(`${import.meta.env.VITE_API_URL}/updateDoc/${id}`, {
       method: 'PUT',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(doctorData),
+      body: formData, // No headers aquí tampoco
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      Swal.fire('Error', `No se pudo agregar el doctor: ${errorData.message}`, 'error');
+      Swal.fire('Error', `No se pudo actualizar el doctor: ${errorData.message}`, 'error');
+      return false;
     }
+
     Swal.fire('Éxito', 'Doctor actualizado correctamente', 'success');
     return true;
   } catch (error) {
@@ -105,7 +112,7 @@ const GestionDoctores = () => {
     correo: '',
     telefo: '',
     especialidad: '',
-    foto_doc: '',
+    imagen: '',
     password: '',
     vista_previa: null,
     precio_base: '',
@@ -287,7 +294,7 @@ const GestionDoctores = () => {
       genero: doctor.genero,
       correo: doctor.correo,
       telefo: doctor.telefo,
-      foto_doc: doctor.foto_doc,
+      imagen: doctor.foto_doc,
       password: doctor.password,
       especialidad: especialidadCode,
       precio_base: doctor.precio_base,
@@ -337,24 +344,26 @@ const GestionDoctores = () => {
   }, [filterText, resetPaginationToggle, selectedField]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+  const { name, value, files } = e.target;
 
-    if (name === 'perfil') {
-      const file = files[0];
-      if (file) {
-        setNewDoctor((prev) => ({
-          ...prev,
-          foto_doc: file.name,
-          vista_previa: URL.createObjectURL(file),
-        }));
-      }
-    } else {
+  if (name === 'imagen') {
+    const file = files[0];
+    if (file) {
       setNewDoctor((prev) => ({
         ...prev,
-        [name]: value,
+        imagen: file, 
+        vista_previa: URL.createObjectURL(file),
       }));
     }
-  };
+  } else {
+    setNewDoctor((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
+
+
 
 
   const handleSubmit = async () => {
@@ -547,20 +556,13 @@ const GestionDoctores = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Foto de Perfil</Form.Label>
-                  <Form.Control
-                    type="file"
-                    name="perfil"
-                    accept="image/*"
-                    onChange={handleChange}
-                  />
-                  {newDoctor.vista_previa || newDoctor.foto_doc ? (
-                    <img
-                      src={newDoctor.foto_doc || `/ruta/del/servidor/${newDoctor.foto_doc}`}
-                      alt="Previsualización"
-                      className="mt-2"
-                      style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }}
-                    />
-                  ) : null}
+             <Form.Control
+  type="file"
+  name="imagen" 
+  accept="image/*"
+  onChange={handleChange}
+/>
+
                 </Form.Group>
               </Col>
 

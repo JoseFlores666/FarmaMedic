@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const Valores = () => {
   const [Valores, setValores] = useState([]);
-  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: '' });
+  const [nuevoEnlace, setnuevoEnlace] = useState({ id: null, nombre: '', descripcion: '', imagen: null });
   const [editMode, setEditMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
@@ -23,21 +23,32 @@ const Valores = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
+  if (name === 'imagen') {
+    setnuevoEnlace({ ...nuevoEnlace, imagen: files[0] });
+  } else {
     setnuevoEnlace({ ...nuevoEnlace, [name]: value });
-  };
+  }
+};
 
-  const handleShow = (link = null) => {
-    if (link) {
-      setnuevoEnlace(link);
-      setEditMode(true);
-    } else {
-      setnuevoEnlace({ nombre: "", descripcion: "", imagen: "" });
-      setEditMode(false);
-    }
-    setShowModal(true);
-  };
+
+const handleShow = (link = null) => {
+  if (link) {
+    setnuevoEnlace({
+      id: link.id,
+      nombre: link.nombre,
+      descripcion: link.descripcion,
+      imagen: link.imagen, 
+    });
+    setEditMode(true);
+  } else {
+    setnuevoEnlace({ id: null, nombre: '', descripcion: '', imagen: null });
+    setEditMode(false);
+  }
+  setShowModal(true);
+};
+
 
   const handleDelete = async (id) => {
     const authData = JSON.parse(localStorage.getItem("authData"));
@@ -81,46 +92,54 @@ const Valores = () => {
     setEditMode(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const authData = JSON.parse(localStorage.getItem("authData"));
-    const userId = authData ? authData.id : null;
-    const isEdit = editMode;
-    if (isEdit && !nuevoEnlace.id) {
-      Swal.fire('Error', 'No se puede editar el enlace porque no tiene un ID válido.', 'error');
-      return;
+
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const authData = JSON.parse(localStorage.getItem("authData"));
+  const userId = authData ? authData.id : null;
+  const isEdit = editMode;
+
+  if (isEdit && !nuevoEnlace.id) {
+    Swal.fire('Error', 'No se puede editar el enlace porque no tiene un ID válido.', 'error');
+    return;
+  }
+
+  const method = isEdit ? 'PUT' : 'POST';
+  const url = isEdit
+    ? `${import.meta.env.VITE_API_URL}/updateValores/${nuevoEnlace.id}`
+    : `${import.meta.env.VITE_API_URL}/createValor`;
+
+  try {
+    const formData = new FormData();
+    formData.append('nombre', nuevoEnlace.nombre);
+    formData.append('descripcion', nuevoEnlace.descripcion);
+    formData.append('id_usuario', userId);
+    if (!isEdit || (isEdit && nuevoEnlace.imagen instanceof File)) {
+      formData.append('imagen', nuevoEnlace.imagen);
     }
-    const method = editMode ? 'PUT' : 'POST';
-    const descripcion = editMode ? `${import.meta.env.VITE_API_URL}/updateValores/${nuevoEnlace.id}` : `${import.meta.env.VITE_API_URL}/createValor`;
 
-    try {
-      const response = await fetch(descripcion, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ ...nuevoEnlace, id_usuario: userId }),
-      });
+    const response = await fetch(url, {
+      method,
+      body: formData,
+      credentials: 'include',
+    });
 
-      if (!response.ok) {
-        throw new Error('Error al guardar el enlace');
-      }
-
-      if (isEdit) {
-        setValores((prev) => prev.map((link) => (link.id === nuevoEnlace.id ? nuevoEnlace : link)));
-      } else {
-        setValores((prev) => [...prev, nuevoEnlace]);
-      }
-      fetchValores();
-      Swal.fire('Éxito', editMode ? 'Enlace actualizado correctamente' : 'Enlace agregado correctamente', 'success');
-      resetForm();
-      handleClose();
-    } catch (error) {
-      console.error('Error al guardar enlace:', error);
-      Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
+    if (!response.ok) {
+      throw new Error('Error al guardar el enlace');
     }
-  };
+
+    fetchValores();
+
+    Swal.fire('Éxito', isEdit ? 'Valor actualizado correctamente' : 'Valor agregado correctamente', 'success');
+    resetForm();
+    handleClose();
+  } catch (error) {
+    console.error('Error al guardar enlace:', error);
+    Swal.fire('Error', 'Ocurrió un error al guardar el enlace', 'error');
+  }
+};
+
 
   useEffect(() => {
     fetchValores();
@@ -242,17 +261,17 @@ const Valores = () => {
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">Imagen:</Form.Label>
-              <Form.Control
-                type="text"
-                name="imagen"
-                value={nuevoEnlace.imagen}
-                onChange={handleChange}
-                placeholder="Ingrese la url de la imagen"
-                required
-              />
-            </Form.Group>
+          <Form.Group className="mb-3">
+  <Form.Label className="fw-bold">Imagen:</Form.Label>
+  <Form.Control
+    type="file"
+    name="imagen"
+    onChange={handleChange}
+    accept="image/*"
+    required={!editMode} // solo requerido al crear
+  />
+</Form.Group>
+
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
                 Cancelar

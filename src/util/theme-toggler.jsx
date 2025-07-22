@@ -18,13 +18,26 @@ const ThemeToggle = () => {
         document.documentElement.setAttribute('data-bs-theme', storedTheme);
     }, []);
 
-    return (
-        <div >
-            <button className="btn btn-primary  " onClick={toggleTheme}>
-                {theme === 'light' ? <FaSun color='yellow' size={20} /> : <FaMoon size={20} color='white' />}
-            </button>
-        </div>
-    );
+   return (
+    <div>
+        {theme === 'light' ? (
+            <FaSun 
+                color='yellow' 
+                size={20} 
+                style={{ cursor: 'pointer' }} 
+                onClick={toggleTheme} 
+            />
+        ) : (
+            <FaMoon 
+                size={20} 
+                color='white' 
+                style={{ cursor: 'pointer' }} 
+                onClick={toggleTheme} 
+            />
+        )}
+    </div>
+);
+
 };
 
 export default ThemeToggle;

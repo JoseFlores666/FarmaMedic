@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
-import { FaBan, FaCalendarCheck, FaEdit, FaSyncAlt } from 'react-icons/fa';
+import { FaBan, FaCalendarCheck, FaCheckCircle, FaEdit, FaSyncAlt } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import { Accordion, Button, Col, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
@@ -74,7 +74,22 @@ const getServiciosAsignados = async (coddoc, setServiciosDoc) => {
   }
 };
 
-const userColumns = (setCitas, handleEditCita, abrirModal, handleReagendarCita, handleCancelarCita) => [
+const fetchServiciosDeLaCita = async (codcita) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getServiciosDeCita/${codcita}`);
+    if (!response.ok) throw new Error('Error al obtener servicios de la cita');
+    const data = await response.json();
+    return data.map(servicio => ({
+      label: servicio.nombre,
+      value: servicio.id
+    }));
+  } catch (error) {
+    console.error('Error al obtener servicios de la cita:', error);
+    return [];
+  }
+};
+
+const userColumns = (setCitas, handleEditCita, abrirModal, handleReagendarCita, handleCancelarCita,handleCompletarCita) => [
   { name: 'Paciente', selector: row => row.paciente || 'Vacante', sortable: true },
   { name: 'Doctor', selector: row => row.doctor, sortable: true },
   { name: 'Especialidad', selector: row => row.especialidad, sortable: true },
@@ -109,6 +124,12 @@ const userColumns = (setCitas, handleEditCita, abrirModal, handleReagendarCita, 
           title='Cancelar'
           style={{ cursor: 'pointer', marginRight: 10 }}
           onClick={() => handleCancelarCita(row)}
+        />
+        <FaCheckCircle
+          color='darkgreen'
+          title='Completar Cita'
+          style={{ cursor: 'pointer', marginRight: 10 }}
+          onClick={() => handleCompletarCita(row)}
         />
       </div>
     ),
@@ -195,15 +216,37 @@ export const CitasMedicas = () => {
     setEditingCita(null);
   }
 
-  const handleEditCita = (Cita) => {
+  const handleEditCita = async (Cita) => {
     setPacienteSeleccionado(Cita.codpaci);
     setFechaCreacion(Cita.fecha_creacion);
     setDoctor(Cita.coddoc);
     setMotivoCita(Cita.motivo_cita);
     setHora(Cita.hora);
-    setEspecialidad(Cita.especialidad)
-    setFecha(Cita.fecha)
+    setEspecialidad(Cita.especialidad);
+    setFecha(Cita.fecha);
     setEditingCita(Cita);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getServiciosDelDoctor/${Cita.coddoc}`);
+      const serviciosDoctor = await response.json();
+      setServiciosDoc(serviciosDoctor);
+
+      const serviciosCita = await fetchServiciosDeLaCita(Cita.id);
+
+      const serviciosDisponibles = serviciosDoctor.map(serv => ({
+        label: serv.nombre,
+        value: serv.id
+      }));
+
+      const serviciosSeleccionados = serviciosCita.filter(servSel =>
+        serviciosDisponibles.some(opt => opt.value === servSel.value)
+      );
+
+      setServiciosSeleccionados(serviciosSeleccionados);
+    } catch (error) {
+      console.error('Error al cargar los servicios:', error);
+    }
+
     setShowModal2(true);
   };
 
@@ -231,7 +274,7 @@ export const CitasMedicas = () => {
     setShowModal5(true);
   };
 
-  const abrirModal = (Cita) => {
+  const abrirModal = async (Cita) => {
     setDoctor(Cita.doctor);
     setFechaCreacion(Cita.fecha_creacion);
     setEspecialidad(Cita.especialidad);
@@ -243,6 +286,17 @@ export const CitasMedicas = () => {
     setPacienteCitaActual(Cita.codpaci || null);
     setPacienteSeleccionado(null);
     fetchListaEspera(Cita.codcita, setListaEspera);
+    setDoctor(Cita.coddoc);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getServiciosDelDoctor/${Cita.coddoc}`);
+      const serviciosDoctor = await response.json();
+      setServiciosDoc(serviciosDoctor);
+
+      setServiciosSeleccionados([]);
+    } catch (error) {
+      console.error('Error al cargar los servicios:', error);
+    }
     setShowModal(true);
   };
 
@@ -251,11 +305,12 @@ export const CitasMedicas = () => {
     fetchUsuarios(setPacientes)
     fetchDoctores(setDoctores)
     fetchServicios(setServiciosAll)
-  if (doctor) {
-    getServiciosAsignados(doctor, setServiciosDoc);
-  } else {
-    setServiciosDoc([]);
-  }  }, [doctor]);
+    if (doctor) {
+      getServiciosAsignados(doctor, setServiciosDoc);
+    } else {
+      setServiciosDoc([]);
+    }
+  }, [doctor]);
 
   const handleSaveCita = async () => {
     if (!pacienteSeleccionado || !doctor || !motivoCita) {
@@ -347,6 +402,29 @@ export const CitasMedicas = () => {
       });
     }
   };
+  
+const handleCompletarCita = async (cita) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/migrarCitaAHistorial`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: cita.id }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Error al completar la cita');
+    }
+
+    Swal.fire('Éxito', 'Cita marcada como completada y movida al historial', 'success');
+    fetchCitas(setCitas);
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire('Error', error.message || 'Error al completar la cita', 'error');
+  }
+};
+
+
 
   const handleCancelarYEliminarCita = async () => {
     if (!motivoCancelacion || motivoCancelacion.trim() === '') {
@@ -449,6 +527,7 @@ export const CitasMedicas = () => {
     const role = authData?.role;
 
     const pacienteId = role === 1 ? pacienteSeleccionado : authData?.id;
+    const serviciosIds = serviciosSeleccionados.map(s => s.value);
 
     if (!pacienteId) {
       Swal.fire('Error', 'Debe seleccionar un paciente', 'error');
@@ -483,7 +562,8 @@ export const CitasMedicas = () => {
         body: JSON.stringify({
           id: selectCita.id,
           codpaci: pacienteId,
-          motivoCita: motivoCita
+          motivoCita: motivoCita,
+          servicios: serviciosIds
         }),
       });
 
@@ -516,15 +596,16 @@ export const CitasMedicas = () => {
   };
 
 
-  const agregarListaEspera = async (pacienteId) => {
+  const agregarListaEspera = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/agregarListaEspera`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          codcita: selectCita.id,
-          codpaci: pacienteId,
-          motivo_consulta: motivoCita
+          codcita: selectCita.codcita,
+          codpaci: pacienteSeleccionado,
+          motivo_consulta: motivoCita,
+          servicios: serviciosSeleccionados.map(s => s.value),
         }),
       });
 
@@ -598,7 +679,7 @@ export const CitasMedicas = () => {
     <div className=''>
       <CustomDataTable
         title="Gestión de Citas Medicas"
-        columns={userColumns(setCitas, handleEditCita, abrirModal, handleReagendarCita, handleCancelarCita)}
+        columns={userColumns(setCitas, handleEditCita, abrirModal, handleReagendarCita, handleCancelarCita,handleCompletarCita)}
         data={filteredItems}
         subHeaderComponent={subHeaderComponentMemo}
       />
@@ -642,27 +723,27 @@ export const CitasMedicas = () => {
                 </Form.Group>
               </Col>
             </Row>
-                <Form.Group className="mb-3">
-                  <Form.Label>Servicios (máx. 2)</Form.Label>
-                  <Select
-                    options={serviciosDoc.map(serv => ({
-                      label: serv.nombre,
-                      value: serv.id
-                    }))}
-                    isMulti
-                    closeMenuOnSelect={false}
-                    placeholder="Seleccione servicios"
-                    value={serviciosSeleccionados}
-                    onChange={(selectedOptions) => {
-                      if (selectedOptions.length <= 2) {
-                        setServiciosSeleccionados(selectedOptions);
-                      }
-                    }}
-                  />
-                  {serviciosSeleccionados.length >= 2 && (
-                    <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
-                  )}
-                </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Servicios (máx. 2)</Form.Label>
+              <Select
+                options={serviciosDoc.map(serv => ({
+                  label: serv.nombre,
+                  value: serv.id
+                }))}
+                isMulti
+                closeMenuOnSelect={false}
+                placeholder="Seleccione servicios"
+                value={serviciosSeleccionados}
+                onChange={(selectedOptions) => {
+                  if (selectedOptions.length <= 2) {
+                    setServiciosSeleccionados(selectedOptions);
+                  }
+                }}
+              />
+              {serviciosSeleccionados.length >= 2 && (
+                <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+              )}
+            </Form.Group>
             {!editingCita && (
               <Row>
                 <Col md={6}>
@@ -718,33 +799,67 @@ export const CitasMedicas = () => {
             <Col>
               <Form>
                 <Row>
-                  <Col md={12}>
-                    <Select
-                      options={opcionesPacientes}
-                      placeholder="Selecciona un paciente"
-                      isClearable
-                      value={
-                        pacienteSeleccionado
-                          ? pacientes.map(p => ({ value: p.id, label: p.nombreUsuario })).find(op => op.value === pacienteSeleccionado)
-                          : null
-                      }
+                  <Col >
+                    <Form.Group>
+                      <Form.Label>Paciente</Form.Label>
+                      <Select
+                        options={opcionesPacientes}
+                        placeholder="Selecciona un paciente"
+                        isClearable
+                        value={
+                          pacienteSeleccionado
+                            ? pacientes.map(p => ({ value: p.id, label: p.nombreUsuario })).find(op => op.value === pacienteSeleccionado)
+                            : null
+                        }
 
-                      onChange={(selected) => setPacienteSeleccionado(selected ? selected.value : null)}
-                    />
+                        onChange={(selected) => setPacienteSeleccionado(selected ? selected.value : null)}
+                      />
+                    </Form.Group>
+
                   </Col>
-                </Row>
-                <Row>
-                  <Col md={3}>
-                    <Form.Group className="mb-3">
+                  <Col >
+                    <Form.Group>
                       <Form.Label>Doctor</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={doctor}
-                        onChange={(e) => setDoctor(e.target.value)}
-                        readOnly
+                      <Select
+                        options={opcionesDoctores}
+                        placeholder="Seleccione un doctor"
+                        isClearable
+                        isDisabled={true}
+                        value={opcionesDoctores.find(op => op.value === doctor) || null}
+                        onChange={(selected) => {
+                          const doctorId = selected ? selected.value : null;
+                          setDoctor(doctorId);
+                          if (doctorId) {
+                            getServiciosAsignados(doctorId, setServiciosDoc);
+                          } else {
+                            setServiciosDoc([]);
+                          }
+                        }}
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            backgroundColor: 'white',
+                            opacity: 1,
+                            cursor: 'default',
+                            color: '#000',
+                            borderColor: '#ced4da',
+                            boxShadow: 'none',
+                          }),
+                          singleValue: (base) => ({
+                            ...base,
+                            color: '#000'
+                          }),
+                          indicatorsContainer: (base) => ({
+                            ...base,
+                            display: 'none'
+                          })
+                        }}
                       />
                     </Form.Group>
                   </Col>
+                </Row>
+                <Row>
+
 
                   <Col md={3}>
                     <Form.Group className="mb-3">
@@ -786,7 +901,7 @@ export const CitasMedicas = () => {
                   </Col>
 
                 </Row>
-   <Form.Group className="mb-3">
+                <Form.Group className="mb-3">
                   <Form.Label>Servicios (máx. 2)</Form.Label>
                   <Select
                     options={serviciosDoc.map(serv => ({

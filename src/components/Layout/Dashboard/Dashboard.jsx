@@ -23,7 +23,9 @@ import {
   FaComments,
   FaShieldAlt,
   FaFileContract,
-  FaGavel
+  FaGavel,
+  FaLink,
+  FaLock
 } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppRouter } from "../../../router/AppRouter";
@@ -102,7 +104,7 @@ export const Sidebar = () => {
                   Expedientes
                 </ListGroup.Item>
                     <ListGroup.Item as={NavLink} to="/Asignar_Servicios" style={{ backgroundColor: "#2c245b", color: "white" }}>
-                  <FaFolderOpen className="me-2" />
+                  <FaLink className="me-2" />
                   Asignar Servicios
                 </ListGroup.Item>
                 <ListGroup.Item as={NavLink} to="/Horarios_Citas" style={{ backgroundColor: "#2c245b", color: "white" }}>
@@ -113,9 +115,9 @@ export const Sidebar = () => {
                   <FaPrescriptionBottleAlt className="me-2" />
                   Recetas
                 </ListGroup.Item>
-                <ListGroup.Item as={NavLink} to="/Act_Expediente" style={{ backgroundColor: "#2c245b", color: "white" }}>
-                  <FaFileMedical className="me-2" />
-                  Actualizar Expediente
+                   <ListGroup.Item as={NavLink} to="/Predicciones" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                  <FaPrescriptionBottleAlt className="me-2" />
+                  Predicciones
                 </ListGroup.Item>
               </ListGroup>
             </Accordion.Body>
@@ -133,7 +135,10 @@ export const Sidebar = () => {
                   <FaClock className="me-2" />
                   Horario
                 </ListGroup.Item>
-
+       <ListGroup.Item as={NavLink} to="/Inicio/NoticiasForm" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                  <FaUserCog className="me-2" />
+                  Noticias
+                </ListGroup.Item>
                 <ListGroup.Item as={NavLink} to="/Gestion_Usuarios" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaUserCog className="me-2" />
                   Gestionar Usuarios
@@ -155,17 +160,21 @@ export const Sidebar = () => {
             <Accordion.Header>Doc Regulatorio</Accordion.Header>
             <Accordion.Body className="p-0" style={{ backgroundColor: "#2c245b" }}>
               <ListGroup variant="flush">
-                <ListGroup.Item as={NavLink} to="/CRUDPoliticas" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Home/Politicas_De_Privacidad" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaShieldAlt className="me-2" />
                   Políticas de Privacidad
                 </ListGroup.Item>
-                <ListGroup.Item as={NavLink} to="/CRUDTerminos" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Home/Terminos_Y_Condiciones" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaFileContract className="me-2" />
                   Términos y Condiciones
                 </ListGroup.Item>
-                <ListGroup.Item as={NavLink} to="/CRUDDeslinde" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Home/Deslinde_Legal" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaGavel className="me-2" />
                   Deslinde Legal
+                </ListGroup.Item>
+                   <ListGroup.Item as={NavLink} to="/Home/Aviso_De_Privacidad" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                  <FaLock className="me-2" />
+                  Aviso De Privacidad
                 </ListGroup.Item>
               </ListGroup>
             </Accordion.Body>

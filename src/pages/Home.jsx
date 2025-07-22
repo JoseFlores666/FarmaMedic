@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import './Home.css';
-import { motion, AnimatePresence } from "framer-motion";
-import { Button, Card, Carousel, Col, Container, Row } from 'react-bootstrap';
+import { motion } from "framer-motion";
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaAmbulance, FaCheckCircle, FaMedal, FaMobileAlt, FaSpa, FaStar, FaStethoscope } from 'react-icons/fa';
+import { FaAmbulance, FaCheckCircle, FaMedal, FaMobileAlt, FaSpa, FaStethoscope } from 'react-icons/fa';
 import { Contactanos } from './Clients/Contactanos';
+import Opiniones from './AcercaDe/Opiniones';
+import { Noticias } from './noticias/noticias';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ export const Home = () => {
       const y = contactoDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
-
   };
 
   const scrollToConocenos = () => {
@@ -33,6 +34,7 @@ export const Home = () => {
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
+
   useEffect(() => {
     if (opiniones.length > 0) {
       const interval = setInterval(() => {
@@ -205,49 +207,38 @@ export const Home = () => {
         <h2 className="text-center mb-5">Nuestros Servicios</h2>
         <Row className="g-4 mb-5">
           {servicios.map((service) => (
-            <Col key={service.id} lg={3} md={6} sm={6} xs={12}>
+            <Col key={service.id} lg={3} md={6} sm={6} xs={12} className="d-flex">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
                 whileHover={{ scale: 1.05 }}
+                className="w-100"
               >
-                <Card className="shadow-lg border service-card h-100">
-                  <div style={{ height: '180px', overflow: 'hidden' }}>
-                    <Card.Img
-                      variant="top"
-                      src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
-                      alt="service-icon"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <Card.Body className="d-flex flex-column justify-content-between">
-                    <div className='mb-1'>
-                      <Card.Title className="fw-semibold fs-5">{service.nombre}</Card.Title>
-                      <Card.Text className="text-muted">
-                        {service.descripcion
-                          ? service.descripcion.length > 70
-                            ? service.descripcion.substring(0, 70) + '...'
-                            : service.descripcion
-                          : "Descripción no disponible"}
-                      </Card.Text>
+                <Link to={`/servicios/${service.id}`} className="text-decoration-none text-dark">
+                  <Card className="shadow-lg border service-card h-100" style={{ minHeight: '300px' }}>
+                    <div style={{ height: '180px', overflow: 'hidden' }}>
+                      <Card.Img
+                        variant="top"
+                        src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
+                        alt="service-icon"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </div>
-                    <Link to={`/servicios/${service.id}`}>
-                      <Button variant="outline-primary" size="sm">Leer Más</Button>
-                    </Link>
-                  </Card.Body>
-                </Card>
+                    <Card.Body className="d-flex align-items-center justify-content-center">
+                      <Card.Title className="fw-semibold fs-5 text-center mb-0">{service.nombre}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </Link>
               </motion.div>
             </Col>
           ))}
         </Row>
       </Container>
-
-
 
       <Container className='position-relative'>
         <motion.div
@@ -281,7 +272,7 @@ export const Home = () => {
             zIndex: -1,
           }}
         ></motion.div>
-        <h3 className="text-center mb-4">Nuestro equipo médico</h3>
+        <h3 className="text-center mb-4">Nuestro personal médico</h3>
 
         <Row className="g-3 justify-content-center">
           {doctoresVisibles.map((doctor, index) => (
@@ -336,42 +327,7 @@ export const Home = () => {
       </Container>
 
       <Container className="mt-5">
-        <h3 className='text-center'>Nuestras Instalaciones</h3>
-        <Row className="align-items-center g-4 mt-4">
-          <Col lg={6}>
-            <h2>Las instalaciones clínicas son la columna vertebral de los sistemas de salud modernos</h2>
-            <p>
-              Proporcionan recursos esenciales para el diagnóstico, tratamiento y manejo de diversas afecciones médicas. Estas instalaciones abarcan una amplia gama de entornos, desde hospitales y clínicas hasta laboratorios de diagnóstico y centros de rehabilitación. En este artículo, exploraremos el papel vital que desempeñan las instalaciones clínicas en la prestación de una atención médica de alta calidad y la mejora de los resultados de los pacientes.
-            </p>
-          </Col>
-          <Col lg={6} className="position-relative d-flex justify-content-center">
-            <Carousel>
-              {[
-                "https://fundacionesperanzayalegria.org/wp-content/uploads/2021/07/UCI-MMT-Hospital.jpg",
-                "https://www.rcnradio.com/_next/image?url=https%3A%2F%2Ffiles.rcnradio.com%2Fpublic%2Fstyles%2F16_9%2Fpublic%2F2022-10%2Flos_cobos_2_0.png%3FVersionId%3DOLtng3F0NxivjL5CFxLBNEOBLsCVop8v%26itok%3DrUq_dgwz&w=3840&q=75",
-                "https://grupoors.com.mx/wp-content/uploads/2022/11/Diseno-Hospitales-1200x628-1.jpg",
-              ].map((imgSrc, index) => (
-                <Carousel.Item key={index} interval={1000}>
-                  <img
-                    src={imgSrc}
-                    alt={`Slide ${index + 1}`}
-                    className="d-block w-100"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      aspectRatio: "16/9",
-                    }}
-                  />
-                  <Carousel.Caption>
-                    <h3>{`Slide label ${index + 1}`}</h3>
-                    <p>Descripción del slide.</p>
-                  </Carousel.Caption>
-                </Carousel.Item>
-              ))}
-            </Carousel>
-          </Col>
-        </Row>
+        <Noticias />
       </Container>
 
       <section className='mt-5 overflow-hidden'>
@@ -454,74 +410,15 @@ export const Home = () => {
         </Row>
       </section>
 
+
+
       <Container className='mt-5' id='contacto'>
         <Contactanos />
       </Container>
 
-      <Container className="mt-5 mb-5">
-        <h3 className="text-center">Opiniones de nuestros clientes</h3>
-        <Row className="justify-content-center mt-5">
-          {opiniones.length > 0 ? (
-            <AnimatePresence mode="popLayout">
-              {opiniones.slice(index, index + 3).map((opinion, i) => (
-                <Col key={opinion.id} xs={12} md={6} lg={4} className="rounded mt-3">
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.6, delay: i * 0.2 }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Card
-                      className="text-center mt-4 p-3 shadow-lg"
-                      style={{
-                        border: "6px solid #d3b79a",
-                        backgroundColor: "#2c245b",
-                        height: "250px",
-                      }}
-                    >
-                      <Card.Img
-                        variant="top"
-                        src={opinion.foto_perfil}
-                        className="rounded-circle mx-auto"
-                        style={{
-                          width: "90px",
-                          height: "90px",
-                          objectFit: "cover",
-                          border: "6px solid #d3b79a",
-                          marginTop: "-60px",
-                          zIndex: "1",
-                        }}
-                      />
-                      <h5 className="text-white fs-3">{opinion.usuario_nombre}</h5>
-                      <div className="d-flex justify-content-center mt-2">
-                        {[...Array(opinion.estrellas || 5)].map((_, j) => (
-                          <FaStar key={j} style={{ color: "#f39c12", margin: "0 2px" }} />
-                        ))}
-                      </div>
-                      <Card.Body>
-                        <Card.Text className="text-white">{opinion.opinion}</Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </motion.div>
-                </Col>
-              ))}
-            </AnimatePresence>
-          ) : (
-            <p className="text-center text-muted">No hay opiniones disponibles.</p>
-          )}
-        </Row>
-        <div className="mt-4 d-flex justify-content-center">
-          <Button
-            variant="outline-primary"
-            size="lg"
-            className="w-100 w-md-auto shadow-sm rounded-pill px-4 py-2"
 
-            onClick={() => navigate('/Inicio/Ayuda/Opiniones')}
-          >
-            Mostrar Todas
-          </Button>
-        </div>
+      <Container className='mt-5' id='contacto'>
+        <Opiniones />
       </Container>
     </div>
   );
