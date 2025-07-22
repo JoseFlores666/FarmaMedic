@@ -15,7 +15,7 @@ const Resultados = () => {
 
   // Obtener métricas de clasificación
   useEffect(() => {
-    axios.get('http://127.0.0.1:5001/metrics')
+    axios.get('https://pm3flask.onrender.com/metrics')
       .then(res => {
         setAccuracy(res.data.accuracy);
         setConfMatrix(res.data.confusion_matrix);
@@ -25,7 +25,7 @@ const Resultados = () => {
 
   // Obtener reglas de asociación
   useEffect(() => {
-    axios.get('http://127.0.0.1:5001/rules')
+    axios.get('https://pm3flask.onrender.com/rules')
       .then(res => setRules(res.data))
       .catch(err => console.error('Error al cargar reglas:', err));
   }, []);

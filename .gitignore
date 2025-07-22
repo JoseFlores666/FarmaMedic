@@ -27,3 +27,5 @@ ssl/*
 *.sln
 *.sw?
 *.env
+
+*vite.config.js
