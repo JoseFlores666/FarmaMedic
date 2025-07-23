@@ -33,6 +33,7 @@ import { useAuth } from "../../../context/useAuth";
 import "./styles.css";
 import ScrollToTop from '../Navbar/ScrollTop';
 import Breadcrumbs from "../../Breadcrumbs";
+import ThemeToggle from "../../../util/theme-toggler";
 
 export const Sidebar = () => {
   const { isAuthenticated, role } = useAuth();
@@ -103,7 +104,7 @@ export const Sidebar = () => {
                   <FaFolderOpen className="me-2" />
                   Expedientes
                 </ListGroup.Item>
-                    <ListGroup.Item as={NavLink} to="/Asignar_Servicios" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Asignar_Servicios" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaLink className="me-2" />
                   Asignar Servicios
                 </ListGroup.Item>
@@ -115,7 +116,7 @@ export const Sidebar = () => {
                   <FaPrescriptionBottleAlt className="me-2" />
                   Recetas
                 </ListGroup.Item>
-                   <ListGroup.Item as={NavLink} to="/Predicciones" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Predicciones" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaPrescriptionBottleAlt className="me-2" />
                   Predicciones
                 </ListGroup.Item>
@@ -135,7 +136,7 @@ export const Sidebar = () => {
                   <FaClock className="me-2" />
                   Horario
                 </ListGroup.Item>
-       <ListGroup.Item as={NavLink} to="/Inicio/NoticiasForm" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Inicio/NoticiasForm" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaUserCog className="me-2" />
                   Noticias
                 </ListGroup.Item>
@@ -172,7 +173,7 @@ export const Sidebar = () => {
                   <FaGavel className="me-2" />
                   Deslinde Legal
                 </ListGroup.Item>
-                   <ListGroup.Item as={NavLink} to="/Home/Aviso_De_Privacidad" style={{ backgroundColor: "#2c245b", color: "white" }}>
+                <ListGroup.Item as={NavLink} to="/Home/Aviso_De_Privacidad" style={{ backgroundColor: "#2c245b", color: "white" }}>
                   <FaLock className="me-2" />
                   Aviso De Privacidad
                 </ListGroup.Item>
@@ -356,6 +357,7 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
             </Nav>
 
           </Navbar.Collapse>
+          <ThemeToggle></ThemeToggle>
 
         </Navbar>
 
