@@ -7,15 +7,30 @@ const VistaAviso = ({ showModal, onClose }) => {
   Modal.setAppElement('#root');
 
   useEffect(() => {
-    const fetchDeslindes = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/getCurrentAvisosPriv`);
-        const data = await response.json();
-        setDeslindes(data);
-      } catch (error) {
-        console.error('Error al obtener los deslindes:', error);
-      }
-    };
+   const fetchDeslindes = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/getCurrentAvisosPriv`);
+
+    if (!response.ok) {
+      const errorText = await response.text(); // para ver qué regresó el backend
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data)) {
+      setDeslindes(data);
+    } else {
+      console.error('La respuesta no es un array:', data);
+      setDeslindes([]); // evita que crashee
+    }
+
+  } catch (error) {
+    console.error('Error al obtener los deslindes:', error);
+    setDeslindes([]); // fallback seguro
+  }
+};
+
     fetchDeslindes();
   }, []);
 

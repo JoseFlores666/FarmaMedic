@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import './Home.css';
 import { motion } from "framer-motion";
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaAmbulance, FaCheckCircle, FaMedal, FaMobileAlt, FaSpa, FaStethoscope } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { Contactanos } from './Clients/Contactanos';
 import Opiniones from './AcercaDe/Opiniones';
 import { Noticias } from './noticias/Noticias';
+import ServiciosPage from './servicios/ServiciosPage';
+import Mejores from './top/Mejores';
 
 export const Home = () => {
   const navigate = useNavigate();
   const [empresa, setEmpresa] = useState([]);
-  const [servicios, setServicios] = useState([]);
   const [doctores, setDoctores] = useState([]);
   const [opiniones, setOpiniones] = useState([]);
   const [index, setIndex] = useState(0);
@@ -65,17 +65,6 @@ export const Home = () => {
     }
   };
 
-  const getServicios = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/getServicios`);
-      if (!response.ok) throw new Error('Error al obtener servicios');
-      const data = await response.json();
-      setServicios(data);
-    } catch (err) {
-      setError(err);
-    }
-  };
-
   const getDoctores = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/getDoc`);
@@ -103,7 +92,6 @@ export const Home = () => {
   useEffect(() => {
     getOpinions();
     getEmpresa()
-    getServicios()
     getDoctores()
   }, []);
 
@@ -158,15 +146,15 @@ export const Home = () => {
                 }}
               />
               <img
-                src={'https://pngimg.com/d/doctor_PNG15987.png'}
+                src={'https://res.cloudinary.com/dzppbjrlm/image/upload/v1753331868/doc-Photoroom_1_wunkih.png'}
                 alt="doctor"
                 className="img-fluid position-absolute"
                 style={{
-                  width: "60%",
+                  width: "70%",
                   maxWidth: "100%",
                   height: "auto",
-                  bottom: "1%",
-                  left: "50%",
+                  bottom: "5%",
+                  left: "47%",
                   transform: "translateX(-45%)",
                 }}
               />
@@ -204,40 +192,7 @@ export const Home = () => {
 
 
       <Container>
-        <h2 className="text-center mb-5">Nuestros Servicios</h2>
-        <Row className="g-4 mb-5">
-          {servicios.map((service) => (
-            <Col key={service.id} lg={3} md={6} sm={6} xs={12} className="d-flex">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-                className="w-100"
-              >
-                <Link to={`/servicios/${service.id}`} className="text-decoration-none text-dark">
-                  <Card className="shadow-lg border service-card h-100" style={{ minHeight: '300px' }}>
-                    <div style={{ height: '180px', overflow: 'hidden' }}>
-                      <Card.Img
-                        variant="top"
-                        src={service.imagen || "https://www.eabel.com/wp-content/uploads/2021/04/P08-s02-img6.jpg"}
-                        alt="service-icon"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                    <Card.Body className="d-flex align-items-center justify-content-center">
-                      <Card.Title className="fw-semibold fs-5 text-center mb-0">{service.nombre}</Card.Title>
-                    </Card.Body>
-                  </Card>
-                </Link>
-              </motion.div>
-            </Col>
-          ))}
-        </Row>
+       <ServiciosPage/>
       </Container>
 
       <Container className='position-relative'>
@@ -330,87 +285,9 @@ export const Home = () => {
         <Noticias />
       </Container>
 
-      <section className='mt-5 overflow-hidden'>
-        <Row>
-          <Col
-            md={4}
-            className="d-flex align-items-center justify-content-center"
-            style={{
-              backgroundColor: "#d3b79a",
-              backgroundImage: "url('https://cdn-icons-png.flaticon.com/512/1509/1509538.png')",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-            }}
-          >
-          </Col>
-
-          <Col
-            md={8}
-            className="py-5 px-4 text-white"
-            style={{
-              backgroundColor: "#2c245b",
-            }}
-          >
-            <h2 className="fw-bold mb-3">¿Por qué somos los mejores?</h2>
-            <p className="mb-5">
-              Ofrecemos atención médica profesional, rápida y de calidad. Nuestro compromiso es con tu salud.
-            </p>
-            <Row className="text-center text-white">
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaMobileAlt size={36} />
-                  </div>
-                  <h6>Atención Médica Online</h6>
-                </div>
-              </Col>
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaSpa size={36} />
-                  </div>
-                  <h6>Experiencia de Bienestar</h6>
-                </div>
-              </Col>
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaStethoscope size={36} />
-                  </div>
-                  <h6>Consulta Médica Profesional</h6>
-                </div>
-              </Col>
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaAmbulance size={36} />
-                  </div>
-                  <h6>Servicios de Urgencias</h6>
-                </div>
-              </Col>
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaCheckCircle size={36} />
-                  </div>
-                  <h6>Empresas Acreditadas</h6>
-                </div>
-              </Col>
-              <Col md={4} className="mb-4">
-                <div className="service-box">
-                  <div className="icon-circle">
-                    <FaMedal size={36} />
-                  </div>
-                  <h6>Calidad y Acreditación</h6>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+      <section className='mt-5'>
+       <Mejores/>
       </section>
-
-
 
       <Container className='mt-5' id='contacto'>
         <Contactanos />

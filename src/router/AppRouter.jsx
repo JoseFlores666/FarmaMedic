@@ -1,10 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 import { PrivateRoute } from './PrivateRoute';
 import { Home } from '../pages';
-
 import { Error400, Error500, Error404 } from '../components/ErrorPages';
 import { Register, Login, OTPInput, ForgotPassword } from '../pages/auth';
-
 import Deslinde from '../pages/DocRegulatorio/Deslinde';
 import Politicas from '../pages/DocRegulatorio/Politicas';
 import Terminos from '../pages/DocRegulatorio/Terminos';
@@ -42,6 +40,7 @@ import AvisoPriv from '../pages/DocRegulatorio/AvisoPriv';
 import { NoticiasAdmin } from '../pages/noticias/NoticiasAdmin';
 import NoticiasPost from '../pages/noticias/NoticiasAll';
 import Resultados from '../pages/Predicciones/Resultados';
+import ServicioDetalle from '../pages/servicios/ServicioDetalle';
 
 export const AppRouter = () => {
 	return (
@@ -49,6 +48,7 @@ export const AppRouter = () => {
 			<Routes>
 				<Route path='/' element={<Home />} />
 				<Route path='/Inicio' element={<Home />} />
+
 				{/* {Parte del auth login resgitro verificacion etc} */}
 				<Route path='/Acceder' element={<Login />} />
 				<Route path='/Registrarse' element={<Register />} />
@@ -76,6 +76,7 @@ export const AppRouter = () => {
 				<Route path='/Inicio/Expediente' element={<PrivateRoute><ExpedienteUsuario /></PrivateRoute>} />
 				<Route path='/Inicio/Busqueda' element={<Busqueda />} />
 
+				<Route path="/Inicio/:id" element={<ServicioDetalle/>} />
 
 				{/* {Documentos Regulatorios} */}
 				<Route path='/Home/Deslinde_Legal' element={<PrivateRoute><Deslinde /></PrivateRoute>} />
@@ -94,7 +95,6 @@ export const AppRouter = () => {
 				<Route path='/Asignar_Servicios' element={<PrivateRoute><AsignarServicios /></PrivateRoute>} />
 
 				{/* {Parte de la gestion clientes} */}
-				<Route path='/CRUDOpiniones' element={<PrivateRoute><GestionOpiniones /></PrivateRoute>} />
 				<Route path='/CRUDOpiniones' element={<PrivateRoute><GestionOpiniones /></PrivateRoute>} />
 
 				{/*Acerca del sitio */}

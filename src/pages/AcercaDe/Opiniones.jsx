@@ -83,11 +83,18 @@ const Opiniones = () => {
 
     return (
         <div className="mb-5">
-            <div className="text-center">
-
-                <h5 className="text-muted mb-2">Testimonios</h5>
-                <h2 className="fw-bold mb-2">Comparte tu experiencia</h2>
-
+            <div className="text-center mb-4">
+            <h5 className="text-muted mb-1">Testimonios</h5>
+            <h2 className="fw-bold">Comparte tu experiencia</h2>
+                <div
+                    style={{
+                        height: '3px',
+                        width: '160px',
+                        margin: '10px auto 20px',
+                        backgroundColor: '#0d6efd',
+                        borderRadius: '2px',
+                    }}
+                ></div>
             </div>
             <Row className="g-4">
                 <Col md={8}>

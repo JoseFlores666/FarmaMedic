@@ -30,7 +30,7 @@ export const Register = () => {
     const [captchaValue, setCaptchaValue] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-const [showAvisoModal, setShowAvisoModal] = useState(false); // Aviso de Privacidad
+    const [showAvisoModal, setShowAvisoModal] = useState(false);
 
     const { usuario, nombre, apellidoPaterno, apellidoMaterno, edad, telefono, genero, correo, password, confirmPassword, onInputChange, onResetForm } = useForm({
         usuario: '',
@@ -58,8 +58,8 @@ const [showAvisoModal, setShowAvisoModal] = useState(false); // Aviso de Privaci
     const closeDeslindeModal2 = () => setShowModal2(false);
     const openDeslindeModal3 = () => setShowModal3(true);
     const closeDeslindeModal3 = () => setShowModal3(false);
-const openAvisoModal     = () => setShowAvisoModal(true);     // Aviso
-const closeAvisoModal     = () => setShowAvisoModal(false);
+    const openAvisoModal = () => setShowAvisoModal(true);     // Aviso
+    const closeAvisoModal = () => setShowAvisoModal(false);
 
     const validateCorreo = (correo) => /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(correo);
     const validatePassword = (password) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{8,50}$/.test(password);

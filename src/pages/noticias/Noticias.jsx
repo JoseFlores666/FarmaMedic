@@ -19,7 +19,16 @@ export const Noticias = () => {
         const cargarNoticias = async () => {
             try {
                 const data = await getNoticias();
-                setNoticias(data.slice(0, 4));
+
+                // Aquí defines el orden que quieres, según los IDs de tus noticias
+                const ordenPersonalizado = [20, 19, 21, 3];
+
+                // Filtrar y ordenar las noticias según el orden personalizado
+                const dataOrdenada = ordenPersonalizado
+                    .map((id) => data.find((item) => item.id === id))
+                    .filter(Boolean); // Filtrar undefined si algún id no existe
+
+                setNoticias(dataOrdenada);
             } catch (error) {
                 console.error('Error al cargar noticias:', error.message);
             }
@@ -63,13 +72,25 @@ export const Noticias = () => {
     }
 
     return (
-        <div className="">
-            <div className="text-center">
-                <h5 className="text-muted mb-2">Noticias destacadas</h5>
-                <h2 className="display-6 fw-semibold">Mantente informado con FarmaMedic</h2>
+        <div>
+            <div className="text-center mb-4">
+                <h5 className="text-muted mb-1">Noticias destacadas</h5>
+                <h2 className="fw-bold">
+                    Mantente informado con <span style={{ color: '#0d6efd' }}>FarmaMedic</span>
+                </h2>
+                <div
+                    style={{
+                        height: '3px',
+                        width: '160px',
+                        margin: '10px auto 20px',
+                        backgroundColor: '#0d6efd',
+                        borderRadius: '2px',
+                    }}
+                ></div>
             </div>
 
             <MDBRow>
+                {/* Bloque grande */}
                 <MDBCol md='8'>
                     <div className='pb-3'>
                         <motion.div whileHover={{ scale: 1.02 }} className="w-100 h-100">
@@ -95,6 +116,7 @@ export const Noticias = () => {
                         </motion.div>
                     </div>
 
+                    {/* Dos imágenes medianas */}
                     <MDBRow>
                         <MDBCol md='6' className="pb-2 pb-md-0">
                             <motion.div whileHover={{ scale: 1.02 }} className="w-100 h-100">
@@ -145,6 +167,7 @@ export const Noticias = () => {
                     </MDBRow>
                 </MDBCol>
 
+                {/* Imagen lateral */}
                 <MDBCol md='4'>
                     <motion.div whileHover={{ scale: 1.02 }} className="w-100 h-100">
                         <MDBCard className="position-relative" style={{ height: '520px', overflow: 'hidden' }}>
@@ -175,13 +198,12 @@ export const Noticias = () => {
                     Mostrar todas las noticias
                 </Button>
             </div>
-
         </div>
     );
 };
 
 Noticias.propTypes = {
-    titulo: PropTypes.string.isRequired,
-    descripcion: PropTypes.string.isRequired,
+    titulo: PropTypes.string,
+    descripcion: PropTypes.string,
     showDescription: PropTypes.bool,
 };

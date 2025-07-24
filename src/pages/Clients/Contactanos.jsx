@@ -78,8 +78,20 @@ export const Contactanos = () => {
 
         <div >
             <div className="text-center">
-                <h5 className="text-muted mb-2">Contacto</h5>
-                <h2 className="fw-bold mb-2">Envíanos un Mensaje</h2>
+
+            </div>
+            <div className="text-center mb-4">
+                <h5 className="text-muted mb-1">Contacto</h5>
+                <h2 className="fw-bold ">Envíanos un Mensaje</h2>
+                <div
+                    style={{
+                        height: '3px',
+                        width: '160px',
+                        margin: '10px auto 20px',
+                        backgroundColor: '#0d6efd',
+                        borderRadius: '2px',
+                    }}
+                ></div>
             </div>
             <div className="contact-right text-white p-4 rounded" style={{ backgroundColor: "#2c245b" }}>
 
@@ -87,7 +99,7 @@ export const Contactanos = () => {
                     <Col md={7} className="">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <div className="d-flex align-items-center">
-                                <FaMapMarkedAlt size={25       } className="me-2" />
+                                <FaMapMarkedAlt size={25} className="me-2" />
                                 <span className="fw-bold fs-4">Ubicación</span>
                             </div>
 
@@ -96,17 +108,14 @@ export const Contactanos = () => {
                             </Button>
                         </div>
 
-
                         <iframe
-                            src="https://maps.google.com/maps?width=286&amp;height=217&amp;hl=en&amp;q=san%20felipe%20orizatlan%20+(far)&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                            width="100%"
+                            src="https://www.google.com/maps/embed?pb=!4v1753337142087!6m8!1m7!1sURp4GOPvjupI2rMzcr2xCg!2m2!1d21.13610771841157!2d-98.53699619284265!3f129.2887256405927!4f-4.479242399518057!5f1.3459263108804513" width="100%"
                             height="407"
                             loading="lazy"
                             title="Location Map"
                             style={{ border: 0, borderRadius: '8px' }}
                             allowFullScreen
                         ></iframe>
-
                     </Col>
 
                     <Col md={5}>
