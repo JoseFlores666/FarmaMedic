@@ -20,7 +20,7 @@ const Resultados = () => {
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5000/predecir');
+        const res = await fetch('https://pm3flask.onrender.com/predecir');
         const data = await res.json();
         setPredicciones(data);
       } catch (error) {
@@ -107,7 +107,6 @@ const Resultados = () => {
         </Row>
       )}
 
-      {/* Modal con resultado */}
       <Modal show={showModal} onHide={cerrarModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Resultado de la Predicción</Modal.Title>

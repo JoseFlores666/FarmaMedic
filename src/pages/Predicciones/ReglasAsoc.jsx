@@ -15,7 +15,6 @@ const ReglasAsoc = () => {
     const [modalData, setModalData] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    // Lista estática de antecedentes que quieres mostrar
     const antecedentesSeleccionados = [
         "Delia, Control de embarazo.",
         "Gregorio, Control de embarazo.",
@@ -28,7 +27,7 @@ const ReglasAsoc = () => {
     useEffect(() => {
         const obtenerReglas = async () => {
             try {
-                const res = await fetch('http://127.0.0.1:5000/reglas');
+                const res = await fetch('https://pm3flask.onrender.com/reglas');
                 const data = await res.json();
                 setReglas(data);
             } catch (error) {
@@ -51,7 +50,6 @@ const ReglasAsoc = () => {
         setModalData(null);
     };
 
-    // Filtrar reglas solo para los antecedentes definidos
     const reglasFiltradas = reglas
         .filter(r => antecedentesSeleccionados.includes(r.antecedents))
         .map(r => ({
@@ -93,7 +91,6 @@ const ReglasAsoc = () => {
                 </Row>
             )}
 
-            {/* Modal para mostrar servicios */}
             <Modal show={showModal} onHide={cerrarModal} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Servicios asociados</Modal.Title>
@@ -103,10 +100,10 @@ const ReglasAsoc = () => {
                         <>
                             <h5 className="fw-bold mb-3">{modalData.antecedents}</h5>
                             <ul>
-                                <li><strong>🩺 Servicio:</strong> {modalData.consequents}</li>
-                                <li><strong>✅ Confianza:</strong> {modalData.confidence.toFixed(2)}</li>
-                                <li><strong>📈 Lift:</strong> {modalData.lift.toFixed(2)}</li>
-                                <li><strong>📊 Soporte:</strong> {modalData.support}</li>
+                                <li><strong>Servicio:</strong> {modalData.consequents}</li>
+                                <li><strong>Confianza:</strong> {modalData.confidence.toFixed(2)}</li>
+                                <li><strong>Lift:</strong> {modalData.lift.toFixed(2)}</li>
+                                <li><strong>Soporte:</strong> {modalData.support}</li>
                             </ul>
                         </>
                     )}
