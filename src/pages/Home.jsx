@@ -8,6 +8,7 @@ import Opiniones from './AcercaDe/Opiniones';
 import { Noticias } from './noticias/Noticias';
 import ServiciosPage from './servicios/ServiciosPage';
 import Mejores from './top/Mejores';
+import ReglasAsoc from './Predicciones/ReglasAsoc';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -279,6 +280,10 @@ export const Home = () => {
             </Button>
           ))}
         </div>
+      </Container>
+
+         <Container className='mt-5' id='contacto'>
+        <ReglasAsoc />
       </Container>
 
       <Container className="mt-5">
