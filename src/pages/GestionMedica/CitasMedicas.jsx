@@ -724,7 +724,7 @@ const handleCompletarCita = async (cita) => {
               </Col>
             </Row>
             <Form.Group className="mb-3">
-              <Form.Label>Servicios (máx. 2)</Form.Label>
+              <Form.Label>Servicios (máx. 1)</Form.Label>
               <Select
                 options={serviciosDoc.map(serv => ({
                   label: serv.nombre,
@@ -735,13 +735,13 @@ const handleCompletarCita = async (cita) => {
                 placeholder="Seleccione servicios"
                 value={serviciosSeleccionados}
                 onChange={(selectedOptions) => {
-                  if (selectedOptions.length <= 2) {
+                  if (selectedOptions.length <= 1) {
                     setServiciosSeleccionados(selectedOptions);
                   }
                 }}
               />
-              {serviciosSeleccionados.length >= 2 && (
-                <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+              {serviciosSeleccionados.length >= 1 && (
+                <small style={{ color: 'red' }}>Solo se permite 1 servicio.</small>
               )}
             </Form.Group>
             {!editingCita && (
@@ -913,13 +913,13 @@ const handleCompletarCita = async (cita) => {
                     placeholder="Seleccione servicios"
                     value={serviciosSeleccionados}
                     onChange={(selectedOptions) => {
-                      if (selectedOptions.length <= 2) {
+                      if (selectedOptions.length <= 1) {
                         setServiciosSeleccionados(selectedOptions);
                       }
                     }}
                   />
-                  {serviciosSeleccionados.length >= 2 && (
-                    <small style={{ color: 'red' }}>Solo se permiten hasta 2 servicios.</small>
+                  {serviciosSeleccionados.length >= 1 && (
+                    <small style={{ color: 'red' }}>Solo se permite 1 servicio.</small>
                   )}
                 </Form.Group>
                 <Form.Group className="mb-3">

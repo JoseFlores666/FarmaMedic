@@ -59,21 +59,21 @@ export const NoticiasAdmin = () => {
     }));
   };
 
-const handleSubmit = async e => {
-  e.preventDefault();
+  const handleSubmit = async e => {
+    e.preventDefault();
 
-  if (isSubmitting) return;
-  setIsSubmitting(true); 
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-  const data = new FormData();
-  data.append('titulo', formData.titulo);
-  data.append('descripcion', formData.descripcion);
+    const data = new FormData();
+    data.append('titulo', formData.titulo);
+    data.append('descripcion', formData.descripcion);
 
-  if (formData.imagen instanceof File && formData.imagen.size > 0) {
-    data.append('imagen', formData.imagen);
-  }
+    if (formData.imagen instanceof File && formData.imagen.size > 0) {
+      data.append('imagen', formData.imagen);
+    }
 
-   try {
+    try {
       if (editMode) {
         await axios.put(`${import.meta.env.VITE_API_URL}/updateNoticia/${currentId}`, data);
         Swal.fire('Actualizado', 'La noticia fue actualizada correctamente', 'success');
@@ -82,17 +82,17 @@ const handleSubmit = async e => {
         Swal.fire('Guardado', 'La noticia fue creada correctamente', 'success');
       }
 
-      await fetchNoticias(); 
-      handleClose(); 
+      await fetchNoticias();
+      handleClose();
     } catch (err) {
       console.error('Error al guardar/editar noticia:', err);
       Swal.fire('Error', 'Error al guardar o editar la noticia', 'error');
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   };
 
-const handleDelete = async id => {
+  const handleDelete = async id => {
     const result = await Swal.fire({
       title: '¿Eliminar noticia?',
       text: 'Esta acción no se puede deshacer.',
@@ -191,15 +191,15 @@ const handleDelete = async id => {
             </Form.Group>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-<Button
-  variant="primary"
-  type="submit"
-  disabled={isSubmitting}
->
-  {isSubmitting
-    ? (editMode ? 'Actualizando...' : 'Agregando...')
-    : (editMode ? 'Actualizar' : 'Agregar')}
-</Button>
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? (editMode ? 'Actualizando...' : 'Agregando...')
+                  : (editMode ? 'Actualizar' : 'Agregar')}
+              </Button>
             </Modal.Footer>
           </Form>
         </Modal.Body>

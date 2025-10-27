@@ -10,10 +10,9 @@ const Servicios = () => {
     id: null,
     nombre: '',
     descripcion: '',
-    imagen: '',     // URL o path actual para mostrar
-    imagenFile: null, // Archivo seleccionado
+    imagen: '',     
+    imagenFile: null, 
     costo: '',
-    descuento: ''
   });
   const [editMode, setEditMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -57,7 +56,7 @@ const Servicios = () => {
       });
       setEditMode(true);
     } else {
-      setnuevoEnlace({ id: null, nombre: "", descripcion: "", imagen: "", imagenFile: null, costo: "", descuento: "" });
+      setnuevoEnlace({ id: null, nombre: "", descripcion: "", imagen: "", imagenFile: null, costo: ""});
       setEditMode(false);
     }
     setShowModal(true);
@@ -98,7 +97,7 @@ const Servicios = () => {
   };
 
   const resetForm = () => {
-    setnuevoEnlace({ id: null, nombre: '', descripcion: '', imagen: '', imagenFile: null, costo: '', descuento: '' });
+    setnuevoEnlace({ id: null, nombre: '', descripcion: '', imagen: '', imagenFile: null, costo: '' });
     setEditMode(false);
   };
 
@@ -122,7 +121,6 @@ const Servicios = () => {
         formData.append('nombre', nuevoEnlace.nombre);
         formData.append('descripcion', nuevoEnlace.descripcion);
         formData.append('costo', nuevoEnlace.costo);
-        formData.append('descuento', nuevoEnlace.descuento);
         formData.append('id_usuario', userId);
 
         const url = editMode
@@ -191,7 +189,6 @@ const Servicios = () => {
               <th style={{ minWidth: "250px", wordBreak: "break-word" }}>Descripcion</th>
               <th style={{ minWidth: "250px", wordBreak: "break-word" }}>Imagen</th>
               <th style={{ minWidth: "100px" }}>Costo</th>
-              <th style={{ minWidth: "100px" }}>Descuento</th>
               <th style={{ minWidth: "200px" }}>Acciones</th>
             </tr>
           </thead>
@@ -218,7 +215,6 @@ const Servicios = () => {
                     )}
                   </td>
                   <td style={{ wordBreak: "break-word" }}>{item.costo}</td>
-                  <td style={{ wordBreak: "break-word" }}>{item.descuento}</td>
                   <td className="text-center">
                     <Row className="justify-content-center g-2">
                       <Col xs="auto">
@@ -311,7 +307,7 @@ const Servicios = () => {
               )}
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">Costo Normal:</Form.Label>
+              <Form.Label className="fw-bold">Costo:</Form.Label>
               <Form.Control
                 type="number"
                 name="costo"
@@ -323,19 +319,7 @@ const Servicios = () => {
                 step="0.01"
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">Descuento:</Form.Label>
-              <Form.Control
-                type="number"
-                name="descuento"
-                value={nuevoEnlace.descuento}
-                onChange={handleChange}
-                placeholder="Ingrese el descuento"
-                min={0}
-                step="0.01"
-                required
-              />
-            </Form.Group>
+          
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
                 Cancelar

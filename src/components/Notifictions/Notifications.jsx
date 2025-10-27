@@ -18,7 +18,6 @@ const Notifications = ({ setNotificationCount }) => {
         </div>
 
       );
-      // Aumentar el contador y guardar en localStorage
       setNotificationCount(prev => {
         const newCount = prev + 1;
         localStorage.setItem("notificationCount", newCount.toString());

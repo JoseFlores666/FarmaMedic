@@ -23,11 +23,12 @@ const ReglasAsoc = () => {
         "Minerva, Diagnostico médico y tratamiento.",
         "Dolores, Control de embarazo."
     ];
-
+//http://127.0.0.1:5000
+//https://pm3flask.onrender.com
     useEffect(() => {
         const obtenerReglas = async () => {
             try {
-                const res = await fetch('https://pm3flask.onrender.com/reglas');
+                const res = await fetch('http://127.0.0.1:5000/reglas');
                 const data = await res.json();
                 setReglas(data);
             } catch (error) {

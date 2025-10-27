@@ -17,6 +17,7 @@ export const Home = () => {
   const [opiniones, setOpiniones] = useState([]);
   const [index, setIndex] = useState(0);
   const [error, setError] = useState(null);
+  const [mostrarReglas] = useState(false);
 
   const scrollToContacto = () => {
     const contactoDiv = document.getElementById('contacto');
@@ -193,7 +194,7 @@ export const Home = () => {
 
 
       <Container>
-       <ServiciosPage/>
+        <ServiciosPage />
       </Container>
 
       <Container className='position-relative'>
@@ -282,16 +283,19 @@ export const Home = () => {
         </div>
       </Container>
 
-         <Container className='mt-5' id='contacto'>
-        <ReglasAsoc />
-      </Container>
+      {/* Utilize un estado para ocultar las reglas de asociacion ya que fue un trabajo con el doc*/}
+      {mostrarReglas && (
+        <Container className='mt-5' id='contacto'>
+          <ReglasAsoc />
+        </Container>
+      )}
 
       <Container className="mt-5">
         <Noticias />
       </Container>
 
       <section className='mt-5'>
-       <Mejores/>
+        <Mejores />
       </section>
 
       <Container className='mt-5' id='contacto'>

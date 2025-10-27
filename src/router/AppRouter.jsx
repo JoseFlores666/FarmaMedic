@@ -41,6 +41,8 @@ import { NoticiasAdmin } from '../pages/noticias/NoticiasAdmin';
 import NoticiasPost from '../pages/noticias/NoticiasAll';
 import Resultados from '../pages/Predicciones/Resultados';
 import ServicioDetalle from '../pages/servicios/ServicioDetalle';
+import Ruleta from '../pages/Clients/Ruleta';
+import AdminRuleta from '../pages/Admin/AdminRuleta';
 
 export const AppRouter = () => {
 	return (
@@ -75,8 +77,9 @@ export const AppRouter = () => {
 				<Route path='/Inicio/Doctor/Reservar_Cita' element={<PrivateRoute><ReservarCita /></PrivateRoute>} />
 				<Route path='/Inicio/Expediente' element={<PrivateRoute><ExpedienteUsuario /></PrivateRoute>} />
 				<Route path='/Inicio/Busqueda' element={<Busqueda />} />
-
+				<Route path='/Inicio/Ruleta' element={<Ruleta />} />
 				<Route path="/Inicio/:id" element={<ServicioDetalle/>} />
+				<Route path='/Inicio/Editar_Ruleta' element={<AdminRuleta/>}/>
 
 				{/* {Documentos Regulatorios} */}
 				<Route path='/Home/Deslinde_Legal' element={<PrivateRoute><Deslinde /></PrivateRoute>} />

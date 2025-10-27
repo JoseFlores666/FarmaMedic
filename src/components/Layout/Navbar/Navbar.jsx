@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../context/useAuth';
 import ScrollToTop from './ScrollTop';
-import { FaCog, FaHome, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { FaBell, FaCheck, FaCog, FaHome, FaSignInAlt, FaTrashAlt, FaUserPlus } from "react-icons/fa";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
@@ -13,12 +13,69 @@ import { AppRouter } from '../../../router/AppRouter';
 import Breadcrumbs from '../../Breadcrumbs';
 import "../../Layout/Navbar/style.css"
 import ThemeToggle from '../../../util/theme-toggler';
+import axios from "axios";
 
-export const Navbar2 = () => {
+export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti })  => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, username, logout, role } = useAuth();
   const navigate = useNavigate();
   const [logoActivo, setLogoActivo] = useState(null);
+
+  const authData = JSON.parse(localStorage.getItem("authData"));
+  const userId = authData ? authData.id : null;
+
+  const [notificaciones, setNotificaciones] = useState([]);
+
+   const getNotificaciones = async () => {
+      if (!userId) return;
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/getNotiById/${userId}`);
+        setNotificaciones(res.data);
+      } catch (error) {
+        console.error("Error al obtener notificaciones:", error);
+      }
+    };
+  
+    useEffect(() => {
+      getNotificaciones();
+    }, [userId]);
+  
+    const marcarTodasNotiLeidas = async () => {
+      try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/notiLeidas/${userId}`);
+        getNotificaciones();
+      } catch (error) {
+        console.error("Error al marcar todas:", error);
+      }
+    };
+  
+    const eliminarNoti = async (id) => {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/deleteNoti/${id}`);
+        getNotificaciones();
+      } catch (error) {
+        console.error("Error al eliminar notificación:", error);
+      }
+    };
+  
+    const eliminarTodasNoti = async () => {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/deleteNotisAll/${userId}`);
+        getNotificaciones();
+      } catch (error) {
+        console.error("Error al eliminar todas:", error);
+      }
+    };
+  
+    const marcarNotiLeida = async (id) => {
+      try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/notiLeida/${id}`);
+        getNotificaciones();
+      } catch (error) {
+        console.error("Error al marcar notificación:", error);
+      }
+    };
+  
 
   const fetchLogoActivo = useCallback(async () => {
     try {
@@ -157,6 +214,11 @@ export const Navbar2 = () => {
                             Mis Reservaciones
                           </NavDropdown.Item>
                         </NavDropdown>
+                         <NavDropdown title="Mini Juegos" >
+                          <NavDropdown.Item as={NavLink} to="/Inicio/Ruleta" onClick={closeMenu}>
+                            Ruleta de la suerte
+                          </NavDropdown.Item>
+                        </NavDropdown>
                       </>
                     )}
                     {role === 3 && (
@@ -218,6 +280,79 @@ export const Navbar2 = () => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
           <ThemeToggle></ThemeToggle>
+            {authData && (
+        <Nav className="me-3">
+          <NavDropdown
+            align="end"
+            id="notification-dropdown"
+            title={
+              <>
+                <div
+                  className="position-relative"
+                  style={{ color: "white", cursor: "pointer" }}
+                ></div>
+                <FaBell size={20} />
+                {notificationCount > 0 && (
+                  <span
+                    className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
+                    style={{ fontSize: "0.6rem" }}
+                  >
+                    {notificationCount}
+                  </span>
+                )}
+              </>
+            }
+          >
+            <div style={{ maxHeight: "250px", overflowY: "auto" }}>
+              {consNoti && consNoti.length > 0 ? (
+                consNoti.map((noti, index) => (
+                  <NavDropdown.Item
+                    key={index}
+                    className="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <strong>{noti.titulo || "Notificación"}</strong>
+                      <div style={{ fontSize: "0.75rem", color: "#666" }}>
+                        {noti.descripcion || "Sin descripción"}
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center">
+                      <button
+                        className="btn btn-sm btn-outline-success me-1"
+                        title="Marcar como leída"
+                        onClick={() => marcarNotiLeida(noti.id)}
+                      >
+                        <FaCheck />
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        title="Eliminar notificación"
+                        onClick={() => eliminarNoti(noti.id)}
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  </NavDropdown.Item>
+                ))
+              ) : (
+                <NavDropdown.Item disabled>
+                  No tienes notificaciones nuevas
+                </NavDropdown.Item>
+              )}
+            </div>
+
+            <NavDropdown.Divider />
+
+            <NavDropdown.Item onClick={() => marcarTodasNotiLeidas(userId)}>
+              <FaCheck className="me-2 text-success" /> Marcar todas como leídas
+            </NavDropdown.Item>
+            <NavDropdown.Item onClick={() => eliminarTodasNoti(userId)}>
+              <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
+            </NavDropdown.Item>
+          </NavDropdown>
+        </Nav>
+      )}
 
         </Container>
 

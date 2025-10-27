@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Container, Row, Col, Button, Spinner } from "react-bootstrap";
+import { Card, Container, Row, Col, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -11,19 +11,19 @@ const ServicioDetalle = () => {
     const navigate = useNavigate();
     const authData = JSON.parse(localStorage.getItem("authData"));
     const pacienteId = authData?.id;
-    
-const handleSolicitarServicio = () => {
-    if (!pacienteId) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Debes iniciar sesión',
-        text: 'Por favor inicia sesión para solicitar una cita.',
-        confirmButtonText: 'Entendido',
-      });
-      return;
-    }
-    navigate("/Inicio/Doctor");
-  };
+
+    const handleSolicitarServicio = () => {
+        if (!pacienteId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Debes iniciar sesión',
+                text: 'Por favor inicia sesión para solicitar una cita.',
+                confirmButtonText: 'Entendido',
+            });
+            return;
+        }
+        navigate("/Inicio/Doctor");
+    };
 
     useEffect(() => {
         const fetchDetalle = async () => {
@@ -104,29 +104,6 @@ const handleSolicitarServicio = () => {
 
                                 </Col>
                             </Row>
-
-                            <div className="d-flex justify-content-center mt-4">
-                            <Button
-      variant="primary"
-      size="lg"
-      className="px-5 py-2 rounded-pill shadow"
-      style={{
-        backgroundColor: "#0d6efd",
-        border: "none",
-        transition: "all 0.3s ease-in-out",
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.backgroundColor = "#0b5ed7";
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.backgroundColor = "#0d6efd";
-      }}
-      onClick={handleSolicitarServicio}
-      >
-      Solicitar una cita
-    </Button>
-
-                            </div>
                         </Card.Body>
                     </Col>
                 </Row>
