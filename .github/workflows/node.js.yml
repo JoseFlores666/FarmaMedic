@@ -36,15 +36,15 @@ jobs:
           npm cache clean --force
       - name: Corregir nombre del paquete "standard" (si aplica)
         run: |
-          sed -i 's/"standart"/"standard"/g' package.json || true
+          sed -i 's/"standart"/"standard"/g' package.json
       - name: Instalar dependencias
         run: npm install --legacy-peer-deps --no-fund --no-audit
 
       - name: Linter
-        run: npm run lint || true
+        run: npm run lint
 
       - name: Tests
-        run: npm run test || echo "Sin tests definidos"
+        run: npm run test
 
       - name: Confirmar éxito de pruebas
         if: success()
