@@ -1,6 +1,6 @@
-import { Card, Form, Button, Container, Row, Col, ListGroup } from "react-bootstrap";
-import { useState, useEffect } from "react";
-import ThemeToggle from "../../util/theme-toggler";
+import { Card, Form, Button, Container, Row, Col } from "react-bootstrap";
+import { useState, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
 
 const PerfilUsuario = () => {
   const authData = JSON.parse(localStorage.getItem("authData"));
@@ -11,7 +11,6 @@ const PerfilUsuario = () => {
     edad: "",
     telefono: "",
     correo: "",
-    password: "",
     usuario: "",
     apellidoPaterno: "",
     apellidoMaterno: "",
@@ -19,17 +18,23 @@ const PerfilUsuario = () => {
     foto_perfil: "",
   });
 
-  const [selectedSection, setSelectedSection] = useState("personal");
+  const [fotoFile, setFotoFile] = useState(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [stream, setStream] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/getPerfilbyid/${userId}`);
-      const data = await response.json();
-      setUser(data);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getPerfilbyid/${userId}`);
+        const data = await response.json();
+        setUser(data);
+      } catch (err) {
+        console.error("Error al obtener datos del usuario:", err);
+      }
     };
-    if (userId) {
-      fetchUserData();
-    }
+    if (userId) fetchUserData();
   }, [userId]);
 
   const handleChange = (e) => {
@@ -37,14 +42,50 @@ const PerfilUsuario = () => {
     setUser({ ...user, [name]: value });
   };
 
+  const iniciarCamara = async () => {
+    try {
+      setShowCamera(true);
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+      videoRef.current.srcObject = mediaStream;
+      setStream(mediaStream);
+    } catch (err) {
+      console.error("Error al acceder a la cámara:", err);
+      alert("No se pudo acceder a la cámara");
+    }
+  };
+
+  const tomarFoto = () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!video || !canvas) return;
+
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      setFotoFile(blob);
+      const imageUrl = URL.createObjectURL(blob);
+      setUser({ ...user, foto_perfil: imageUrl });
+    }, "image/png");
+
+    detenerCamara();
+    setShowCamera(false);
+  };
+
+  const detenerCamara = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+  };
+
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setUser({ ...user, foto_perfil: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setFotoFile(file);
+      setUser({ ...user, foto_perfil: URL.createObjectURL(file) });
     }
   };
 
@@ -52,196 +93,171 @@ const PerfilUsuario = () => {
     e.preventDefault();
 
     const updatedFields = {};
-
-    // Solo incluir los campos que no estén vacíos
     for (const key in user) {
-      if (user[key] && user[key] !== "") {
-        updatedFields[key] = user[key];
+      if (key !== "foto_perfil" && user[key] && user[key] !== "") updatedFields[key] = user[key];
+    }
+
+    if (Object.keys(updatedFields).length > 0) {
+      try {
+        const resDatos = await fetch(`${import.meta.env.VITE_API_URL}/updatePerfilDatos/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedFields),
+        });
+
+        await resDatos.json();
+        if (!resDatos.ok) {
+          Swal.fire("Error", "Error al actualizar datos", "error");
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Error de conexión al actualizar datos", "error");
+        return;
+
       }
     }
 
-    if (Object.keys(updatedFields).length === 0) {
-      return alert("No se realizaron cambios para guardar.");
-    }
+    if (fotoFile) {
+      const formData = new FormData();
+      formData.append("foto", fotoFile);
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/updateperfilbyid/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedFields),
-      });
+      try {
+        const resFoto = await fetch(`${import.meta.env.VITE_API_URL}/updatePerfilFoto/${userId}`, {
+          method: "PUT",
+          body: formData,
+        });
 
-      await response.json();
-      if (response.ok) {
-        alert("Datos actualizados correctamente");
-      } else {
-        alert("Error al actualizar los datos");
+        const data = await resFoto.json();
+        if (resFoto.ok) {
+          Swal.fire("Éxito", "Perfil actualizado correctamente", "success");
+          setFotoFile(null);
+          if (data.foto_perfil) setUser(prev => ({ ...prev, foto_perfil: data.foto_perfil }));
+        } else {
+          Swal.fire("Error", "Error al actualizar la foto", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Error de conexión al actualizar la foto", "error");
       }
-    } catch (error) {
-      console.error('Error en la actualización:', error);
-      alert("Error de conexión.");
+    } else if (Object.keys(updatedFields).length > 0) {
+      Swal.fire("Éxito", "Datos actualizados correctamente", "success");
+    } else {
+      Swal.fire("Información", "No hubo cambios para guardar", "info");
     }
   };
 
-
   return (
-    <Container className="mb-5 ">
-      <Card className="mb-4" style={{ width: "auto", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", borderRadius: "15px" }}>
-        <Card.Body>
-          <ThemeToggle />
+    <Container className="mb-5 mt-5">
+      <Card className="mb-4" style={{ borderRadius: "15px", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)" }}>
+        <Card.Body className="text-center">
           <div
-            className="text-center mb-4"
             style={{
-              backgroundColor: 'red',
-              width: '150px',
-              height: '150px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: '50%',
-              margin: '0 auto'
+              width: "150px",
+              height: "150px",
+              borderRadius: "50%",
+              margin: "0 auto 20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              backgroundColor: "#ddd",
             }}
           >
-            <label htmlFor="avatarInput" className="d-block">
-              <img
-                src={user.foto_perfil || "Cargando..."}
-                alt="Avatar"
-                className="rounded-circle"
-                width={120}
-                height={120}
-                style={{ cursor: "pointer" }}
-              />
-            </label>
-            <input type="file" id="avatarInput" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
+            <img
+              src={user.foto_perfil || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+              alt="Avatar"
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+            />
           </div>
-          <h3 className="text-center mb-4">{user.nombre}</h3>
 
-          <Row className="mb-4">
-            <Col>
-              <div className="text-center p-3 rounded border">
-                <strong>Sección de Datos Personales</strong>
+          <div className="d-flex justify-content-center gap-3 mb-3">
+            <Button variant="outline-primary" onClick={iniciarCamara}>Tomar foto</Button>
+            <Form.Label htmlFor="fileInput" className="btn btn-outline-success mb-0">Subir imagen</Form.Label>
+            <input type="file" id="fileInput" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
+          </div>
+
+          {showCamera && (
+            <div className="mt-3">
+              <video ref={videoRef} autoPlay playsInline style={{ width: "100%", maxWidth: "400px", borderRadius: "10px", backgroundColor: "#000" }}></video>
+              <div className="mt-2">
+                <Button variant="success" className="me-2" onClick={tomarFoto}>Capturar</Button>
+                <Button variant="danger" onClick={() => { detenerCamara(); setShowCamera(false); }}>Cancelar</Button>
               </div>
-            </Col>
-            <Col>
-              <div className="text-center p-3 rounded border">
-                <strong>Sección de Seguridad</strong>
-              </div>
-            </Col>
-          </Row>
+              <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+            </div>
+          )}
         </Card.Body>
       </Card>
 
-      <Card style={{ width: "auto", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", borderRadius: "15px" }}>
-        <ListGroup horizontal className="mb-4">
-          <ListGroup.Item
-            action
-            active={selectedSection === "personal"}
-            onClick={() => setSelectedSection("personal")}
-          >
-            Datos Personales
-          </ListGroup.Item>
-          <ListGroup.Item
-            action
-            active={selectedSection === "password"}
-            onClick={() => setSelectedSection("password")}
-          >
-            Seguridad
-          </ListGroup.Item>
-        </ListGroup>
+      <Card style={{ borderRadius: "15px", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)" }}>
+        <div style={{ textAlign: 'center', fontSize: '20px' }}>Datos Personales</div>
         <Card.Body>
-          {selectedSection === "personal" && (
-            <Form onSubmit={handleSubmit}>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Nombre</Form.Label>
-                    <Form.Control type="text" name="nombre" value={user.nombre} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Usuario</Form.Label>
-                    <Form.Control type="text" name="usuario" value={user.usuario} onChange={handleChange} />
-                  </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Nombre</Form.Label>
+                  <Form.Control type="text" name="nombre" value={user.nombre} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Usuario</Form.Label>
+                  <Form.Control type="text" name="usuario" value={user.usuario} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+            </Row>
 
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Apellido Paterno</Form.Label>
-                    <Form.Control type="text" name="apellidoPaterno" value={user.apellidoPaterno} onChange={handleChange} />
-                  </Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Apellido Paterno</Form.Label>
+                  <Form.Control type="text" name="apellidoPaterno" value={user.apellidoPaterno} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Apellido Materno</Form.Label>
+                  <Form.Control type="text" name="apellidoMaterno" value={user.apellidoMaterno} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+            </Row>
 
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Apellido Materno</Form.Label>
-                    <Form.Control type="text" name="apellidoMaterno" value={user.apellidoMaterno} onChange={handleChange} />
-                  </Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control type="email" name="correo" value={user.correo} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Teléfono</Form.Label>
+                  <Form.Control type="text" name="telefono" value={user.telefono} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+            </Row>
 
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" name="correo" value={user.correo} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Teléfono</Form.Label>
-                    <Form.Control type="text" name="telefono" value={user.telefono} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Edad</Form.Label>
-                    <Form.Control type="text" name="edad" value={user.edad} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Género</Form.Label>
-                    <Form.Control type="text" name="genero" value={user.genero} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <div className="text-center">
-                <Button variant="primary" type="submit" style={{ borderRadius: "10px", padding: "10px 20px" }}>
-                  Guardar Cambios
-                </Button>
-              </div>
-            </Form>
-          )}
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Edad</Form.Label>
+                  <Form.Control type="text" name="edad" value={user.edad} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Género</Form.Label>
+                  <Form.Control type="text" name="genero" value={user.genero} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+            </Row>
 
-          {selectedSection === "password" && (
-            <Form onSubmit={handleSubmit}>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Contraseña Nueva</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      value={user.password || ""}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <div className="text-center">
-                <Button variant="primary" type="submit" style={{ borderRadius: "10px", padding: "10px 20px" }}>
-                  Cambiar Contraseña
-                </Button>
-              </div>
-            </Form>
-          )}
+            <div className="text-center">
+              <Button variant="primary" type="submit" style={{ borderRadius: "10px", padding: "10px 20px" }}>Guardar Cambios</Button>
+            </div>
+          </Form>
         </Card.Body>
       </Card>
     </Container>
