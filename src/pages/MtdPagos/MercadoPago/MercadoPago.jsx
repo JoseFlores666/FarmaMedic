@@ -3,7 +3,7 @@ import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 const MercadoPago = () => {
 // Inicializa Mercado Pago con tu public key
-initMercadoPago(`${import.meta.env.Public_Key}`,{
+initMercadoPago(`${import.meta.env.VITE_Public_Key}`,{
     locale:'es-MX'
 });
   return (
