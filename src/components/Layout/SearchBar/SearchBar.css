@@ -1,6 +1,6 @@
 .search-container {
     position: relative;
-    width: 100%; /* Tamaño fijo */
+    width: 100%;
     min-width: 200px;
     max-width: 400px;
 }
@@ -12,7 +12,9 @@
     background-color: white;
     overflow: hidden;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 25px; /* redondeado de toda la barra */
 }
+
 
 .search-icon {
     padding: 10px;
@@ -24,7 +26,15 @@
     padding: 8px;
     border: none;
     outline: none;
+    background-color: #ffffff !important; 
+    color: #000000 !important;           
 }
+
+.search-input::placeholder {
+    color: #888888 !important;
+    opacity: 1;
+}
+
 
 .search-results {
     position: absolute;
@@ -36,6 +46,7 @@
     max-height: 250px;
     overflow-y: auto;
     z-index: 10;
+    
 }
 
 .search-results li {

@@ -282,81 +282,81 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
           <div style={{ display: "none" }}>
             <ThemeToggle></ThemeToggle>
           </div>
-  <div style={{ display:'none'}}>
+          <div style={{ display: 'none' }}>
 
-          {authData && (
-            <Nav className="me-3">
-              <NavDropdown
-                align="end"
-                id="notification-dropdown"
-                title={
-                  <>
-                    <div
-                      className="position-relative"
-                      style={{ color: "white", cursor: "pointer" }}
-                    ></div>
-                    <FaBell size={20} />
-                    {notificationCount > 0 && (
-                      <span
-                        className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
-                        style={{ fontSize: "0.6rem" }}
-                      >
-                        {notificationCount}
-                      </span>
-                    )}
-                  </>
-                }
-              >
-                <div style={{ maxHeight: "250px", overflowY: "auto" }}>
-                  {consNoti && consNoti.length > 0 ? (
-                    consNoti.map((noti, index) => (
-                      <NavDropdown.Item
-                        key={index}
-                        className="d-flex justify-content-between align-items-center"
-                      >
-                        <div>
-                          <strong>{noti.titulo || "Notificación"}</strong>
-                          <div style={{ fontSize: "0.75rem", color: "#666" }}>
-                            {noti.descripcion || "Sin descripción"}
+            {authData && (
+              <Nav className="me-3">
+                <NavDropdown
+                  align="end"
+                  id="notification-dropdown"
+                  title={
+                    <>
+                      <div
+                        className="position-relative"
+                        style={{ color: "white", cursor: "pointer" }}
+                      ></div>
+                      <FaBell size={20} />
+                      {notificationCount > 0 && (
+                        <span
+                          className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
+                          style={{ fontSize: "0.6rem" }}
+                        >
+                          {notificationCount}
+                        </span>
+                      )}
+                    </>
+                  }
+                >
+                  <div style={{ maxHeight: "250px", overflowY: "auto" }}>
+                    {consNoti && consNoti.length > 0 ? (
+                      consNoti.map((noti, index) => (
+                        <NavDropdown.Item
+                          key={index}
+                          className="d-flex justify-content-between align-items-center"
+                        >
+                          <div>
+                            <strong>{noti.titulo || "Notificación"}</strong>
+                            <div style={{ fontSize: "0.75rem", color: "#666" }}>
+                              {noti.descripcion || "Sin descripción"}
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="d-flex align-items-center">
-                          <button
-                            className="btn btn-sm btn-outline-success me-1"
-                            title="Marcar como leída"
-                            onClick={() => marcarNotiLeida(noti.id)}
-                          >
-                            <FaCheck />
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            title="Eliminar notificación"
-                            onClick={() => eliminarNoti(noti.id)}
-                          >
-                            <FaTrashAlt />
-                          </button>
-                        </div>
+                          <div className="d-flex align-items-center">
+                            <button
+                              className="btn btn-sm btn-outline-success me-1"
+                              title="Marcar como leída"
+                              onClick={() => marcarNotiLeida(noti.id)}
+                            >
+                              <FaCheck />
+                            </button>
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              title="Eliminar notificación"
+                              onClick={() => eliminarNoti(noti.id)}
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
+                        </NavDropdown.Item>
+                      ))
+                    ) : (
+                      <NavDropdown.Item disabled>
+                        No tienes notificaciones nuevas
                       </NavDropdown.Item>
-                    ))
-                  ) : (
-                    <NavDropdown.Item disabled>
-                      No tienes notificaciones nuevas
-                    </NavDropdown.Item>
-                  )}
-                </div>
+                    )}
+                  </div>
 
-                <NavDropdown.Divider />
+                  <NavDropdown.Divider />
 
-                <NavDropdown.Item onClick={() => marcarTodasNotiLeidas(userId)}>
-                  <FaCheck className="me-2 text-success" /> Marcar todas como leídas
-                </NavDropdown.Item>
-                <NavDropdown.Item onClick={() => eliminarTodasNoti(userId)}>
-                  <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
-                </NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
-          )}
+                  <NavDropdown.Item onClick={() => marcarTodasNotiLeidas(userId)}>
+                    <FaCheck className="me-2 text-success" /> Marcar todas como leídas
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => eliminarTodasNoti(userId)}>
+                    <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
+                  </NavDropdown.Item>
+                </NavDropdown>
+              </Nav>
+            )}
           </div>
 
         </Container>
