@@ -1,6 +1,7 @@
 import { Card, Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
+import ThemeToggle from "../../util/theme-toggler";
 
 const PerfilUsuario = () => {
   const authData = JSON.parse(localStorage.getItem("authData"));
@@ -149,7 +150,30 @@ const PerfilUsuario = () => {
 
   return (
     <Container className="mb-5 mt-5">
-      <Card className="mb-4" style={{ borderRadius: "15px", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)" }}>
+      <Card
+        className="mb-4"
+        style={{
+          borderRadius: "15px",
+          boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+          position: "relative" 
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 15,
+            zIndex: 20,
+            backgroundColor: "gray",  
+            padding: "5px 8px",          
+            borderRadius: "8px",         
+            boxShadow: "0 2px 5px rgba(0,0,0,0.2)" 
+          }}
+        >
+          <ThemeToggle />
+        </div>
+
+
         <Card.Body className="text-center">
           <div
             style={{
