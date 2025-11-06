@@ -82,7 +82,7 @@ export const SearchB = () => {
                 <input
                     type="search"
                     className="search-input"
-                    placeholder="Busca Servicios o Doctores"
+                    placeholder="Buscar Servicios"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />

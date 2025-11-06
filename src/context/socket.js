@@ -1,6 +1,5 @@
 import { io } from 'socket.io-client';
 
-export const socket = io(import.meta.env.VITE_API_SOCKETS, {
-  transports: ["websocket"],
+export const socket = io('https://localhost:4000', {
   withCredentials: true,
 });

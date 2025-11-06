@@ -12,7 +12,6 @@ import { SearchB } from '../SearchBar/Search';
 import { AppRouter } from '../../../router/AppRouter';
 import Breadcrumbs from '../../Breadcrumbs';
 import "../../Layout/Navbar/style.css"
-import ThemeToggle from '../../../util/theme-toggler';
 import axios from "axios";
 
 export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti })  => {
@@ -279,7 +278,6 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti })  
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
-          <ThemeToggle></ThemeToggle>
             {authData && (
         <Nav className="me-3">
           <NavDropdown
