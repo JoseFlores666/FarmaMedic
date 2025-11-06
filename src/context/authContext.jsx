@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { socket } from './socket'; 
+import { socket } from './socket';
 
 export const AuthContext = createContext();
 
@@ -24,26 +24,48 @@ export const AuthProvider = ({ children }) => {
     );
 
     if (userRole === 1) {
-      socket.emit('joinPaciente', id); 
+      socket.emit('joinPaciente', id);
     }
   };
 
   const logout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include', 
+      });
 
-    setIsAuthenticated(false);
-    setUsername(null);
-    setIsAdmin(false);
-    setUserId(null);
-    setRole(null);
-    localStorage.removeItem('authData');
+      localStorage.removeItem('authData');
+      setIsAuthenticated(false);
+      setUsername(null);
+      setIsAdmin(false);
+      setUserId(null);
+      setRole(null);
+
+    } catch (error) {
+      console.error('Error cerrando sesión:', error);
+    }
   };
 
   useEffect(() => {
     const checkSession = async () => {
+      const localAuth = localStorage.getItem('authData');
+      if (localAuth) {
+        const { usuario, isAdmin, role, id } = JSON.parse(localAuth);
+        setIsAuthenticated(true);
+        setUsername(usuario);
+        setIsAdmin(isAdmin);
+        setRole(role);
+        setUserId(id);
+
+        if (role === 1) {
+          socket.emit('joinPaciente', id);
+        }
+
+        console.log('Sesión restaurada desde localStorage');
+        return; 
+      }
+
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/session`, {
           credentials: 'include',
@@ -57,8 +79,8 @@ export const AuthProvider = ({ children }) => {
         } else {
           logout();
         }
-      } catch (error) {
-        console.error('Error verificando la sesión:', error);
+      } catch {
+        console.warn('Sin conexión: no se pudo verificar la sesión en el servidor.');
       }
     };
 

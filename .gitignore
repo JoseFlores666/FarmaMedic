@@ -26,6 +26,6 @@ ssl/*
 *.njsproj
 *.sln
 *.sw?
-*.env
+.env
 
 *vite.config.js

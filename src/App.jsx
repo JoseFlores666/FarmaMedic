@@ -34,19 +34,14 @@ function App() {
         );
         const data = res.data;
 
-        /**
-         * Se espera que el backend devuelva algo como:
-         * { puedeGirar: true, fecha_giro: "2025-10-20T00:00:00Z" }
-         */
         const puedeGirar = data.puedeGirar;
         const ultimaVezGiro = data.fecha_giro ? dayjs(data.fecha_giro) : null;
         const hace7dias = dayjs().subtract(7, "day");
 
-        // ✅ Mostrar ruleta SOLO si el usuario puede girar y han pasado 7 días
         if (puedeGirar && (!ultimaVezGiro || ultimaVezGiro.isBefore(hace7dias))) {
           setShowRuleta(true);
         } else {
-          setShowRuleta(false); // 🔒 No mostrar si ya giró o no puede
+          setShowRuleta(false); 
         }
       } catch (err) {
         console.error("Error verificando ruleta:", err);
@@ -71,7 +66,6 @@ function App() {
         <>
           <Notificactions setNotificationCount={setNotificationCount} />
 
-          {/* 👇 Modal que contiene la ruleta */}
           <Modal
             show={showRuleta}
             onHide={() => setShowRuleta(false)}
@@ -86,7 +80,6 @@ function App() {
 
             <Modal.Body className="bg-light">
               <Ruleta onFinish={() => setShowRuleta(false)} /> 
-              {/* 👈 Cierra el modal cuando termina el giro */}
             </Modal.Body>
 
             <Modal.Footer className="bg-light">

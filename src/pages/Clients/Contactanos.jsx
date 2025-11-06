@@ -109,12 +109,13 @@ export const Contactanos = () => {
                         </div>
 
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!4v1753337142087!6m8!1m7!1sURp4GOPvjupI2rMzcr2xCg!2m2!1d21.13610771841157!2d-98.53699619284265!3f129.2887256405927!4f-4.479242399518057!5f1.3459263108804513" width="100%"
+                            src="https://www.google.com/maps/embed?pb=!4v1753337142087!6m8!1m7!1sURp4GOPvjupI2rMzcr2xCg!2m2!1d21.13610771841157!2d-98.53699619284265!3f129.2887256405927!4f-4.479242399518057!5f1.3459263108804513"
+                            width="100%"
                             height="407"
+                            allow="accelerometer; gyroscope; magnetometer; fullscreen"
                             loading="lazy"
                             title="Location Map"
                             style={{ border: 0, borderRadius: '8px' }}
-                            allowFullScreen
                         ></iframe>
                     </Col>
 
