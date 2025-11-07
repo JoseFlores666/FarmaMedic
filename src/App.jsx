@@ -41,7 +41,7 @@ function App() {
         if (puedeGirar && (!ultimaVezGiro || ultimaVezGiro.isBefore(hace7dias))) {
           setShowRuleta(true);
         } else {
-          setShowRuleta(false); 
+          setShowRuleta(false);
         }
       } catch (err) {
         console.error("Error verificando ruleta:", err);
@@ -52,6 +52,26 @@ function App() {
       verificarRuleta();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleOffline = () => {
+      alert("No tienes conexión a Internet. Algunas funciones pueden no estar disponibles.");
+      console.warn("Sin conexión a Internet. Algunas funciones no estarán disponibles.");
+    };
+
+    const handleOnline = () => {
+      console.log("✅ Conexión a Internet restaurada");
+    };
+
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleOnline);
+    };
+  }, []);
+
 
   return (
     <>
@@ -79,7 +99,7 @@ function App() {
             </Modal.Header>
 
             <Modal.Body className="bg-light">
-              <Ruleta onFinish={() => setShowRuleta(false)} /> 
+              <Ruleta onFinish={() => setShowRuleta(false)} />
             </Modal.Body>
 
             <Modal.Footer className="bg-light">
