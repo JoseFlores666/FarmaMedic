@@ -28,9 +28,10 @@ export default defineConfig(({ mode }) => {
           runtimeCaching: [
             {
               urlPattern: ({ url }) => url.pathname.startsWith('/api'),
-              handler: 'CacheFirst',
+              handler: 'NetworkFirst', 
               options: {
                 cacheName: 'api-cache',
+                networkTimeoutSeconds: 5, 
                 cacheableResponse: {
                   statuses: [0, 200],
                 },
@@ -80,11 +81,11 @@ export default defineConfig(({ mode }) => {
     server: {
       ...(useHttps
         ? {
-            https: {
-              key: fs.readFileSync(path.resolve(__dirname, 'ssl', 'server.key')),
-              cert: fs.readFileSync(path.resolve(__dirname, 'ssl', 'server.crt')),
-            },
-          }
+          https: {
+            key: fs.readFileSync(path.resolve(__dirname, 'ssl', 'server.key')),
+            cert: fs.readFileSync(path.resolve(__dirname, 'ssl', 'server.crt')),
+          },
+        }
         : {}),
       host: 'localhost',
       port: 5173,
