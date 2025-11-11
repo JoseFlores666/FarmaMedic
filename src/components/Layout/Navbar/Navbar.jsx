@@ -210,7 +210,7 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
                           <NavDropdown.Item as={NavLink} to="/Inicio/Expediente" onClick={closeMenu}>
                             Mi expediente medico
                           </NavDropdown.Item>
-                          <NavDropdown.Item as={NavLink} to="" onClick={closeMenu}>
+                          <NavDropdown.Item as={NavLink} to="/Inicio/Reservaciones" onClick={closeMenu}>
                             Mis Reservaciones
                           </NavDropdown.Item>
                         </NavDropdown>

@@ -2,28 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Container, Row, Col, Spinner } from "react-bootstrap";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2';
 
 const ServicioDetalle = () => {
     const { id } = useParams();
     const [servicio, setServicio] = useState(null);
-    const navigate = useNavigate();
-    const authData = JSON.parse(localStorage.getItem("authData"));
-    const pacienteId = authData?.id;
-
-    const handleSolicitarServicio = () => {
-        if (!pacienteId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Debes iniciar sesión',
-                text: 'Por favor inicia sesión para solicitar una cita.',
-                confirmButtonText: 'Entendido',
-            });
-            return;
-        }
-        navigate("/Inicio/Doctor");
-    };
 
     useEffect(() => {
         const fetchDetalle = async () => {

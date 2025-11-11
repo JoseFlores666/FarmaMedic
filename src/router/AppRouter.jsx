@@ -43,6 +43,7 @@ import Resultados from '../pages/Predicciones/Resultados';
 import ServicioDetalle from '../pages/servicios/ServicioDetalle';
 import Ruleta from '../pages/Clients/Ruleta';
 import AdminRuleta from '../pages/Admin/AdminRuleta';
+import MisReservaciones from '../pages/Clients/MisReservaciones';
 
 export const AppRouter = () => {
 	return (
@@ -78,6 +79,7 @@ export const AppRouter = () => {
 				<Route path='/Inicio/Expediente' element={<PrivateRoute><ExpedienteUsuario /></PrivateRoute>} />
 				<Route path='/Inicio/Busqueda' element={<Busqueda />} />
 				<Route path='/Inicio/Ruleta' element={<Ruleta />} />
+				<Route path='/Inicio/Reservaciones' element={<MisReservaciones />} />
 				<Route path="/Inicio/:id" element={<ServicioDetalle/>} />
 				<Route path='/Inicio/Editar_Ruleta' element={<AdminRuleta/>}/>
 
