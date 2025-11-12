@@ -1,63 +1,20 @@
-import { useAuth } from '../../../context/useAuth';
-import { Navigate } from 'react-router-dom';
-import { Dashboard, Navbar2 } from '../../Layout';
-import { useEffect, useState } from 'react';
-import { socket } from '../../../context/socket';
+// src/components/Layout/Menu/Menu.jsx
+import { useAuth } from "../../../context/useAuth";
+import { Navigate } from "react-router-dom";
+import { Dashboard, Navbar2 } from "../../Layout";
 
-export const Menu = ({ notificationCount, setNotificationCount }) => {
-  const { isAuthenticated, role, userId } = useAuth();
-  const [consNoti, setConsNoti] = useState([]);
+export const Menu = () => {
+  const { isAuthenticated, role } = useAuth();
 
- useEffect(() => {
-  const fetchNotificaciones = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/getNotiById/${userId}`);
-      if (!response.ok) throw new Error("Error al obtener notificaciones");
-      const data = await response.json();
-      setNotificationCount(data.length);
-      setConsNoti(data);
-    } catch (error) {
-      console.error("Error cargando notificaciones:", error);
-    }
-  };
-
-  if (userId) {
-    fetchNotificaciones();
-
-    // Unirse a la sala del usuario
-    socket.emit("joinRoom", `paciente_${userId}`);
-
-    // Escuchar notificaciones nuevas
-    socket.on("notificacion:nueva", () => {
-      fetchNotificaciones();
-    });
-
-    // Cleanup
-    return () => {
-      socket.off("notificacion:nueva");
-    };
-  }
-}, [userId, setNotificationCount]);
-
-  
-  const props = {
-    notificationCount,
-    setNotificationCount,
-    consNoti
-  };
-
-  if (!isAuthenticated) {
-    return <Navbar2 {...props} />;
-  }
+  if (!isAuthenticated) return <Navbar2 />;
 
   switch (role) {
     case 1:
     case 3:
-      return <Dashboard {...props} />;
+      return <Dashboard />;
     case 2:
-      return <Navbar2 {...props} />;
+      return <Navbar2 />;
     default:
       return <Navigate to="/Inicio" replace />;
-
   }
 };

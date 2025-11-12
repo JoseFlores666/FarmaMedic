@@ -4,7 +4,7 @@ import { useAuth } from '../../context/useAuth';
 import { socket } from '../../context/socket';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Notifications = ({ setNotificationCount }) => {
+const Notifications = () => {
   const { userId, role } = useAuth();
 
   useEffect(() => {
@@ -16,13 +16,7 @@ const Notifications = ({ setNotificationCount }) => {
           <strong style={{ fontSize: '16px' }}>{data.titulo}</strong>
           <span style={{ fontSize: '14px', marginTop: '4px' }}>{data.mensaje}</span>
         </div>
-
       );
-      setNotificationCount(prev => {
-        const newCount = prev + 1;
-        localStorage.setItem("notificationCount", newCount.toString());
-        return newCount;  
-      });
     };
 
     socket.on('notificacion:nueva', handleNotificacion);
@@ -30,7 +24,7 @@ const Notifications = ({ setNotificationCount }) => {
     return () => {
       socket.off('notificacion:nueva', handleNotificacion);
     };
-  }, [userId, role,setNotificationCount]);
+  }, [userId, role]);
 
   return (
     <ToastContainer

@@ -8,6 +8,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { Modal, Button } from "react-bootstrap";
 import Ruleta from "../src/pages/Clients/Ruleta";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -55,7 +56,6 @@ function App() {
 
   useEffect(() => {
     const handleOffline = () => {
-      alert("No tienes conexión a Internet. Algunas funciones pueden no estar disponibles.");
       console.warn("Sin conexión a Internet. Algunas funciones no estarán disponibles.");
     };
 
@@ -114,6 +114,7 @@ function App() {
           </Modal>
         </>
       )}
+      <Analytics />
     </>
   );
 }

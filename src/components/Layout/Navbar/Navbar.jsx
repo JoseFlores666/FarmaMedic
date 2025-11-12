@@ -14,8 +14,9 @@ import Breadcrumbs from '../../Breadcrumbs';
 import "../../Layout/Navbar/style.css"
 import ThemeToggle from '../../../util/theme-toggler';
 import axios from "axios";
+import { socket } from "../../../context/socket";
 
-export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) => {
+export const Navbar2 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, username, logout, role } = useAuth();
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
   const authData = JSON.parse(localStorage.getItem("authData"));
   const userId = authData ? authData.id : null;
 
-  const [notificaciones, setNotificaciones] = useState([]);
+  const [ setNotificaciones] = useState([]);
 
   const getNotificaciones = async () => {
     if (!userId) return;
@@ -37,15 +38,27 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
   };
 
   useEffect(() => {
+    if (!userId) return;
+
+    socket.emit("joinRoom", `paciente_${userId}`);
+
     getNotificaciones();
-  }, [userId]);
+
+    socket.on("notificacion:nueva", () => {
+      getNotificaciones(); 
+    });
+
+    return () => {
+      socket.off("notificacion:nueva");
+    };
+  }, );
 
   const marcarTodasNotiLeidas = async () => {
     try {
       await axios.put(`${import.meta.env.VITE_API_URL}/notiLeidas/${userId}`);
       getNotificaciones();
     } catch (error) {
-      console.error("Error al marcar todas:", error);
+      console.error("Error al marcar todas como leídas:", error);
     }
   };
 
@@ -72,11 +85,9 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
       await axios.put(`${import.meta.env.VITE_API_URL}/notiLeida/${id}`);
       getNotificaciones();
     } catch (error) {
-      console.error("Error al marcar notificación:", error);
+      console.error("Error al marcar como leída:", error);
     }
   };
-
-
   const fetchLogoActivo = useCallback(async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
@@ -109,7 +120,7 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
 
   useEffect(() => {
     fetchLogoActivo()
-  }, []);
+  },);
 
   return (
     <>
@@ -224,10 +235,10 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
                     {role === 3 && (
                       <>
                         <NavDropdown
+                          title="Gestión Médica"
                           align="end"
                           menuAlign="right"
                           container="body"
-                          title="Gestión Médica"
                         >
                           <NavDropdown.Item as={NavLink} to="/Citas" onClick={closeMenu}>
                             Gestión de Citas Médicas
@@ -245,10 +256,9 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
                             Actualización de Expediente
                           </NavDropdown.Item>
                         </NavDropdown>
-
-
                       </>
                     )}
+
                     <NavDropdown
                       title={<><FaCog /> {username}</>}
                       id="user-dropdown"
@@ -296,54 +306,44 @@ export const Navbar2 = ({ notificationCount, setNotificationCount, consNoti }) =
                         style={{ color: "white", cursor: "pointer" }}
                       ></div>
                       <FaBell size={20} />
-                      {notificationCount > 0 && (
-                        <span
-                          className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
-                          style={{ fontSize: "0.6rem" }}
-                        >
-                          {notificationCount}
-                        </span>
-                      )}
+                      <span
+                        className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
+                        style={{ fontSize: "0.6rem" }}
+                      >
+                      </span>
                     </>
                   }
                 >
                   <div style={{ maxHeight: "250px", overflowY: "auto" }}>
-                    {consNoti && consNoti.length > 0 ? (
-                      consNoti.map((noti, index) => (
-                        <NavDropdown.Item
-                          key={index}
-                          className="d-flex justify-content-between align-items-center"
-                        >
-                          <div>
-                            <strong>{noti.titulo || "Notificación"}</strong>
-                            <div style={{ fontSize: "0.75rem", color: "#666" }}>
-                              {noti.descripcion || "Sin descripción"}
-                            </div>
-                          </div>
 
-                          <div className="d-flex align-items-center">
-                            <button
-                              className="btn btn-sm btn-outline-success me-1"
-                              title="Marcar como leída"
-                              onClick={() => marcarNotiLeida(noti.id)}
-                            >
-                              <FaCheck />
-                            </button>
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              title="Eliminar notificación"
-                              onClick={() => eliminarNoti(noti.id)}
-                            >
-                              <FaTrashAlt />
-                            </button>
-                          </div>
-                        </NavDropdown.Item>
-                      ))
-                    ) : (
-                      <NavDropdown.Item disabled>
-                        No tienes notificaciones nuevas
-                      </NavDropdown.Item>
-                    )}
+                    <NavDropdown.Item
+                      className="d-flex justify-content-between align-items-center"
+                    >
+                      <div>
+                        <strong></strong>
+                        <div style={{ fontSize: "0.75rem", color: "#666" }}>
+
+                        </div>
+                      </div>
+
+                      <div className="d-flex align-items-center">
+                        <button
+                          className="btn btn-sm btn-outline-success me-1"
+                          title="Marcar como leída"
+                          onClick={() => marcarNotiLeida()}
+                        >
+                          <FaCheck />
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          title="Eliminar notificación"
+                          onClick={() => eliminarNoti()}
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </NavDropdown.Item>
+
                   </div>
 
                   <NavDropdown.Divider />
