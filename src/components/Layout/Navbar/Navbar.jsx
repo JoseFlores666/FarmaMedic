@@ -25,7 +25,7 @@ export const Navbar2 = () => {
   const authData = JSON.parse(localStorage.getItem("authData"));
   const userId = authData ? authData.id : null;
 
-  const [ setNotificaciones] = useState([]);
+  const [setNotificaciones] = useState([]);
 
   const getNotificaciones = async () => {
     if (!userId) return;
@@ -45,13 +45,13 @@ export const Navbar2 = () => {
     getNotificaciones();
 
     socket.on("notificacion:nueva", () => {
-      getNotificaciones(); 
+      getNotificaciones();
     });
 
     return () => {
       socket.off("notificacion:nueva");
     };
-  }, );
+  },);
 
   const marcarTodasNotiLeidas = async () => {
     try {
@@ -216,13 +216,16 @@ export const Navbar2 = () => {
                       <>
                         <NavDropdown title="Mis Citas" >
                           <NavDropdown.Item as={NavLink} to="/Inicio/Doctor" onClick={closeMenu}>
-                            Doctores disponibles
+                            Doctores Disponibles
                           </NavDropdown.Item>
                           <NavDropdown.Item as={NavLink} to="/Inicio/Expediente" onClick={closeMenu}>
-                            Mi expediente medico
+                            Mi Expediente Médico
                           </NavDropdown.Item>
                           <NavDropdown.Item as={NavLink} to="/Inicio/Reservaciones" onClick={closeMenu}>
                             Mis Reservaciones
+                          </NavDropdown.Item>
+                          <NavDropdown.Item as={NavLink} to="/Inicio/Mis_Recetas" onClick={closeMenu}>
+                            Mis Recetas
                           </NavDropdown.Item>
                         </NavDropdown>
                         <NavDropdown title="Mini Juegos" >

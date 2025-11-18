@@ -8,6 +8,7 @@ import FilterComponent from '../../components/FilterComponent';
 import { FaEdit, FaEye, FaTrash } from 'react-icons/fa';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import RecetaPDF from './RecetaPDF';
+import { getLogoActivo } from '../../Api/apiLogoActivo';
 
 const fetchRecetas = async (setRecetas) => {
   try {
@@ -40,17 +41,6 @@ const fetchDoctores = async (setDoctores) => {
     console.error('Error al obtener Doctores:', error);
     throw error;
 
-  }
-};
-
-const fetchMedicamentosByReceta = async (recetaId) => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/getMedicamentosByReceta/${recetaId}`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error al obtener medicamentos:', error);
-    throw new Error('No se pudieron cargar los medicamentos');
   }
 };
 
@@ -142,6 +132,7 @@ export const Recetas = () => {
   const [medicamentos, setMedicamentos] = useState([
     { medicamento: '', dosis: '', instrucciones: '' }
   ]);
+  const [logoActivo, setLogoActivo] = useState(null);
 
   const [fechaEmision, setFechaEmision] = useState('');
   const [fechaVencimiento, setfechaVencimiento] = useState('');
@@ -173,46 +164,38 @@ export const Recetas = () => {
     setShowMedic(false);
   };
 
-
-  const handleEditReceta = async (receta) => {
+  const handleEditReceta = (receta) => {
     setPaciente(receta.codpaci);
     setDoctor(receta.coddoc);
     setFechaEmision(formatDate(receta.fecha_inicio));
     setfechaVencimiento(formatDate(receta.fecha_fin));
     setEditingReceta(receta);
-
-    const medicamentosData = await fetchMedicamentosByReceta(receta.id);
-
-    if (Array.isArray(medicamentosData) && medicamentosData.length > 0) {
-      setMedicamentos(medicamentosData);
+    console.log(receta)
+    if (Array.isArray(receta.medicamentos) && receta.medicamentos.length > 0) {
+      setMedicamentos(receta.medicamentos);
     } else {
       setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
     }
+
     setShowModal(true);
   };
 
+  const handleMedicamentos = (receta) => {
+    setEditingReceta(receta);
+    setPaciente(receta.codpaci);
+    setDoctor(receta.coddoc);
+    setFechaEmision(formatDate(receta.fecha_inicio));
+    setfechaVencimiento(formatDate(receta.fecha_fin));
 
-  const handleMedicamentos = async (receta) => {
-    try {
-      setEditingReceta(receta);
-      setPaciente(receta.codpaci);
-      setDoctor(receta.coddoc);
-      setFechaEmision(formatDate(receta.fecha_inicio));
-      setfechaVencimiento(formatDate(receta.fecha_fin));
-
-      const data = await fetchMedicamentosByReceta(receta.id);
-      if (Array.isArray(data) && data.length > 0) {
-        setMedicamentos(data);
-      } else {
-        setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
-      }
-
-      setShowMedic(true);
-    } catch (error) {
-      console.error('Error al cargar medicamentos para vista:', error);
-      Swal.fire('Error', 'No se pudieron cargar los medicamentos', 'error');
+    if (Array.isArray(receta.medicamentos) && receta.medicamentos.length > 0) {
+      setMedicamentos(receta.medicamentos);
+    } else {
+      setMedicamentos([{ medicamento: '', dosis: '', instrucciones: '' }]);
     }
+
+    setShowMedic(true);
   };
+
 
 
   useEffect(() => {
@@ -230,19 +213,19 @@ export const Recetas = () => {
     nuevosMedicamentos[index][field] = value;
     setMedicamentos(nuevosMedicamentos);
   };
-
   const handleSaveReceta = async () => {
-    const recetasData = medicamentos.map((med) => ({
-      historial_id: editingReceta ? editingReceta.historial_id : null, 
+    const payload = {
       coddoc: Number(doctor),
       codpaci: Number(paciente),
-      medicamento: med.medicamento,
-      dosis: med.dosis,
-      instrucciones: med.instrucciones,
       fecha_inicio: fechaEmision,
       fecha_fin: fechaVencimiento,
       estado: 'Activo',
-    }));
+      medicamentos: medicamentos.map((m) => ({
+        medicamento: m.medicamento,
+        dosis: m.dosis,
+        instrucciones: m.instrucciones
+      }))
+    };
 
     const url = editingReceta
       ? `${import.meta.env.VITE_API_URL}/updateReceta/${editingReceta.id}`
@@ -254,7 +237,7 @@ export const Recetas = () => {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recetas: recetasData }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -270,6 +253,11 @@ export const Recetas = () => {
       Swal.fire('Error', error.message, 'error');
     }
   };
+
+  useEffect(() => {
+    getLogoActivo().then(setLogoActivo);
+  }, []);
+
 
   const filteredItems = (recetas || []).filter(item => {
     const filter = filterText.toLowerCase();
@@ -333,7 +321,6 @@ export const Recetas = () => {
         <Modal.Header closeButton>
           <Modal.Title>{editingReceta ? 'Editar Receta' : 'Agregar Nueva Receta'}</Modal.Title>
         </Modal.Header>
-
         <Modal.Body>
           <Form>
             <Row>
@@ -419,7 +406,7 @@ export const Recetas = () => {
                     <Form.Group className="mb-3">
                       <Form.Label>Frecuencia(Horas)</Form.Label>
                       <Form.Control
-                        type="number"
+                        type="text"
                         placeholder="Ingrese la frecuencia"
                         value={med.instrucciones}
                         onChange={(e) => handleMedicamentoChange(index, 'instrucciones', e.target.value)}
@@ -458,7 +445,6 @@ export const Recetas = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
 
       <Modal show={showMedic} onHide={handleClose} centered size='xl'>
         <Modal.Header closeButton>
@@ -528,7 +514,7 @@ export const Recetas = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Frecuencia (Horas)</Form.Label>
-                    <Form.Control type="number" value={med.instrucciones} disabled />
+                    <Form.Control type="text" value={med.instrucciones} disabled />
                   </Form.Group>
                 </Col>
               </Row>
@@ -541,11 +527,12 @@ export const Recetas = () => {
           <PDFDownloadLink
             document={
               <RecetaPDF
-      paciente={editingReceta?.paciente || ''}
-      doctor={editingReceta?.doctor || ''}
+                paciente={editingReceta?.paciente || ''}
+                doctor={editingReceta?.doctor || ''}
                 fecha_inicio={fechaEmision}
                 fecha_fin={fechaVencimiento}
                 medicamentos={medicamentos}
+                logo={logoActivo}
               />
             }
             fileName={`receta-${paciente}-${new Date().toISOString().split('T')[0]}.pdf`}

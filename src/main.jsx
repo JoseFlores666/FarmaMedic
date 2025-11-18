@@ -5,6 +5,9 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/authContext.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Buffer } from "buffer";
+
+window.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>
