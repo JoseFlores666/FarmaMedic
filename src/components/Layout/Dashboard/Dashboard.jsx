@@ -37,6 +37,7 @@ import ScrollToTop from '../Navbar/ScrollTop';
 import Breadcrumbs from "../../Breadcrumbs";
 import ThemeToggle from "../../../util/theme-toggler";
 import axios from "axios";
+import { socket } from "../../../context/socket";
 
 export const Sidebar = () => {
   const { isAuthenticated, role } = useAuth();
@@ -241,7 +242,7 @@ export const Sidebar = () => {
   );
 };
 
-export const Dashboard = ({ notificationCount, setNotificationCount, consNoti }) => {
+export const Dashboard = () => {
   const [toggled, setToggled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoActivo, setLogoActivo] = useState(null);
@@ -251,18 +252,14 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
 
   const authData = JSON.parse(localStorage.getItem("authData"));
   const userId = authData ? authData.id : null;
-  
+
   const fetchLogoActivo = useCallback(async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
       if (!response.ok) throw new Error("Error fetching active logo");
       const data = await response.json();
 
-      if (data && data.url) {
-        setLogoActivo(data.url);
-      } else {
-        setLogoActivo(null);
-      }
+      setLogoActivo(data?.url || null);
     } catch (error) {
       console.error("Error fetching active logo:", error);
       setLogoActivo(null);
@@ -288,7 +285,9 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
   const getNotificaciones = async () => {
     if (!userId) return;
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/getNotiById/${userId}`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/getNotiById/${userId}`
+      );
       setNotificaciones(res.data);
     } catch (error) {
       console.error("Error al obtener notificaciones:", error);
@@ -296,7 +295,24 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
   };
 
   useEffect(() => {
-    getNotificaciones();
+    if (userId) {
+      getNotificaciones(); 
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    // Unirse a la sala correcta
+    socket.emit("joinPaciente", userId);
+
+    socket.on("notificacion:nueva", () => {
+      getNotificaciones();
+    });
+
+    return () => {
+      socket.off("notificacion:nueva");
+    };
   }, [userId]);
 
   const marcarTodasNotiLeidas = async () => {
@@ -336,22 +352,30 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
   };
 
   return (
-    <div className={`d-flex  ${toggled ? "toggled" : ""}`} id="wrapper" >
+    <div className={`d-flex ${toggled ? "toggled" : ""}`} id="wrapper">
       <ScrollToTop />
 
       <Sidebar />
 
       <div id="page-content-wrapper">
-        <Navbar expand="lg" variant="dark" className="px-4 py-3 sticky-top text-white" style={{ backgroundColor: '#2c245b' }} >
+        <Navbar
+          expand="lg"
+          variant="dark"
+          className="px-4 py-3 sticky-top text-white"
+          style={{ backgroundColor: "#2c245b" }}
+        >
           <div className="d-flex align-items-center">
-            <FaAlignLeft className="fs-4 me-3" onClick={toggleSidebar} style={{ cursor: 'pointer' }} />
-            <Breadcrumbs></Breadcrumbs>
+            <FaAlignLeft
+              className="fs-4 me-3"
+              onClick={toggleSidebar}
+              style={{ cursor: "pointer" }}
+            />
+            <Breadcrumbs />
           </div>
+
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse
-            id="basic-navbar-nav"
-            className="justify-content-end"
-          >
+          <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+            {/* Usuario */}
             <Nav>
               <NavDropdown
                 title={
@@ -362,67 +386,64 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
                 }
                 id="user-dropdown"
               >
-                <NavDropdown.Item
-                  as={NavLink}
-                  to="/Recetas"
-                  onClick={closeMenu}
-                >
+                <NavDropdown.Item as={NavLink} to="/Recetas" onClick={closeMenu}>
                   Profile
                 </NavDropdown.Item>
-                <NavDropdown.Item href="#">Settings</NavDropdown.Item>
+                <NavDropdown.Item>Settings</NavDropdown.Item>
                 <NavDropdown.Item onClick={onLogout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>
+
+            {/* Notificaciones */}
             <Nav className="me-3">
               <NavDropdown
                 align="end"
                 id="notification-dropdown"
                 title={
                   <>
-                    <div
-                      className="position-relative"
-                      style={{ color: "white", cursor: "pointer" }}
-                    ></div>
                     <FaBell size={20} />
-                    {notificationCount > 0 && (
+
+                    {notificaciones.length > 0 && (
                       <span
                         className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
                         style={{ fontSize: "0.6rem" }}
                       >
-                        {notificationCount}
+                        {notificaciones.length}
                       </span>
                     )}
                   </>
                 }
               >
                 <div style={{ maxHeight: "250px", overflowY: "auto" }}>
-                  {consNoti && consNoti.length > 0 ? (
-                    consNoti.map((noti, index) => (
+                  {notificaciones.length > 0 ? (
+                    notificaciones.map((noti) => (
                       <NavDropdown.Item
-                        key={index}
+                        key={noti.id}
                         className="d-flex justify-content-between align-items-center"
                       >
                         <div>
                           <strong>{noti.titulo || "Notificación"}</strong>
                           <div style={{ fontSize: "0.75rem", color: "#666" }}>
-                            {noti.descripcion || "Sin descripción"}
+                            {noti.mensaje || "Sin descripción"}
                           </div>
                         </div>
 
                         <div className="d-flex align-items-center">
-                          <button
-                            className="btn btn-sm btn-outline-success me-1"
-                            title="Marcar como leída"
-                            onClick={() => marcarNotiLeida(noti.id)}
-                          >
-                            <FaCheck />
-                          </button>
+                          {!noti.leida && (
+                            <button
+                              className="btn btn-sm btn-outline-success me-1"
+                              title="Marcar como leída"
+                              onClick={() => marcarNotiLeida(noti.id)}
+                            >
+                              <FaCheck />
+                            </button>
+                          )}
+
                           <button
                             className="btn btn-sm btn-outline-danger"
                             title="Eliminar notificación"
                             onClick={() => eliminarNoti(noti.id)}
                           >
-
                             <FaTrashAlt />
                           </button>
                         </div>
@@ -437,20 +458,18 @@ export const Dashboard = ({ notificationCount, setNotificationCount, consNoti })
 
                 <NavDropdown.Divider />
 
-                {/* Acciones generales */}
-                <NavDropdown.Item onClick={() => marcarTodasNotiLeidas(userId)}>
+                <NavDropdown.Item onClick={marcarTodasNotiLeidas}>
                   <FaCheck className="me-2 text-success" /> Marcar todas como leídas
                 </NavDropdown.Item>
-                <NavDropdown.Item onClick={() => eliminarTodasNoti(userId)}>
-                  {/* Cambia aquí también el ícono si quieres */}
+
+                <NavDropdown.Item onClick={eliminarTodasNoti}>
                   <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>
-
           </Navbar.Collapse>
-          <ThemeToggle></ThemeToggle>
 
+          <ThemeToggle />
         </Navbar>
 
         <div className="px-4 pt-3">

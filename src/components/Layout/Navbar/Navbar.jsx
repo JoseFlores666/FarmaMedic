@@ -24,8 +24,8 @@ export const Navbar2 = () => {
 
   const authData = JSON.parse(localStorage.getItem("authData"));
   const userId = authData ? authData.id : null;
-
-  const [setNotificaciones] = useState([]);
+  // ---------------- NOTIFICACIONES ----------------
+  const [notificaciones, setNotificaciones] = useState([]);
 
   const getNotificaciones = async () => {
     if (!userId) return;
@@ -37,12 +37,13 @@ export const Navbar2 = () => {
     }
   };
 
+  // Conexión socket y carga inicial
   useEffect(() => {
     if (!userId) return;
 
-    socket.emit("joinRoom", `paciente_${userId}`);
+    socket.emit("joinPaciente", userId); // Únete a la sala correcta
 
-    getNotificaciones();
+    getNotificaciones(); // Cargar notificaciones al entrar
 
     socket.on("notificacion:nueva", () => {
       getNotificaciones();
@@ -51,8 +52,9 @@ export const Navbar2 = () => {
     return () => {
       socket.off("notificacion:nueva");
     };
-  },);
+  }, [userId]);
 
+  // Acciones
   const marcarTodasNotiLeidas = async () => {
     try {
       await axios.put(`${import.meta.env.VITE_API_URL}/notiLeidas/${userId}`);
@@ -88,6 +90,7 @@ export const Navbar2 = () => {
       console.error("Error al marcar como leída:", error);
     }
   };
+
   const fetchLogoActivo = useCallback(async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/getLogoActivo`);
@@ -295,7 +298,6 @@ export const Navbar2 = () => {
           <div style={{ display: "none" }}>
             <ThemeToggle></ThemeToggle>
           </div>
-          <div style={{ display: 'none' }}>
 
             {authData && (
               <Nav className="me-3">
@@ -304,63 +306,66 @@ export const Navbar2 = () => {
                   id="notification-dropdown"
                   title={
                     <>
-                      <div
-                        className="position-relative"
-                        style={{ color: "white", cursor: "pointer" }}
-                      ></div>
                       <FaBell size={20} />
-                      <span
-                        className="position-absolute top-14 start-40 translate-middle badge rounded-pill bg-danger"
-                        style={{ fontSize: "0.6rem" }}
-                      >
-                      </span>
+                      {notificaciones.length > 0 && (
+                        <span className="badge bg-danger ms-1" style={{ fontSize: "0.65rem" }}>
+                          {notificaciones.length}
+                        </span>
+                      )}
                     </>
                   }
                 >
                   <div style={{ maxHeight: "250px", overflowY: "auto" }}>
+                    {notificaciones.length === 0 && (
+                      <NavDropdown.Item className="text-center text-muted">
+                        No tienes notificaciones
+                      </NavDropdown.Item>
+                    )}
 
-                    <NavDropdown.Item
-                      className="d-flex justify-content-between align-items-center"
-                    >
-                      <div>
-                        <strong></strong>
-                        <div style={{ fontSize: "0.75rem", color: "#666" }}>
+                    {notificaciones.map((n) => (
+                      <NavDropdown.Item key={n.id}>
+                        <div className="d-flex justify-content-between">
+                          <div>
+                            <strong>{n.titulo}</strong>
+                            <div style={{ fontSize: "0.75rem" }}>{n.mensaje}</div>
+                          </div>
 
+                          <div className="d-flex align-items-center">
+                            {!n.leida && (
+                              <button
+                                className="btn btn-sm btn-outline-success me-1"
+                                onClick={() => marcarNotiLeida(n.id)}
+                              >
+                                <FaCheck />
+                              </button>
+                            )}
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={() => eliminarNoti(n.id)}
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="d-flex align-items-center">
-                        <button
-                          className="btn btn-sm btn-outline-success me-1"
-                          title="Marcar como leída"
-                          onClick={() => marcarNotiLeida()}
-                        >
-                          <FaCheck />
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          title="Eliminar notificación"
-                          onClick={() => eliminarNoti()}
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    </NavDropdown.Item>
-
+                      </NavDropdown.Item>
+                    ))}
                   </div>
 
-                  <NavDropdown.Divider />
-
-                  <NavDropdown.Item onClick={() => marcarTodasNotiLeidas(userId)}>
-                    <FaCheck className="me-2 text-success" /> Marcar todas como leídas
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => eliminarTodasNoti(userId)}>
-                    <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
-                  </NavDropdown.Item>
+                  {notificaciones.length > 0 && (
+                    <>
+                      <NavDropdown.Divider />
+                      <NavDropdown.Item onClick={marcarTodasNotiLeidas}>
+                        <FaCheck className="me-2 text-success" /> Marcar todas como leídas
+                      </NavDropdown.Item>
+                      <NavDropdown.Item onClick={eliminarTodasNoti}>
+                        <FaTrashAlt className="me-2 text-danger" /> Eliminar todas
+                      </NavDropdown.Item>
+                    </>
+                  )}
                 </NavDropdown>
+
               </Nav>
             )}
-          </div>
 
         </Container>
 

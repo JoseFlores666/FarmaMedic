@@ -12,16 +12,8 @@ import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const { isAuthenticated } = useAuth();
-  const [notificationCount, setNotificationCount] = useState(() => {
-    const storedCount = localStorage.getItem("notificationCount");
-    return storedCount ? parseInt(storedCount, 10) : 0;
-  });
 
   const [showRuleta, setShowRuleta] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem("notificationCount", notificationCount);
-  }, [notificationCount]);
 
   useEffect(() => {
     const verificarRuleta = async () => {
@@ -72,19 +64,15 @@ function App() {
     };
   }, []);
 
-
   return (
     <>
-      <Menu
-        notificationCount={notificationCount}
-        setNotificationCount={setNotificationCount}
-      />
+      <Menu />
       <Footer />
       <Chatbot />
 
       {isAuthenticated && (
         <>
-          <Notificactions setNotificationCount={setNotificationCount} />
+          <Notificactions />
 
           <Modal
             show={showRuleta}
