@@ -5,6 +5,8 @@ import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath } from 'url';
 import process from 'process';
+import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
@@ -28,10 +30,10 @@ export default defineConfig(({ mode }) => {
           runtimeCaching: [
             {
               urlPattern: ({ url }) => url.pathname.startsWith('/api'),
-              handler: 'NetworkFirst', 
+              handler: 'NetworkFirst',
               options: {
                 cacheName: 'api-cache',
-                networkTimeoutSeconds: 5, 
+                networkTimeoutSeconds: 5,
                 cacheableResponse: {
                   statuses: [0, 200],
                 },
@@ -78,6 +80,23 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    resolve: {
+      alias: {
+        buffer: "buffer",
+      },
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        define: {
+          global: "globalThis",
+        },
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            buffer: true,
+          }),
+        ],
+      },
+    },
     server: {
       ...(useHttps
         ? {
